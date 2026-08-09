@@ -35,6 +35,57 @@
     <script>
 "use strict";
 const { useState, useEffect } = React;
+
+// ⚠️ SUBSTITUI pelo URL do teu Worker Cloudflare (ver GUIA-DEPLOY.md)
+const PROXY_URL = "https://analisador-osg-proxy.SEU-SUBDOMINIO.workers.dev";
+
+// Acima deste tamanho, um único pedido seria demasiado grande para
+// analisar com fiabilidade — a análise passa automaticamente a
+// dividir o documento em partes (ver ANALISE_CHUNK_SIZE mais abaixo).
+const ANALISE_CHUNK_SIZE = 120000; // caracteres por parte
+const ANALISE_MAX_PARTES = 12; // ~1,44M caracteres no total — cobre praticamente qualquer OGE
+const ABSOLUTO_MAX = ANALISE_CHUNK_SIZE * ANALISE_MAX_PARTES;
+
+// Divide o texto em partes de tamanho-alvo, tentando cortar em
+// quebras de parágrafo (não a meio de uma frase ou tabela) sempre
+// que a quebra estiver razoavelmente perto do alvo.
+function dividirEmPartes(texto, tamanhoAlvo) {
+    const partes = [];
+    let pos = 0;
+    while (pos < texto.length) {
+        let fim = Math.min(pos + tamanhoAlvo, texto.length);
+        if (fim < texto.length) {
+            const quebra = texto.lastIndexOf("\n\n", fim);
+            if (quebra > pos + tamanhoAlvo * 0.5) fim = quebra;
+        }
+        partes.push(texto.slice(pos, fim));
+        pos = fim;
+    }
+    return partes;
+}
+
+const EXTRACTION_SYSTEM = `Você prepara extratos de uma parte de um documento orçamental extenso, para uma análise posterior de Orçamento Sensível ao Género (BSG). Este é o excerto {N} de um documento maior. Leia o texto e extraia, em português, apenas o que for relevante para avaliar: (1) declarações/notas orçamentais de género, (2) documentação orçamental que mencione género, (3) classificação ou natureza de linhas/projetos orçamentais, (4) dados de execução/desempenho desagregados por sexo, (5) avaliação de impacto ou exame legislativo sobre género. Inclua também até 8 linhas orçamentais ou projetos com montante, se existirem neste excerto. Seja factual e conciso — não invente informação que não esteja no texto, e não repita o texto integralmente. Se este excerto não tiver nada relevante, devolva notas vazias. Responda APENAS com JSON válido, sem markdown: {"notas": "<até 250 palavras>", "linhas": [{"nome": "...", "montante": "...", "observacao": "..."}]}`;
+
+async function chamarWorker(system, userContent, maxTokens) {
+    const response = await fetch(PROXY_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            system,
+            messages: [{ role: "user", content: userContent }],
+            max_tokens: maxTokens,
+        }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error((data && data.error && data.error.message) || `Erro da API (código ${response.status}).`);
+    }
+    const text = (data.content || []).map((b) => b.text || "").join("");
+    if (!text.trim())
+        throw new Error("A resposta veio vazia.");
+    return text;
+}
+
 // Ícones locais leves (substituem lucide-react, que exige um bundler).
 function Icon({ children, className, style, strokeWidth = 2 }) {
     return (React.createElement("svg", { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: strokeWidth, strokeLinecap: "round", strokeLinejoin: "round", className: className, style: style, "aria-hidden": "true" }, children));
@@ -334,6 +385,7 @@ function BSGAnalyzer() {
     const [result, setResult] = useState(null);
     const [exemploAtivo, setExemploAtivo] = useState(null);
     const [errorMsg, setErrorMsg] = useState("");
+    const [progresso, setProgresso] = useState("");
     const [copiado, setCopiado] = useState(false);
     const [ficheiroNome, setFicheiroNome] = useState("");
     const [extraindo, setExtraindo] = useState(false);
@@ -358,11 +410,16 @@ function BSGAnalyzer() {
             return `--- Folha: ${nome} ---\n${csv}`;
         }).join("\n\n");
     }
+    const TAMANHO_MAX_FICHEIRO = 30 * 1024 * 1024; // 30 MB — acima disto o browser pode ficar sem resposta
     async function lidarComFicheiro(e) {
         const file = e.target.files && e.target.files[0];
         if (!file)
             return;
         setErroFicheiro("");
+        if (file.size > TAMANHO_MAX_FICHEIRO) {
+            setErroFicheiro(`Este ficheiro tem ${(file.size / 1024 / 1024).toFixed(1)} MB — o limite é 30 MB. Tente exportar só a secção relevante (ex.: um separador do Excel ou um intervalo de páginas do PDF).`);
+            return;
+        }
         setExtraindo(true);
         setFicheiroNome(file.name);
         try {
@@ -385,11 +442,17 @@ function BSGAnalyzer() {
             if (!texto.trim()) {
                 throw new Error("Não foi possível extrair texto deste ficheiro (pode ser uma imagem digitalizada sem texto selecionável).");
             }
-            const LIMITE = 18000;
-            const truncado = texto.length > LIMITE;
-            setInput(truncado ? texto.slice(0, LIMITE) + "\n\n[texto truncado — o ficheiro é muito extenso]" : texto);
+            // Não truncamos aqui: o texto completo é guardado e a fase de
+            // análise (analisar()) decide automaticamente se processa tudo
+            // de uma vez ou divide em partes — ver ABSOLUTO_MAX abaixo para
+            // o único limite físico que resta (proteção do próprio browser).
+            const truncado = texto.length > ABSOLUTO_MAX;
             if (truncado) {
-                setErroFicheiro("O ficheiro é muito extenso; foi usada apenas a primeira parte. Reveja e edite o texto antes de analisar.");
+                setErroFicheiro(`Este documento tem ${texto.length.toLocaleString("pt-PT")} caracteres — muito acima do que qualquer análise consegue cobrir com segurança (${ABSOLUTO_MAX.toLocaleString("pt-PT")}). Foi mantida a maior parte possível, dividida em partes; considere analisar por secções separadas (ex.: por ministério).`);
+                setInput(texto.slice(0, ABSOLUTO_MAX));
+            }
+            else {
+                setInput(texto);
             }
         }
         catch (err) {
@@ -458,25 +521,30 @@ Responda APENAS com um JSON válido, sem markdown, sem texto antes ou depois, ne
 {"overallScore": <média das 5 pontuações da Parte A, 1 casa decimal>, "overallLevel": "<nível geral>", "summary": "<1 frase curta, máx 25 palavras>", "modules": [{"key": "<key>", "score": <0-4>, "finding": "<1 frase curta, máx 20 palavras>", "recommendation": "<1 frase curta e acionável, máx 20 palavras, o passo seguinte na escada, não o ideal final>"}], "lineItems": [{"name": "<nome curto da linha/projeto>", "category": <1|2|3>, "comment": "<1 frase curta, máx 15 palavras>"}]}
 
 Use as keys exatas dos módulos: ${MODULES.map((m) => m.key).join(", ")}. No campo "summary", mencione o país/região identificado e, se aplicável, o enquadramento regional específico usado além da base universal (ex.: "seguindo a base OCDE/PEFA e o enquadramento da UEMOA"). Seja direto e crítico — não seja excessivamente elogioso se a informação for vaga, dependente de doadores ou insuficiente.`;
-            const response = await fetch("https://api.anthropic.com/v1/messages", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    model: "claude-sonnet-4-6",
-                    max_tokens: 2500,
-                    system,
-                    messages: [{ role: "user", content: input }],
-                }),
-            });
-            const data = await response.json();
-            if (!response.ok) {
-                const apiMsg = (_a = data === null || data === void 0 ? void 0 : data.error) === null || _a === void 0 ? void 0 : _a.message;
-                throw new Error(apiMsg || `Erro da API (código ${response.status}).`);
+            let conteudoParaAnalise = input;
+            // Documento grande: em vez de cortar informação, dividimos em
+            // partes, extraímos o essencial de cada uma (em paralelo) e só
+            // depois enviamos a síntese combinada para a análise final —
+            // nenhum conteúdo é descartado, seja qual for o tamanho.
+            if (input.length > ANALISE_CHUNK_SIZE) {
+                const partes = dividirEmPartes(input, ANALISE_CHUNK_SIZE);
+                setProgresso(`A processar documento extenso em ${partes.length} partes\u2026`);
+                const extratos = await Promise.all(partes.map(async (parte, i) => {
+                    const prompt = EXTRACTION_SYSTEM.replace("{N}", `${i + 1} de ${partes.length}`);
+                    const textoResposta = await chamarWorker(prompt, parte, 1200);
+                    try {
+                        return parseAnalysisJson(textoResposta);
+                    }
+                    catch {
+                        return { notas: "", linhas: [] };
+                    }
+                }));
+                setProgresso("A sintetizar a análise final\u2026");
+                conteudoParaAnalise = extratos
+                    .map((ex, i) => `--- Excerto ${i + 1}/${extratos.length} ---\nNotas: ${ex.notas || "(sem informação relevante)"}\nLinhas: ${JSON.stringify(ex.linhas || [])}`)
+                    .join("\n\n");
             }
-            const text = (data.content || []).map((b) => b.text || "").join("");
-            if (!text.trim()) {
-                throw new Error("A resposta da análise veio vazia.");
-            }
+            const text = await chamarWorker(system, conteudoParaAnalise, 4096);
             const parsed = parseAnalysisJson(text);
             validateResult(parsed);
             setResult(parsed);
@@ -487,6 +555,9 @@ Use as keys exatas dos módulos: ${MODULES.map((m) => m.key).join(", ")}. No cam
                 ? e.message
                 : "Não foi possível concluir a análise. Tente novamente.");
             setStatus("error");
+        }
+        finally {
+            setProgresso("");
         }
     }
     function reiniciar() {
@@ -538,7 +609,8 @@ Use as keys exatas dos módulos: ${MODULES.map((m) => m.key).join(", ")}. No cam
                         " caracteres"),
                     React.createElement("button", { onClick: analisar, disabled: !input.trim() || status === "loading", className: "inline-flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-medium transition-opacity disabled:opacity-40", style: { background: "#1F5D5B", color: "#F6F3ED" } }, status === "loading" ? (React.createElement(React.Fragment, null,
                         React.createElement(Loader2, { className: "w-4 h-4 animate-spin" }),
-                        " A analisar\u2026")) : (React.createElement(React.Fragment, null,
+                        " ",
+                        progresso || "A analisar\u2026")) : (React.createElement(React.Fragment, null,
                         "Analisar or\u00E7amento ",
                         React.createElement(ArrowRight, { className: "w-4 h-4" }))))))),
             status === "idle" && (React.createElement("div", { className: "mt-4" },
