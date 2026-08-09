@@ -4,9 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Analisador OSG · Orçamento Sensível ao Género</title>
-  <meta name="description" content="Ferramenta de análise de Orçamento Sensível ao Género (BSG), segundo os módulos UEMOA e PEFA GFPSG." />
+  <meta name="description" content="Ferramenta internacional de análise de Orçamento Sensível ao Género (BSG), segundo as normas da OCDE, PEFA e enquadramentos regionais (UEMOA, UE, Commonwealth, UA)." />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @media print {
@@ -66,16 +68,18 @@ const Printer = (p) => (React.createElement(Icon, { ...p },
     React.createElement("rect", { x: "6", y: "14", width: "12", height: "8" })));
 const Check = (p) => (React.createElement(Icon, { ...p },
     React.createElement("path", { d: "M20 6 9 17l-5-5" })));
+const Upload = (p) => (React.createElement(Icon, { ...p },
+    React.createElement("path", { d: "M12 3v12M7 8l5-5 5 5M4 21h16" })));
 const MODULES = [
     {
         key: "diagnostico",
         label: "Declaração orçamental sensível ao género",
-        desc: "Cada programa/sub-programa tem uma análise da situação de género, efeitos, atividades, indicadores desagregados por sexo e orçamento associado? (Módulo 4 BSG-UEMOA, formato DPPD/PAP)",
+        desc: "Cada programa/sub-programa tem uma análise da situação de género, efeitos, atividades, indicadores desagregados por sexo e orçamento associado? (formato de declaração orçamental de género — UEMOA, EU, Commonwealth, entre outros)",
     },
     {
         key: "documentacao",
         label: "Documentação orçamental sensível ao género",
-        desc: "Os documentos que acompanham a proposta de orçamento incluem prioridades de género e medidas para reforçar a igualdade? (PEFA GFPSG)",
+        desc: "Os documentos que acompanham a proposta de orçamento incluem prioridades de género e medidas para reforçar a igualdade? (PEFA GRPFM / indicador ODS 5.c.1)",
     },
     {
         key: "classificacao",
@@ -85,12 +89,12 @@ const MODULES = [
     {
         key: "verificacao",
         label: "Verificação e reporting de desempenho",
-        desc: "Os relatórios de execução e desempenho contêm dados desagregados por sexo e despesas ligadas ao género? (PEFA GFPSG)",
+        desc: "Os relatórios de execução e desempenho contêm dados desagregados por sexo e despesas ligadas ao género? (PEFA GRPFM)",
     },
     {
         key: "avaliacao",
         label: "Avaliação de impacto e exame legislativo",
-        desc: "Existe avaliação independente da incidência de género dos serviços, e o parlamento examina essa dimensão no orçamento? (PEFA GFPSG)",
+        desc: "Existe avaliação independente da incidência de género dos serviços, e o parlamento/assembleia examina essa dimensão no orçamento? (PEFA GRPFM)",
     },
 ];
 const LEVEL_LABELS = ["Não iniciado", "Emergente", "Em desenvolvimento", "Avançado", "Exemplar"];
@@ -331,6 +335,72 @@ function BSGAnalyzer() {
     const [exemploAtivo, setExemploAtivo] = useState(null);
     const [errorMsg, setErrorMsg] = useState("");
     const [copiado, setCopiado] = useState(false);
+    const [ficheiroNome, setFicheiroNome] = useState("");
+    const [extraindo, setExtraindo] = useState(false);
+    const [erroFicheiro, setErroFicheiro] = useState("");
+    async function extrairTextoPdf(arrayBuffer) {
+        if (typeof pdfjsLib !== "undefined" && pdfjsLib.GlobalWorkerOptions) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js";
+        }
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let texto = "";
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            texto += content.items.map((it) => it.str).join(" ") + "\n\n";
+        }
+        return texto.trim();
+    }
+    function extrairTextoExcel(arrayBuffer) {
+        const wb = XLSX.read(arrayBuffer, { type: "array" });
+        return wb.SheetNames.map((nome) => {
+            const csv = XLSX.utils.sheet_to_csv(wb.Sheets[nome]);
+            return `--- Folha: ${nome} ---\n${csv}`;
+        }).join("\n\n");
+    }
+    async function lidarComFicheiro(e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file)
+            return;
+        setErroFicheiro("");
+        setExtraindo(true);
+        setFicheiroNome(file.name);
+        try {
+            const ext = file.name.split(".").pop().toLowerCase();
+            let texto = "";
+            if (ext === "txt" || ext === "csv") {
+                texto = await file.text();
+            }
+            else if (ext === "pdf") {
+                const buf = await file.arrayBuffer();
+                texto = await extrairTextoPdf(buf);
+            }
+            else if (ext === "xlsx" || ext === "xls") {
+                const buf = await file.arrayBuffer();
+                texto = extrairTextoExcel(buf);
+            }
+            else {
+                throw new Error("Formato não suportado. Use PDF, Excel (.xlsx/.xls), CSV ou TXT.");
+            }
+            if (!texto.trim()) {
+                throw new Error("Não foi possível extrair texto deste ficheiro (pode ser uma imagem digitalizada sem texto selecionável).");
+            }
+            const LIMITE = 18000;
+            const truncado = texto.length > LIMITE;
+            setInput(truncado ? texto.slice(0, LIMITE) + "\n\n[texto truncado — o ficheiro é muito extenso]" : texto);
+            if (truncado) {
+                setErroFicheiro("O ficheiro é muito extenso; foi usada apenas a primeira parte. Reveja e edite o texto antes de analisar.");
+            }
+        }
+        catch (err) {
+            setErroFicheiro(err && err.message ? err.message : "Não foi possível ler este ficheiro.");
+            setFicheiroNome("");
+        }
+        finally {
+            setExtraindo(false);
+            e.target.value = "";
+        }
+    }
     async function copiarResultado(result) {
         try {
             await navigator.clipboard.writeText(resultToPlainText(result));
@@ -349,9 +419,18 @@ function BSGAnalyzer() {
         setErrorMsg("");
         setExemploAtivo(null);
         try {
-            const system = `Você é um avaliador técnico de Orçamento Sensível ao Género (BSG / Gender-Responsive Budgeting), seguindo a metodologia oficial dos módulos de formação BSG da UEMOA (2024, Módulos 3 e 4) e o módulo suplementar de Gestão das Finanças Públicas Sensíveis ao Género do PEFA (Public Expenditure and Financial Accountability, reforma 2020).
+            const system = `Você é um avaliador técnico internacional de Orçamento Sensível ao Género (BSG / Gender-Responsive Budgeting). A sua avaliação de referência universal segue as Boas Práticas de Orçamentação de Género da OCDE (OECD Best Practices for Gender Budgeting, 2023), o módulo suplementar de Gestão das Finanças Públicas Sensíveis ao Género do PEFA (GRPFM, reforma 2020) e o indicador ODS 5.c.1 da ONU sobre sistemas de acompanhamento de financiamento para a igualdade de género. Esta base é aplicável a qualquer país, independentemente da sua região ou nível de rendimento.
 
-Para a Dimensão 1, aplique especificamente o formato de "énoncé budgétaire sensible au genre" do Módulo 4 da UEMOA: cada sub-programa deveria ter (i) análise da situação com foco nos problemas de género, (ii) efeitos a produzir para resolver essas questões, (iii) atividades associadas, (iv) pelo menos um indicador por efeito, ventilado por sexo, e (v) o orçamento alocado, incluindo qualquer dotação específica para género. A ausência de qualquer um destes 5 elementos deve baixar a nota desta dimensão.
+IMPORTANTE — Reconhecimento regional automático: identifique no texto do utilizador o país, região ou organização em causa e, sempre que reconhecer um enquadramento específico aplicável, cite-o explicitamente nas suas conclusões, além da base universal acima. Exemplos de enquadramentos regionais a reconhecer:
+- Países da UEMOA/CEDEAO (África Ocidental): módulos de formação BSG da UEMOA (2024), formato de "déclaration budgétaire sensible au genre"
+- Estados-membros da União Europeia: EU Gender Action Plan III, orientações do EIGE (European Institute for Gender Equality)
+- Países da Commonwealth: orientações do Commonwealth Secretariat sobre orçamentação de género
+- Estados-membros da União Africana: Protocolo de Maputo, Agenda 2063
+- Países nórdicos: orientações do Conselho Nórdico de Ministros
+- Qualquer outro país: aplique apenas a base universal (OCDE/PEFA/ODS) sem inventar um enquadramento regional que não existe
+Se não conseguir identificar o país/região com confiança, ou se o enquadramento regional específico não for do seu conhecimento, avalie apenas com a base universal e não invente nomes de circulares, leis ou instrumentos que não tenha confirmado existirem.
+
+Para a Dimensão 1, avalie se existe uma declaração ou nota orçamental de género estruturada: idealmente (i) análise da situação com foco nos problemas de género, (ii) efeitos/objetivos a produzir para resolver essas questões, (iii) atividades associadas, (iv) pelo menos um indicador por efeito, ventilado por sexo, e (v) o orçamento alocado, incluindo qualquer dotação específica para género. A ausência de qualquer um destes 5 elementos deve baixar a nota desta dimensão.
 
 PARTE A — Avalie o orçamento/programa segundo estas 5 dimensões, cada uma pontuada de 0 a 4. Use estas âncoras de maturidade institucional, consistentes com o OECD Gender Budgeting Index, para decidir a nota em CADA dimensão — não avalie apenas "existe/não existe", mas o grau de institucionalização:
 
@@ -366,7 +445,7 @@ Regra importante: um instrumento institucional formal mas ainda parcial (ex.: ci
 Dimensões:
 ${MODULES.map((m, i) => `${i + 1}. ${m.label}: ${m.desc}`).join("\n")}
 
-PARTE B — Classificação por linha orçamental (abordagem tri-categorial, Módulo 3 BSG-UEMOA / Centro Hubertine Auclert): identifique até 6 linhas, projetos ou rubricas mencionados no texto do utilizador e classifique cada um em:
+PARTE B — Classificação por linha orçamental (abordagem tri-categorial, amplamente usada internacionalmente, incluindo pela UEMOA e pelo Centro Hubertine Auclert): identifique até 6 linhas, projetos ou rubricas mencionados no texto do utilizador e classifique cada um em:
 - Categoria 1: crédito neutro, sem dimensão de género aparente
 - Categoria 2: crédito específico de género (ação deliberada de igualdade)
 - Categoria 3: crédito com potencial impacto de género, que precisaria de um "comentário de género" para esclarecer
@@ -378,7 +457,7 @@ Regra para as recomendações: cada "recommendation" deve descrever o passo conc
 Responda APENAS com um JSON válido, sem markdown, sem texto antes ou depois, neste formato exato:
 {"overallScore": <média das 5 pontuações da Parte A, 1 casa decimal>, "overallLevel": "<nível geral>", "summary": "<1 frase curta, máx 25 palavras>", "modules": [{"key": "<key>", "score": <0-4>, "finding": "<1 frase curta, máx 20 palavras>", "recommendation": "<1 frase curta e acionável, máx 20 palavras, o passo seguinte na escada, não o ideal final>"}], "lineItems": [{"name": "<nome curto da linha/projeto>", "category": <1|2|3>, "comment": "<1 frase curta, máx 15 palavras>"}]}
 
-Use as keys exatas dos módulos: ${MODULES.map((m) => m.key).join(", ")}. Seja direto e crítico — não seja excessivamente elogioso se a informação for vaga, dependente de doadores ou insuficiente.`;
+Use as keys exatas dos módulos: ${MODULES.map((m) => m.key).join(", ")}. No campo "summary", mencione o país/região identificado e, se aplicável, o enquadramento regional específico usado além da base universal (ex.: "seguindo a base OCDE/PEFA e o enquadramento da UEMOA"). Seja direto e crítico — não seja excessivamente elogioso se a informação for vaga, dependente de doadores ou insuficiente.`;
             const response = await fetch("https://api.anthropic.com/v1/messages", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -416,6 +495,8 @@ Use as keys exatas dos módulos: ${MODULES.map((m) => m.key).join(", ")}. Seja d
         setExemploAtivo(null);
         setStatus("idle");
         setCopiado(false);
+        setFicheiroNome("");
+        setErroFicheiro("");
     }
     const EXEMPLOS = {
         gb: { input: EXEMPLO_GB_INPUT, result: EXEMPLO_GB_RESULT, label: "Guiné-Bissau" },
@@ -438,12 +519,19 @@ Use as keys exatas dos módulos: ${MODULES.map((m) => m.key).join(", ")}. Seja d
         React.createElement("div", { className: "max-w-3xl mx-auto px-6 py-14" },
             React.createElement("div", { className: "flex items-center gap-3 mb-3" },
                 React.createElement(Scale, { className: "w-6 h-6", style: { color: "#C9A227" }, strokeWidth: 1.75 }),
-                React.createElement("span", { className: "text-xs tracking-[0.2em] uppercase", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#7A8F8C" } }, "Prot\u00F3tipo \u00B7 An\u00E1lise BSG")),
+                React.createElement("span", { className: "text-xs tracking-[0.2em] uppercase", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#7A8F8C" } }, "An\u00E1lise BSG \u00B7 Padr\u00F5es internacionais")),
             React.createElement("h1", { className: "text-4xl sm:text-5xl mb-4 leading-tight", style: { fontFamily: "'Fraunces', serif", fontWeight: 600 } }, "O seu or\u00E7amento fala a favor de quem?"),
-            React.createElement("p", { className: "text-base mb-10 max-w-xl", style: { color: "#495C59" } }, "Descreva um or\u00E7amento, programa ou linha de despesa. A an\u00E1lise segue os m\u00F3dulos oficiais de forma\u00E7\u00E3o BSG da UEMOA (2024) e o m\u00F3dulo suplementar de g\u00E9nero do PEFA."),
+            React.createElement("p", { className: "text-base mb-10 max-w-xl", style: { color: "#495C59" } }, "Descreva um or\u00E7amento, programa ou linha de despesa de qualquer pa\u00EDs ou organiza\u00E7\u00E3o. A an\u00E1lise aplica a metodologia internacional de refer\u00EAncia das Boas Pr\u00E1ticas de G\u00E9nero da OCDE (2023) e do m\u00F3dulo PEFA GRPFM, e reconhece automaticamente o enquadramento regional aplic\u00E1vel \u2014 UEMOA, Uni\u00E3o Europeia, Commonwealth, Uni\u00E3o Africana, ONU Mulheres, entre outros \u2014 quando identific\u00E1vel no texto."),
             status !== "done" && (React.createElement("div", { className: "rounded-lg border p-5", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
                 React.createElement("label", { htmlFor: "osg-input", className: "text-xs uppercase tracking-wide mb-2 block", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#7A8F8C" } }, "Descri\u00E7\u00E3o do or\u00E7amento / programa"),
                 React.createElement("textarea", { id: "osg-input", value: input, onChange: (e) => setInput(e.target.value), placeholder: "Ex.: Minist\u00E9rio X, or\u00E7amento de 3 mil milh\u00F5es FCFA, 84% investimento financiado por doadores. Projetos: Empoderamento das Mulheres de Gabu (423M), Educa\u00E7\u00E3o de Base e Igualdade dos G\u00E9neros (300M)...", className: "w-full h-40 resize-none outline-none text-sm leading-relaxed", style: { color: "#16302E" } }),
+                React.createElement("div", { className: "flex items-center gap-3 mt-3 pt-3", style: { borderTop: "1px solid #EDE8DC" } },
+                    React.createElement("label", { htmlFor: "osg-file", className: "inline-flex items-center gap-1.5 text-xs cursor-pointer", style: { color: "#1F5D5B" } },
+                        extraindo ? React.createElement(Loader2, { className: "w-3.5 h-3.5 animate-spin" }) : React.createElement(Upload, { className: "w-3.5 h-3.5" }),
+                        extraindo ? "A ler ficheiro\u2026" : "Carregar ficheiro (PDF, Excel, CSV, TXT)"),
+                    React.createElement("input", { id: "osg-file", type: "file", accept: ".pdf,.xlsx,.xls,.csv,.txt", onChange: lidarComFicheiro, disabled: extraindo, className: "hidden" }),
+                    ficheiroNome && !erroFicheiro && React.createElement("span", { className: "text-xs truncate max-w-[160px]", style: { color: "#9AA6A3" } }, ficheiroNome)),
+                erroFicheiro && React.createElement("p", { className: "text-xs mt-2", style: { color: "#B5541F" } }, erroFicheiro),
                 React.createElement("div", { className: "flex items-center justify-between mt-4" },
                     React.createElement("span", { className: "text-xs", style: { color: "#9AA6A3" } },
                         input.length,
@@ -520,7 +608,7 @@ Use as keys exatas dos módulos: ${MODULES.map((m) => m.key).join(", ")}. Seja d
                     " Analisar outro or\u00E7amento"))),
             React.createElement("div", { className: "mt-14 flex items-center gap-2 text-xs", style: { color: "#9AA6A3" } },
                 React.createElement(FileText, { className: "w-3.5 h-3.5" }),
-                "Fontes: M\u00F3dulos 1-5 de Forma\u00E7\u00E3o BSG da UEMOA (2024) \u00B7 PEFA GFPSG (2020) \u00B7 OCDE Framework for Gender Budgeting (2023)."))));
+                "Fontes: OCDE Best Practices for Gender Budgeting (2023) \u00B7 PEFA GRPFM (2020) \u00B7 Indicador ODS 5.c.1 (ONU) \u00B7 enquadramentos regionais (UEMOA, UE, Commonwealth, UA) quando aplic\u00E1vel."))));
 }
 try {
     const root = ReactDOM.createRoot(document.getElementById("root"));
