@@ -229,6 +229,20 @@ const LEVEL_LABELS_I18N = {
     sw: ["Haijaanza", "Inaanza kujitokeza", "Inaendelea kukua", "Ya hali ya juu", "Ya mfano"],
 };
 
+// Nível de confiança por dimensão: reflete a quantidade/força da evidência
+// textual encontrada, não a qualidade da prática de género em si.
+const CONFIDENCE_LABELS_I18N = {
+    pt: { alta: "Confiança alta", media: "Confiança média", baixa: "Confiança baixa" },
+    fr: { alta: "Confiance élevée", media: "Confiance moyenne", baixa: "Confiance faible" },
+    en: { alta: "High confidence", media: "Medium confidence", baixa: "Low confidence" },
+    es: { alta: "Confianza alta", media: "Confianza media", baixa: "Confianza baja" },
+    ar: { alta: "ثقة عالية", media: "ثقة متوسطة", baixa: "ثقة منخفضة" },
+    zh: { alta: "高置信度", media: "中等置信度", baixa: "低置信度" },
+    ru: { alta: "Высокая достоверность", media: "Средняя достоверность", baixa: "Низкая достоверность" },
+    sw: { alta: "Uhakika wa juu", media: "Uhakika wa kati", baixa: "Uhakika wa chini" },
+};
+const CONFIDENCE_COLOR = { alta: "#1F5D5B", media: "#C9A227", baixa: "#B5541F" };
+
 const CATEGORY_INFO_I18N = {
     pt: { 1: { label: "Categoria 1 — Neutro", color: "#9AA6A3" }, 2: { label: "Categoria 2 — Específico de género", color: "#1F5D5B" }, 3: { label: "Categoria 3 — Potencial impacto (requer comentário)", color: "#C9A227" } },
     fr: { 1: { label: "Catégorie 1 — Neutre", color: "#9AA6A3" }, 2: { label: "Catégorie 2 — Spécifique au genre", color: "#1F5D5B" }, 3: { label: "Catégorie 3 — Impact potentiel (nécessite un commentaire)", color: "#C9A227" } },
@@ -254,6 +268,7 @@ const STRINGS = {
         analyzingButton: "A analisar…",
         progressChunking: (n) => `A processar documento extenso em ${n} partes…`,
         progressSynthesizing: "A sintetizar a análise final…",
+        progressReviewing: "A rever a consistência da análise…",
         examplesLabel: "Exemplos pré-calculados",
         exampleBadge: "Exemplo pré-calculado ·",
         examplesUnavailable: (l) => `Os exemplos pré-calculados estão disponíveis apenas em português. Escreva ou carregue o seu próprio orçamento para analisar em ${l}.`,
@@ -341,6 +356,7 @@ const STRINGS = {
         analyzingButton: "Analyse en cours…",
         progressChunking: (n) => `Traitement d'un document volumineux en ${n} parties…`,
         progressSynthesizing: "Synthèse de l'analyse finale…",
+        progressReviewing: "Vérification de la cohérence de l'analyse…",
         examplesLabel: "Exemples précalculés",
         exampleBadge: "Exemple précalculé ·",
         examplesUnavailable: (l) => `Les exemples précalculés ne sont disponibles qu'en portugais. Rédigez ou chargez votre propre budget pour l'analyser en ${l}.`,
@@ -428,6 +444,7 @@ const STRINGS = {
         analyzingButton: "Analysing…",
         progressChunking: (n) => `Processing large document in ${n} parts…`,
         progressSynthesizing: "Synthesising final analysis…",
+        progressReviewing: "Reviewing analysis consistency…",
         examplesLabel: "Pre-calculated examples",
         exampleBadge: "Pre-calculated example ·",
         examplesUnavailable: (l) => `Pre-calculated examples are only available in Portuguese. Write or upload your own budget to analyse it in ${l}.`,
@@ -515,6 +532,7 @@ const STRINGS = {
         analyzingButton: "Analizando…",
         progressChunking: (n) => `Procesando documento extenso en ${n} partes…`,
         progressSynthesizing: "Sintetizando el análisis final…",
+        progressReviewing: "Revisando la consistencia del análisis…",
         examplesLabel: "Ejemplos precalculados",
         exampleBadge: "Ejemplo precalculado ·",
         examplesUnavailable: (l) => `Los ejemplos precalculados solo están disponibles en portugués. Escriba o cargue su propio presupuesto para analizarlo en ${l}.`,
@@ -602,6 +620,7 @@ const STRINGS = {
         analyzingButton: "جارٍ التحليل…",
         progressChunking: (n) => `جارٍ معالجة مستند كبير على ${n} أجزاء…`,
         progressSynthesizing: "جارٍ تجميع التحليل النهائي…",
+        progressReviewing: "جارٍ مراجعة اتساق التحليل…",
         examplesLabel: "أمثلة محسوبة مسبقاً",
         exampleBadge: "مثال محسوب مسبقاً ·",
         examplesUnavailable: (l) => `الأمثلة المحسوبة مسبقاً متاحة باللغة البرتغالية فقط. اكتب أو حمّل ميزانيتك الخاصة لتحليلها بـ${l}.`,
@@ -689,6 +708,7 @@ const STRINGS = {
         analyzingButton: "分析中…",
         progressChunking: (n) => `正在将大型文档分为 ${n} 部分处理…`,
         progressSynthesizing: "正在综合最终分析…",
+        progressReviewing: "正在审核分析的一致性…",
         examplesLabel: "预先计算的示例",
         exampleBadge: "预先计算的示例 ·",
         examplesUnavailable: (l) => `预先计算的示例仅提供葡萄牙语版本。请撰写或上传您自己的预算，以${l}进行分析。`,
@@ -776,6 +796,7 @@ const STRINGS = {
         analyzingButton: "Анализ…",
         progressChunking: (n) => `Обработка большого документа на ${n} частей…`,
         progressSynthesizing: "Синтез итогового анализа…",
+        progressReviewing: "Проверка согласованности анализа…",
         examplesLabel: "Предварительно рассчитанные примеры",
         exampleBadge: "Предварительно рассчитанный пример ·",
         examplesUnavailable: (l) => `Предварительно рассчитанные примеры доступны только на португальском языке. Напишите или загрузите свой бюджет для анализа на ${l}.`,
@@ -863,6 +884,7 @@ const STRINGS = {
         analyzingButton: "Inachambua…",
         progressChunking: (n) => `Inachakata hati kubwa katika sehemu ${n}…`,
         progressSynthesizing: "Inaunganisha uchambuzi wa mwisho…",
+        progressReviewing: "Inakagua uthabiti wa uchambuzi…",
         examplesLabel: "Mifano iliyohesabiwa tayari",
         exampleBadge: "Mfano uliohesabiwa tayari ·",
         examplesUnavailable: (l) => `Mifano iliyohesabiwa tayari inapatikana kwa Kireno pekee. Andika au pakia bajeti yako mwenyewe ili kuichambua kwa ${l}.`,
@@ -984,8 +1006,10 @@ function validateResult(parsed, s) {
     if (typeof parsed.overallScore !== "number" || typeof parsed.overallLevel !== "string") throw new Error(s.errIncompleteScore);
     if (!Array.isArray(parsed.modules) || parsed.modules.length === 0) throw new Error(s.errIncompleteModules);
     const validKeys = new Set(MODULE_KEYS);
+    const validConfidence = new Set(["alta", "media", "baixa"]);
     for (const m of parsed.modules) {
         if (!validKeys.has(m.key) || typeof m.score !== "number" || m.score < 0 || m.score > 4) throw new Error(s.errInvalidModule);
+        if (m.confidence && !validConfidence.has(m.confidence)) m.confidence = null;
     }
     if (parsed.lineItems && !Array.isArray(parsed.lineItems)) throw new Error(s.errInvalidLineItems);
 }
@@ -1375,6 +1399,34 @@ Use as keys exatas: ${keysList}. Seja direto e crítico — não seja excessivam
 IMPORTANTE SOBRE O IDIOMA: toda a resposta — summary, finding, evidence, recommendation, comment, e overallLevel — deve ser escrita inteiramente em ${LANG_NAMES_PT[lang]}, incluindo terminologia técnica traduzida adequadamente. Mantenha as keys JSON exatamente como especificado (não traduza as keys), apenas os valores de texto devem estar em ${LANG_NAMES_PT[lang]}.`;
     }
 
+    function buildReviewSystemPrompt(draftResult, originalInput) {
+        const modLines = mods.map((m, i) => `${i + 1}. ${m.key} — ${m.label}: ${m.desc}`).join("\n");
+        return `Você é um segundo avaliador técnico, independente do primeiro, a fazer o CONTROLO DE QUALIDADE de uma análise de Orçamento Sensível ao Género (OSG) já produzida. O seu trabalho não é refazer a análise do zero — é revê-la com espírito crítico, corrigir qualquer pontuação que não esteja bem fundamentada no texto original, e atribuir um nível de confiança a cada dimensão.
+
+Análise preliminar a rever (produzida por um primeiro avaliador):
+${JSON.stringify(draftResult)}
+
+Texto original do orçamento (única fonte factual válida):
+"""
+${originalInput.slice(0, 8000)}
+"""
+
+Para cada uma das 5 dimensões (mesmas keys da análise original: ${MODULE_KEYS.join(", ")}):
+${modLines}
+
+O seu trabalho, dimensão a dimensão:
+1. Verifique se o "evidence" citado na análise preliminar corresponde mesmo a algo que está no texto original — se o "evidence" for vago, genérico, ou não encontrar correspondência clara no texto, isso é sinal de confiança baixa, mesmo que a pontuação em si pareça razoável.
+2. Verifique se a pontuação (0-4) está bem calibrada face à âncora de maturidade (0=nenhuma evidência, 1=menção pontual sem instrumento formal, 2=instrumento formal mas parcial, 3=aplicação consistente à maioria dos programas com dados, 4=prática consagrada em lei, universal, com avaliação de impacto). Se a pontuação parecer otimista demais para o que o texto realmente mostra, corrija-a para baixo — nunca para cima sem evidência adicional real no texto.
+3. Atribua um "confidence" a cada dimensão: "alta" (evidência clara, específica e inequívoca no texto), "media" (há alguma evidência mas é indireta, parcial ou ambígua), "baixa" (a evidência é fraca, inferida, ou praticamente inexistente no texto).
+
+Pode manter a pontuação, o "finding", o "evidence" e a "recommendation" originais se concordar que estão bem fundamentados — não mude por mudar. Só corrija o que realmente não resiste a esta verificação.
+
+Responda APENAS com um JSON válido, sem markdown, com a análise revista completa, no mesmo formato da análise original mas com "confidence" adicionado a cada módulo:
+{"overallScore": <média das 5 pontuações revistas, 1 casa decimal>, "overallLevel": "<nível geral>", "summary": "<1 frase curta, máx 25 palavras>", "modules": [{"key": "<key>", "score": <0-4>, "confidence": "<alta|media|baixa>", "finding": "<1 frase, máx 20 palavras>", "evidence": "<referência curta ao texto original, máx 20 palavras, ou \\"Não mencionado no texto fornecido\\">", "recommendation": "<1 frase acionável, máx 20 palavras>"}], "lineItems": ${JSON.stringify(draftResult.lineItems || [])}}
+
+IMPORTANTE SOBRE O IDIOMA: toda a resposta deve ser escrita inteiramente em ${LANG_NAMES_PT[lang]}. Mantenha as keys JSON exatamente como especificado (incluindo os valores de "confidence", que devem ser exatamente "alta", "media" ou "baixa", sem acentos e sem traduzir), apenas o texto narrativo deve estar em ${LANG_NAMES_PT[lang]}.`;
+    }
+
     function buildFullReportSystemPrompt(analysisResult, originalInput) {
         const modLines = mods.map((m, i) => `${i + 1}. ${m.key} — ${m.label}: ${m.desc}`).join("\n");
         const analiseResumo = JSON.stringify({
@@ -1446,6 +1498,20 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta deve ser escrita inteiramente em ${LA
             try { parsed = parseAnalysisJson(text); }
             catch { throw new Error(s.errInvalidFormat); }
             validateResult(parsed, s);
+
+            // Segunda passagem: revisão crítica independente, que corrige
+            // pontuações mal fundamentadas e atribui confiança por dimensão.
+            // Se falhar por qualquer razão, mantém-se a análise da primeira
+            // passagem sem confiança atribuída — nunca bloqueia o resultado.
+            setProgresso(s.progressReviewing);
+            try {
+                const reviewSystem = buildReviewSystemPrompt(parsed, conteudoParaAnalise);
+                const reviewText = await chamarWorker(reviewSystem, "Faz a revisão crítica com base na análise e no texto fornecidos no system prompt.", 4096, accessCode);
+                const reviewed = parseAnalysisJson(reviewText);
+                validateResult(reviewed, s);
+                parsed = reviewed;
+            } catch { /* mantém a análise original sem indicador de confiança */ }
+
             setResult(parsed); setStatus("done");
             guardarHistorico(accessCode, { lang, inputExcerpt: input.slice(0, 400), result: parsed });
         } catch (e) {
@@ -1812,11 +1878,16 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
                 React.createElement("div", { className: "space-y-3" }, mods.map((mod) => {
                     const m = result.modules.find((r) => r.key === mod.key);
                     if (!m) return null;
+                    const confLabels = CONFIDENCE_LABELS_I18N[lang];
                     return (React.createElement("div", { key: mod.key, className: "rounded-lg border p-4", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
                         React.createElement("div", { className: "flex items-start justify-between gap-4 mb-2" },
                             React.createElement("h3", { className: "text-sm font-medium" }, mod.label),
                             React.createElement("span", { className: "text-xs flex-shrink-0", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#7A8F8C" } }, levels[m.score])),
                         React.createElement(LevelBar, { score: m.score }),
+                        m.confidence && React.createElement("span", {
+                            className: "inline-block text-[10px] font-medium px-1.5 py-0.5 rounded mt-2",
+                            style: { color: "#FFFFFF", background: CONFIDENCE_COLOR[m.confidence] || "#9AA6A3" },
+                        }, confLabels[m.confidence] || m.confidence),
                         React.createElement("p", { className: "text-sm mt-3", style: { color: "#3E4C49" } }, m.finding),
                         m.evidence && React.createElement("p", { className: "text-xs mt-1.5 italic", style: { color: "#9AA6A3" } }, `${s.evidenceLabel}: ${m.evidence}`),
                         React.createElement("p", { className: "text-sm mt-1.5 flex items-start gap-1.5", style: { color: "#1F5D5B" } },
