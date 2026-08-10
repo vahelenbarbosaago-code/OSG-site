@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Analisador OSG · Orçamento Sensível ao Género</title>
-  <meta name="description" content="Ferramenta internacional de análise de Orçamento Sensível ao Género (BSG), segundo as normas da OCDE, PEFA e enquadramentos regionais (UEMOA, UE, Commonwealth, UA)." />
+  <meta name="description" content="Ferramenta internacional de análise de Orçamento Sensível ao Género (OSG), segundo as normas da OCDE, PEFA e enquadramentos regionais (UEMOA, UE, Commonwealth, UA)." />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js" crossorigin="anonymous"></script>
@@ -60,7 +60,7 @@ function dividirEmPartes(texto, tamanhoAlvo) {
 // Extração intermédia: mantida sempre em português como "idioma de trabalho"
 // interno — só a síntese final é traduzida para o idioma escolhido pelo
 // utilizador, para evitar perdas de nuance em traduções encadeadas.
-const EXTRACTION_SYSTEM = `Você prepara extratos de uma parte de um documento orçamental extenso, para uma análise posterior de Orçamento Sensível ao Género (BSG). Este é o excerto {N} de um documento maior. Leia o texto e extraia, em português, apenas o que for relevante para avaliar: (1) declarações/notas orçamentais de género, (2) documentação orçamental que mencione género, (3) classificação ou natureza de linhas/projetos orçamentais, (4) dados de execução/desempenho desagregados por sexo, (5) avaliação de impacto ou exame legislativo sobre género. Inclua também até 8 linhas orçamentais ou projetos com montante, se existirem neste excerto. Seja factual e conciso — não invente informação que não esteja no texto, e não repita o texto integralmente. Se este excerto não tiver nada relevante, devolva notas vazias. Responda APENAS com JSON válido, sem markdown: {"notas": "<até 250 palavras>", "linhas": [{"nome": "...", "montante": "...", "observacao": "..."}]}`;
+const EXTRACTION_SYSTEM = `Você prepara extratos de uma parte de um documento orçamental extenso, para uma análise posterior de Orçamento Sensível ao Género (OSG). Este é o excerto {N} de um documento maior. Leia o texto e extraia, em português, apenas o que for relevante para avaliar: (1) declarações/notas orçamentais de género, (2) documentação orçamental que mencione género, (3) classificação ou natureza de linhas/projetos orçamentais, (4) dados de execução/desempenho desagregados por sexo, (5) avaliação de impacto ou exame legislativo sobre género. Inclua também até 8 linhas orçamentais ou projetos com montante, se existirem neste excerto. Seja factual e conciso — não invente informação que não esteja no texto, e não repita o texto integralmente. Se este excerto não tiver nada relevante, devolva notas vazias. Responda APENAS com JSON válido, sem markdown: {"notas": "<até 250 palavras>", "linhas": [{"nome": "...", "montante": "...", "observacao": "..."}]}`;
 
 async function chamarWorker(system, userContent, maxTokens) {
     const response = await fetch(PROXY_URL, {
@@ -109,6 +109,7 @@ const Printer = (p) => (React.createElement(Icon, { ...p },
     React.createElement("rect", { x: "6", y: "14", width: "12", height: "8" })));
 const Check = (p) => (React.createElement(Icon, { ...p }, React.createElement("path", { d: "M20 6 9 17l-5-5" })));
 const Upload = (p) => (React.createElement(Icon, { ...p }, React.createElement("path", { d: "M12 3v12M7 8l5-5 5 5M4 21h16" })));
+const Download = (p) => (React.createElement(Icon, { ...p }, React.createElement("path", { d: "M12 3v12M7 10l5 5 5-5M4 21h16" })));
 const Globe = (p) => (React.createElement(Icon, { ...p },
     React.createElement("circle", { cx: "12", cy: "12", r: "10" }),
     React.createElement("path", { d: "M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20" })));
@@ -120,8 +121,11 @@ const LANGUAGES = {
     en: { name: "English", dir: "ltr" },
     es: { name: "Español", dir: "ltr" },
     ar: { name: "العربية", dir: "rtl" },
+    zh: { name: "中文", dir: "ltr" },
+    ru: { name: "Русский", dir: "ltr" },
+    sw: { name: "Kiswahili", dir: "ltr" },
 };
-const LANG_NAMES_PT = { pt: "português", fr: "francês", en: "inglês", es: "espanhol", ar: "árabe" };
+const LANG_NAMES_PT = { pt: "português", fr: "francês", en: "inglês", es: "espanhol", ar: "árabe", zh: "chinês", ru: "russo", sw: "suaíli" };
 
 const MODULE_KEYS = ["diagnostico", "documentacao", "classificacao", "verificacao", "avaliacao"];
 
@@ -129,7 +133,7 @@ const MODULES_I18N = {
     pt: [
         { key: "diagnostico", label: "Declaração orçamental sensível ao género", desc: "Cada programa/sub-programa tem uma análise da situação de género, efeitos, atividades, indicadores desagregados por sexo e orçamento associado? (formato de declaração orçamental de género — UEMOA, EU, Commonwealth, entre outros)" },
         { key: "documentacao", label: "Documentação orçamental sensível ao género", desc: "Os documentos que acompanham a proposta de orçamento incluem prioridades de género e medidas para reforçar a igualdade? (PEFA GRPFM / indicador ODS 5.c.1)" },
-        { key: "classificacao", label: "Classificação das linhas orçamentais", desc: "As linhas/projetos estão classificados por categoria de género (neutro, específico, ou com potencial impacto a analisar)? (Módulo 3 BSG-UEMOA)" },
+        { key: "classificacao", label: "Classificação das linhas orçamentais", desc: "As linhas/projetos estão classificados por categoria de género (neutro, específico, ou com potencial impacto a analisar)? (Módulo 3 OSG-UEMOA)" },
         { key: "verificacao", label: "Verificação e reporting de desempenho", desc: "Os relatórios de execução e desempenho contêm dados desagregados por sexo e despesas ligadas ao género? (PEFA GRPFM)" },
         { key: "avaliacao", label: "Avaliação de impacto e exame legislativo", desc: "Existe avaliação independente da incidência de género dos serviços, e o parlamento/assembleia examina essa dimensão no orçamento? (PEFA GRPFM)" },
     ],
@@ -143,23 +147,44 @@ const MODULES_I18N = {
     en: [
         { key: "diagnostico", label: "Gender-responsive budget statement", desc: "Does each programme/sub-programme have a gender situation analysis, outcomes, activities, sex-disaggregated indicators, and an associated budget? (gender budget statement format — UEMOA, EU, Commonwealth, among others)" },
         { key: "documentacao", label: "Gender-responsive budget documentation", desc: "Do the documents accompanying the budget proposal include gender priorities and measures to strengthen equality? (PEFA GRPFM / SDG indicator 5.c.1)" },
-        { key: "classificacao", label: "Budget line classification", desc: "Are lines/projects classified by gender category (neutral, specific, or potential impact requiring analysis)? (BSG-UEMOA Module 3)" },
+        { key: "classificacao", label: "Budget line classification", desc: "Are lines/projects classified by gender category (neutral, specific, or potential impact requiring analysis)? (UEMOA Module 3)" },
         { key: "verificacao", label: "Performance verification and reporting", desc: "Do execution and performance reports contain sex-disaggregated data and gender-related expenditure? (PEFA GRPFM)" },
         { key: "avaliacao", label: "Impact assessment and legislative review", desc: "Is there an independent assessment of the gender impact of services, and does parliament examine this dimension of the budget? (PEFA GRPFM)" },
     ],
     es: [
         { key: "diagnostico", label: "Declaración presupuestaria con perspectiva de género", desc: "¿Cada programa/subprograma cuenta con un análisis de la situación de género, efectos, actividades, indicadores desagregados por sexo y presupuesto asociado? (formato de declaración presupuestaria de género — UEMOA, UE, Commonwealth, entre otros)" },
         { key: "documentacao", label: "Documentación presupuestaria con perspectiva de género", desc: "¿Los documentos que acompañan la propuesta de presupuesto incluyen prioridades de género y medidas para reforzar la igualdad? (PEFA GRPFM / indicador ODS 5.c.1)" },
-        { key: "classificacao", label: "Clasificación de las partidas presupuestarias", desc: "¿Las partidas/proyectos están clasificados por categoría de género (neutro, específico, o con impacto potencial a analizar)? (Módulo 3 BSG-UEMOA)" },
+        { key: "classificacao", label: "Clasificación de las partidas presupuestarias", desc: "¿Las partidas/proyectos están clasificados por categoría de género (neutro, específico, o con impacto potencial a analizar)? (Módulo 3 de UEMOA)" },
         { key: "verificacao", label: "Verificación y reporte de desempeño", desc: "¿Los informes de ejecución y desempeño contienen datos desagregados por sexo y gastos relacionados con el género? (PEFA GRPFM)" },
         { key: "avaliacao", label: "Evaluación de impacto y examen legislativo", desc: "¿Existe una evaluación independiente de la incidencia de género de los servicios, y el parlamento examina esta dimensión del presupuesto? (PEFA GRPFM)" },
     ],
     ar: [
         { key: "diagnostico", label: "بيان الميزانية المستجيب للنوع الاجتماعي", desc: "هل يتضمن كل برنامج/برنامج فرعي تحليلاً لوضع النوع الاجتماعي، ونتائج، وأنشطة، ومؤشرات مصنّفة حسب الجنس، وميزانية مرتبطة به؟ (نموذج بيان الميزانية الجندري — الاتحاد الاقتصادي والنقدي لغرب أفريقيا، الاتحاد الأوروبي، الكومنولث، من بين آخرين)" },
         { key: "documentacao", label: "وثائق الميزانية المستجيبة للنوع الاجتماعي", desc: "هل تتضمن الوثائق المرافقة لمقترح الميزانية أولويات جندرية وتدابير لتعزيز المساواة؟ (PEFA GRPFM / مؤشر هدف التنمية المستدامة 5.c.1)" },
-        { key: "classificacao", label: "تصنيف بنود الميزانية", desc: "هل البنود/المشاريع مصنّفة حسب الفئة الجندرية (محايدة، محددة، أو ذات أثر محتمل يتطلب تحليلاً)؟ (الوحدة 3 من BSG-UEMOA)" },
+        { key: "classificacao", label: "تصنيف بنود الميزانية", desc: "هل البنود/المشاريع مصنّفة حسب الفئة الجندرية (محايدة، محددة، أو ذات أثر محتمل يتطلب تحليلاً)؟ (الوحدة 3 من منهجية اتحاد UEMOA)" },
         { key: "verificacao", label: "التحقق والإبلاغ عن الأداء", desc: "هل تتضمن تقارير التنفيذ والأداء بيانات مصنّفة حسب الجنس ونفقات مرتبطة بالنوع الاجتماعي؟ (PEFA GRPFM)" },
         { key: "avaliacao", label: "تقييم الأثر والمراجعة التشريعية", desc: "هل يوجد تقييم مستقل للأثر الجندري للخدمات، وهل يفحص البرلمان هذا البُعد من الميزانية؟ (PEFA GRPFM)" },
+    ],
+    zh: [
+        { key: "diagnostico", label: "性别响应式预算声明", desc: "每个项目/子项目是否包含性别状况分析、成果、活动、按性别分列的指标以及相关预算？（性别预算声明格式——UEMOA、欧盟、英联邦等）" },
+        { key: "documentacao", label: "性别响应式预算文件", desc: "预算提案附带的文件是否包含性别优先事项和加强平等的措施？（PEFA GRPFM / 可持续发展目标指标5.c.1）" },
+        { key: "classificacao", label: "预算科目分类", desc: "科目/项目是否按性别类别分类（中性、特定性别或需要分析的潜在影响）？（UEMOA第三模块方法论）" },
+        { key: "verificacao", label: "绩效核实与报告", desc: "执行和绩效报告是否包含按性别分列的数据及与性别相关的支出？（PEFA GRPFM）" },
+        { key: "avaliacao", label: "影响评估与立法审查", desc: "是否存在对服务性别影响的独立评估，议会是否审查预算的这一维度？（PEFA GRPFM）" },
+    ],
+    ru: [
+        { key: "diagnostico", label: "Гендерно-ориентированное бюджетное заявление", desc: "Содержит ли каждая программа/подпрограмма анализ гендерной ситуации, результаты, мероприятия, показатели с разбивкой по полу и связанный бюджет? (формат гендерного бюджетного заявления — UEMOA, ЕС, Содружество и др.)" },
+        { key: "documentacao", label: "Гендерно-ориентированная бюджетная документация", desc: "Включают ли документы, сопровождающие проект бюджета, гендерные приоритеты и меры по укреплению равенства? (PEFA GRPFM / индикатор ЦУР 5.c.1)" },
+        { key: "classificacao", label: "Классификация бюджетных статей", desc: "Классифицированы ли статьи/проекты по гендерной категории (нейтральные, специфические или с потенциальным воздействием, требующим анализа)? (Модуль 3 – методология UEMOA)" },
+        { key: "verificacao", label: "Проверка и отчётность об исполнении", desc: "Содержат ли отчёты об исполнении и результативности данные с разбивкой по полу и расходы, связанные с гендерным аспектом? (PEFA GRPFM)" },
+        { key: "avaliacao", label: "Оценка воздействия и законодательный надзор", desc: "Проводится ли независимая оценка гендерного воздействия услуг, и рассматривает ли парламент этот аспект бюджета? (PEFA GRPFM)" },
+    ],
+    sw: [
+        { key: "diagnostico", label: "Taarifa ya bajeti inayozingatia jinsia", desc: "Je, kila mpango/mpango mdogo una uchambuzi wa hali ya kijinsia, matokeo, shughuli, viashiria vilivyogawanywa kwa jinsia, na bajeti inayohusiana? (muundo wa taarifa ya bajeti ya kijinsia — UEMOA, EU, Jumuiya ya Madola, na wengine)" },
+        { key: "documentacao", label: "Nyaraka za bajeti zinazozingatia jinsia", desc: "Je, nyaraka zinazoambatana na pendekezo la bajeti zinajumuisha vipaumbele vya kijinsia na hatua za kuimarisha usawa? (PEFA GRPFM / kiashiria cha SDG 5.c.1)" },
+        { key: "classificacao", label: "Uainishaji wa vipengele vya bajeti", desc: "Je, vipengele/miradi vimeainishwa kwa kategoria ya kijinsia (isiyoegemea upande, mahususi, au yenye athari inayoweza kutokea inayohitaji uchambuzi)? (Moduli ya 3 ya UEMOA)" },
+        { key: "verificacao", label: "Uthibitishaji na taarifa za utendaji", desc: "Je, taarifa za utekelezaji na utendaji zina data iliyogawanywa kwa jinsia na matumizi yanayohusiana na jinsia? (PEFA GRPFM)" },
+        { key: "avaliacao", label: "Tathmini ya athari na ukaguzi wa kibunge", desc: "Je, kuna tathmini huru ya athari za kijinsia za huduma, na bunge linachunguza kipengele hiki cha bajeti? (PEFA GRPFM)" },
     ],
 };
 
@@ -169,6 +194,9 @@ const LEVEL_LABELS_I18N = {
     en: ["Not started", "Emerging", "Developing", "Advanced", "Exemplary"],
     es: ["No iniciado", "Emergente", "En desarrollo", "Avanzado", "Ejemplar"],
     ar: ["لم يبدأ", "ناشئ", "قيد التطور", "متقدم", "نموذجي"],
+    zh: ["未启动", "萌芽阶段", "发展中", "较为成熟", "典范水平"],
+    ru: ["Не начато", "Начальный этап", "В стадии развития", "Продвинутый уровень", "Образцовый уровень"],
+    sw: ["Haijaanza", "Inaanza kujitokeza", "Inaendelea kukua", "Ya hali ya juu", "Ya mfano"],
 };
 
 const CATEGORY_INFO_I18N = {
@@ -177,11 +205,14 @@ const CATEGORY_INFO_I18N = {
     en: { 1: { label: "Category 1 — Neutral", color: "#9AA6A3" }, 2: { label: "Category 2 — Gender-specific", color: "#1F5D5B" }, 3: { label: "Category 3 — Potential impact (requires comment)", color: "#C9A227" } },
     es: { 1: { label: "Categoría 1 — Neutro", color: "#9AA6A3" }, 2: { label: "Categoría 2 — Específico de género", color: "#1F5D5B" }, 3: { label: "Categoría 3 — Impacto potencial (requiere comentario)", color: "#C9A227" } },
     ar: { 1: { label: "الفئة 1 — محايدة", color: "#9AA6A3" }, 2: { label: "الفئة 2 — خاصة بالنوع الاجتماعي", color: "#1F5D5B" }, 3: { label: "الفئة 3 — أثر محتمل (يتطلب تعليقاً)", color: "#C9A227" } },
+    zh: { 1: { label: "第一类——中性", color: "#9AA6A3" }, 2: { label: "第二类——性别专项", color: "#1F5D5B" }, 3: { label: "第三类——潜在影响（需要说明）", color: "#C9A227" } },
+    ru: { 1: { label: "Категория 1 — Нейтральная", color: "#9AA6A3" }, 2: { label: "Категория 2 — Гендерно-специфическая", color: "#1F5D5B" }, 3: { label: "Категория 3 — Потенциальное воздействие (требует комментария)", color: "#C9A227" } },
+    sw: { 1: { label: "Kundi la 1 — Lisiloegemea upande", color: "#9AA6A3" }, 2: { label: "Kundi la 2 — Mahususi kwa jinsia", color: "#1F5D5B" }, 3: { label: "Kundi la 3 — Athari inayoweza kutokea (inahitaji maelezo)", color: "#C9A227" } },
 };
 
 const STRINGS = {
     pt: {
-        kicker: "Análise BSG · Padrões internacionais",
+        kicker: "Análise OSG · Padrões internacionais",
         title: "O seu orçamento fala a favor de quem?",
         subtitle: "Descreva um orçamento, programa ou linha de despesa de qualquer país, bloco económico ou organização do mundo. A análise aplica a metodologia internacional de referência das Boas Práticas de Género da OCDE (2023) e do módulo PEFA GRPFM, e reconhece automaticamente o enquadramento nacional ou regional aplicável — quando identificável no texto.",
         inputLabel: "Descrição do orçamento / programa",
@@ -197,7 +228,7 @@ const STRINGS = {
         exampleBadge: "Exemplo pré-calculado ·",
         examplesUnavailable: (l) => `Os exemplos pré-calculados estão disponíveis apenas em português. Escreva ou carregue o seu próprio orçamento para analisar em ${l}.`,
         overallLevelLabel: "Nível geral",
-        copyResult: "Copiar resultado", copiedResult: "Copiado", printResult: "Guardar como PDF",
+        copyResult: "Copiar resultado", copiedResult: "Copiado", printResult: "Guardar como PDF", downloadResult: "Baixar análise",
         lineItemsLabel: "Classificação por linha orçamental",
         restartButton: "Analisar outro orçamento",
         footerSources: "Fontes: OCDE Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Indicador ODS 5.c.1 (ONU) · enquadramentos nacionais e regionais quando aplicável.",
@@ -229,7 +260,7 @@ const STRINGS = {
         exampleBadge: "Exemple précalculé ·",
         examplesUnavailable: (l) => `Les exemples précalculés ne sont disponibles qu'en portugais. Rédigez ou chargez votre propre budget pour l'analyser en ${l}.`,
         overallLevelLabel: "Niveau global",
-        copyResult: "Copier le résultat", copiedResult: "Copié", printResult: "Enregistrer en PDF",
+        copyResult: "Copier le résultat", copiedResult: "Copié", printResult: "Enregistrer en PDF", downloadResult: "Télécharger l'analyse",
         lineItemsLabel: "Classification par ligne budgétaire",
         restartButton: "Analyser un autre budget",
         footerSources: "Sources : OCDE Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Indicateur ODD 5.c.1 (ONU) · cadres nationaux et régionaux le cas échéant.",
@@ -261,7 +292,7 @@ const STRINGS = {
         exampleBadge: "Pre-calculated example ·",
         examplesUnavailable: (l) => `Pre-calculated examples are only available in Portuguese. Write or upload your own budget to analyse it in ${l}.`,
         overallLevelLabel: "Overall level",
-        copyResult: "Copy result", copiedResult: "Copied", printResult: "Save as PDF",
+        copyResult: "Copy result", copiedResult: "Copied", printResult: "Save as PDF", downloadResult: "Download analysis",
         lineItemsLabel: "Budget line classification",
         restartButton: "Analyse another budget",
         footerSources: "Sources: OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · SDG Indicator 5.c.1 (UN) · national and regional frameworks where applicable.",
@@ -293,7 +324,7 @@ const STRINGS = {
         exampleBadge: "Ejemplo precalculado ·",
         examplesUnavailable: (l) => `Los ejemplos precalculados solo están disponibles en portugués. Escriba o cargue su propio presupuesto para analizarlo en ${l}.`,
         overallLevelLabel: "Nivel general",
-        copyResult: "Copiar resultado", copiedResult: "Copiado", printResult: "Guardar como PDF",
+        copyResult: "Copiar resultado", copiedResult: "Copiado", printResult: "Guardar como PDF", downloadResult: "Descargar análisis",
         lineItemsLabel: "Clasificación por partida presupuestaria",
         restartButton: "Analizar otro presupuesto",
         footerSources: "Fuentes: OCDE Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Indicador ODS 5.c.1 (ONU) · marcos nacionales y regionales cuando corresponda.",
@@ -325,7 +356,7 @@ const STRINGS = {
         exampleBadge: "مثال محسوب مسبقاً ·",
         examplesUnavailable: (l) => `الأمثلة المحسوبة مسبقاً متاحة باللغة البرتغالية فقط. اكتب أو حمّل ميزانيتك الخاصة لتحليلها بـ${l}.`,
         overallLevelLabel: "المستوى العام",
-        copyResult: "نسخ النتيجة", copiedResult: "تم النسخ", printResult: "حفظ كملف PDF",
+        copyResult: "نسخ النتيجة", copiedResult: "تم النسخ", printResult: "حفظ كملف PDF", downloadResult: "تنزيل التحليل",
         lineItemsLabel: "تصنيف حسب بند الميزانية",
         restartButton: "تحليل ميزانية أخرى",
         footerSources: "المصادر: OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · مؤشر هدف التنمية المستدامة 5.c.1 (الأمم المتحدة) · أطر وطنية وإقليمية عند الاقتضاء.",
@@ -339,6 +370,102 @@ const STRINGS = {
         errIncompleteModules: "رد التحليل غير مكتمل (الوحدات مفقودة).", errInvalidModule: "يحتوي رد التحليل على بيانات غير صالحة في إحدى الوحدات.",
         errInvalidLineItems: "رد التحليل غير مكتمل (تصنيف غير صالح).", errGeneral: "تعذّر إكمال التحليل. حاول مرة أخرى.",
         langLabel: "اللغة",
+    },
+    zh: {
+        kicker: "性别响应式预算分析 · 国际标准",
+        title: "您的预算在为谁发声？",
+        subtitle: "描述世界上任何国家、经济集团或组织的预算、项目或支出项目。该分析采用经济合作与发展组织（OECD）2023年性别预算最佳实践和PEFA GRPFM模块的国际参考方法，并在文本中可识别时自动识别适用的国家或区域框架。",
+        inputLabel: "预算/项目说明",
+        placeholder: "例如：X部委，预算30亿非洲法郎，84%的投资由捐助方资助。项目：加布妇女赋权（4.23亿）、基础教育与性别平等（3亿）……",
+        uploadLabel: "上传文件（PDF、Excel、CSV、TXT）",
+        uploadLoading: "正在读取文件…",
+        charCount: (n) => `${n} 个字符`,
+        analyzeButton: "分析预算",
+        analyzingButton: "分析中…",
+        progressChunking: (n) => `正在将大型文档分为 ${n} 部分处理…`,
+        progressSynthesizing: "正在综合最终分析…",
+        examplesLabel: "预先计算的示例",
+        exampleBadge: "预先计算的示例 ·",
+        examplesUnavailable: (l) => `预先计算的示例仅提供葡萄牙语版本。请撰写或上传您自己的预算，以${l}进行分析。`,
+        overallLevelLabel: "总体水平",
+        copyResult: "复制结果", copiedResult: "已复制", printResult: "另存为PDF", downloadResult: "下载分析报告",
+        lineItemsLabel: "预算科目分类",
+        restartButton: "分析另一份预算",
+        footerSources: "来源：OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · 联合国可持续发展目标指标5.c.1 · 适用时的国家和区域框架。",
+        fileTooLarge: (mb) => `该文件为 ${mb} MB — 上限为30 MB。请尝试仅导出相关部分。`,
+        fileUnsupported: "不支持的格式。请使用PDF、Excel（.xlsx/.xls）、CSV或TXT。",
+        fileEmpty: "无法从该文件中提取文本（可能是没有可选文本的扫描图像）。",
+        fileTooLong: (t, m) => `该文档包含 ${t} 个字符 — 超出了可靠分析的安全上限（${m}）。已尽可能保留最多内容；建议按部分分别分析。`,
+        fileReadError: "无法读取该文件。",
+        errEmptyResponse: "返回内容为空。", errInvalidFormat: "分析结果格式无效。",
+        errIncompleteGeneral: "分析结果不完整。", errIncompleteScore: "分析结果不完整（缺少总体评分）。",
+        errIncompleteModules: "分析结果不完整（缺少模块）。", errInvalidModule: "分析结果中某个模块包含无效数据。",
+        errInvalidLineItems: "分析结果不完整（科目分类无效）。", errGeneral: "无法完成分析，请重试。",
+        langLabel: "语言",
+    },
+    ru: {
+        kicker: "Анализ гендерного бюджета · Международные стандарты",
+        title: "В чьих интересах говорит ваш бюджет?",
+        subtitle: "Опишите бюджет, программу или статью расходов любой страны, экономического блока или организации мира. Анализ применяет международную эталонную методологию передовой практики гендерного бюджетирования ОЭСР (2023) и модуль PEFA GRPFM, а также автоматически распознаёт применимую национальную или региональную основу — если она определяется в тексте.",
+        inputLabel: "Описание бюджета / программы",
+        placeholder: "Напр.: Министерство X, бюджет 3 млрд франков КФА, 84% инвестиций финансируется донорами. Проекты: расширение прав и возможностей женщин Габу (423 млн), базовое образование и гендерное равенство (300 млн)...",
+        uploadLabel: "Загрузить файл (PDF, Excel, CSV, TXT)",
+        uploadLoading: "Чтение файла…",
+        charCount: (n) => `${n} символов`,
+        analyzeButton: "Анализировать бюджет",
+        analyzingButton: "Анализ…",
+        progressChunking: (n) => `Обработка большого документа на ${n} частей…`,
+        progressSynthesizing: "Синтез итогового анализа…",
+        examplesLabel: "Предварительно рассчитанные примеры",
+        exampleBadge: "Предварительно рассчитанный пример ·",
+        examplesUnavailable: (l) => `Предварительно рассчитанные примеры доступны только на португальском языке. Напишите или загрузите свой бюджет для анализа на ${l}.`,
+        overallLevelLabel: "Общий уровень",
+        copyResult: "Копировать результат", copiedResult: "Скопировано", printResult: "Сохранить как PDF", downloadResult: "Скачать анализ",
+        lineItemsLabel: "Классификация по бюджетным статьям",
+        restartButton: "Анализировать другой бюджет",
+        footerSources: "Источники: OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Индикатор ЦУР 5.c.1 (ООН) · национальные и региональные основы, если применимо.",
+        fileTooLarge: (mb) => `Этот файл весит ${mb} МБ — лимит составляет 30 МБ. Попробуйте экспортировать только нужный раздел.`,
+        fileUnsupported: "Формат не поддерживается. Используйте PDF, Excel (.xlsx/.xls), CSV или TXT.",
+        fileEmpty: "Не удалось извлечь текст из этого файла (возможно, это отсканированное изображение без выделяемого текста).",
+        fileTooLong: (t, m) => `В этом документе ${t} символов — это превышает безопасный лимит (${m}). Сохранена максимально возможная часть; рекомендуется анализировать отдельные разделы.`,
+        fileReadError: "Не удалось прочитать этот файл.",
+        errEmptyResponse: "Пустой ответ.", errInvalidFormat: "Ответ анализа пришёл в неверном формате.",
+        errIncompleteGeneral: "Ответ анализа неполный.", errIncompleteScore: "Ответ анализа неполный (отсутствует общая оценка).",
+        errIncompleteModules: "Ответ анализа неполный (отсутствуют модули).", errInvalidModule: "Ответ анализа содержит недопустимые данные в одном из модулей.",
+        errInvalidLineItems: "Ответ анализа неполный (недопустимая классификация статей).", errGeneral: "Не удалось завершить анализ. Попробуйте снова.",
+        langLabel: "Язык",
+    },
+    sw: {
+        kicker: "Uchambuzi wa Bajeti Inayozingatia Jinsia · Viwango vya Kimataifa",
+        title: "Bajeti yako inazungumza kwa niaba ya nani?",
+        subtitle: "Eleza bajeti, mpango, au kipengele cha matumizi cha nchi yoyote, kundi la kiuchumi, au shirika lolote duniani. Uchambuzi huu unatumia mbinu ya kimataifa ya marejeleo ya Mazoea Bora ya Bajeti Inayozingatia Jinsia ya OECD (2023) na moduli ya PEFA GRPFM, na hutambua kiotomatiki mfumo wa kitaifa au kikanda unaotumika — pale unapoweza kutambulika katika maandishi.",
+        inputLabel: "Maelezo ya bajeti / mpango",
+        placeholder: "Mfano: Wizara X, bajeti ya faranga za CFA bilioni 3, 84% ni uwekezaji unaofadhiliwa na wafadhili. Miradi: Uwezeshaji wa Wanawake wa Gabu (milioni 423), Elimu ya Msingi na Usawa wa Kijinsia (milioni 300)...",
+        uploadLabel: "Pakia faili (PDF, Excel, CSV, TXT)",
+        uploadLoading: "Inasoma faili…",
+        charCount: (n) => `Herufi ${n}`,
+        analyzeButton: "Chambua bajeti",
+        analyzingButton: "Inachambua…",
+        progressChunking: (n) => `Inachakata hati kubwa katika sehemu ${n}…`,
+        progressSynthesizing: "Inaunganisha uchambuzi wa mwisho…",
+        examplesLabel: "Mifano iliyohesabiwa tayari",
+        exampleBadge: "Mfano uliohesabiwa tayari ·",
+        examplesUnavailable: (l) => `Mifano iliyohesabiwa tayari inapatikana kwa Kireno pekee. Andika au pakia bajeti yako mwenyewe ili kuichambua kwa ${l}.`,
+        overallLevelLabel: "Kiwango cha jumla",
+        copyResult: "Nakili matokeo", copiedResult: "Imenakiliwa", printResult: "Hifadhi kama PDF", downloadResult: "Pakua uchambuzi",
+        lineItemsLabel: "Uainishaji wa vipengele vya bajeti",
+        restartButton: "Chambua bajeti nyingine",
+        footerSources: "Vyanzo: OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Kiashiria cha SDG 5.c.1 (UN) · mifumo ya kitaifa na kikanda inapohitajika.",
+        fileTooLarge: (mb) => `Faili hii ina MB ${mb} — kikomo ni MB 30. Jaribu kuhamisha sehemu husika pekee.`,
+        fileUnsupported: "Muundo hauungwi mkono. Tumia PDF, Excel (.xlsx/.xls), CSV, au TXT.",
+        fileEmpty: "Imeshindwa kutoa maandishi kutoka faili hii (huenda ni picha iliyochanganuliwa bila maandishi yanayoweza kuchaguliwa).",
+        fileTooLong: (t, m) => `Hati hii ina herufi ${t} — zaidi ya kikomo salama (${m}). Sehemu kubwa iwezekanavyo imehifadhiwa; fikiria kuchambua sehemu tofauti.`,
+        fileReadError: "Imeshindwa kusoma faili hii.",
+        errEmptyResponse: "Jibu limerudi likiwa tupu.", errInvalidFormat: "Jibu la uchambuzi halikuja kwa muundo sahihi.",
+        errIncompleteGeneral: "Jibu la uchambuzi halijakamilika.", errIncompleteScore: "Jibu la uchambuzi halijakamilika (alama ya jumla haipo).",
+        errIncompleteModules: "Jibu la uchambuzi halijakamilika (moduli hazipo).", errInvalidModule: "Jibu la uchambuzi lina data batili katika moduli moja.",
+        errInvalidLineItems: "Jibu la uchambuzi halijakamilika (uainishaji batili).", errGeneral: "Imeshindwa kukamilisha uchambuzi. Tafadhali jaribu tena.",
+        langLabel: "Lugha",
     },
 };
 
@@ -366,7 +493,7 @@ function useGoogleFonts() {
     useEffect(() => {
         const link = document.createElement("link");
         link.rel = "stylesheet";
-        link.href = "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Arabic:wght@400;600;700&display=swap";
+        link.href = "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Arabic:wght@400;600;700&family=Noto+Sans+SC:wght@400;600;700&display=swap";
         document.head.appendChild(link);
         return () => document.head.removeChild(link);
     }, []);
@@ -415,7 +542,7 @@ function LevelBar({ score }) {
     return (React.createElement("div", { className: "flex gap-1", "aria-hidden": "true" }, [0, 1, 2, 3, 4].map((i) => (React.createElement("div", { key: i, className: "h-2 flex-1 rounded-sm", style: { background: i <= score ? "#1F5D5B" : "#E4DFD3" } })))));
 }
 
-function BSGAnalyzer() {
+function OSGAnalyzer() {
     useGoogleFonts();
     const [lang, setLang] = useState("pt");
     const s = STRINGS[lang];
@@ -423,7 +550,8 @@ function BSGAnalyzer() {
     const levels = LEVEL_LABELS_I18N[lang];
     const categoryInfo = CATEGORY_INFO_I18N[lang];
     const isRTL = LANGUAGES[lang].dir === "rtl";
-    const bodyFont = lang === "ar" ? "'Noto Sans Arabic', sans-serif" : "'Inter', sans-serif";
+    const bodyFont = lang === "ar" ? "'Noto Sans Arabic', sans-serif" : lang === "zh" ? "'Noto Sans SC', sans-serif" : "'Inter', sans-serif";
+    const headingFont = lang === "ar" ? "'Noto Sans Arabic', sans-serif" : lang === "zh" ? "'Noto Sans SC', sans-serif" : "'Fraunces', serif";
 
     const [input, setInput] = useState("");
     const [status, setStatus] = useState("idle");
@@ -490,11 +618,23 @@ function BSGAnalyzer() {
             setCopiado(true); setTimeout(() => setCopiado(false), 2000);
         } catch {}
     }
+    function baixarResultado(result) {
+        const texto = resultToPlainText(result, lang, s);
+        const blob = new Blob([texto], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `analise-osg-${lang}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
 
     function buildSystemPrompt() {
         const modLines = mods.map((m, i) => `${i + 1}. ${m.label}: ${m.desc}`).join("\n");
         const keysList = MODULE_KEYS.join(", ");
-        return `Você é um avaliador técnico internacional de Orçamento Sensível ao Género (BSG / Gender-Responsive Budgeting). A sua avaliação de referência universal segue as Boas Práticas de Orçamentação de Género da OCDE (OECD Best Practices for Gender Budgeting, 2023), o módulo suplementar de Gestão das Finanças Públicas Sensíveis ao Género do PEFA (GRPFM, reforma 2020) e o indicador ODS 5.c.1 da ONU. Esta base é aplicável a qualquer país, independentemente da sua região ou nível de rendimento.
+        return `Você é um avaliador técnico internacional de Orçamento Sensível ao Género (OSG / Gender-Responsive Budgeting). A sua avaliação de referência universal segue as Boas Práticas de Orçamentação de Género da OCDE (OECD Best Practices for Gender Budgeting, 2023), o módulo suplementar de Gestão das Finanças Públicas Sensíveis ao Género do PEFA (GRPFM, reforma 2020) e o indicador ODS 5.c.1 da ONU. Esta base é aplicável a qualquer país, independentemente da sua região ou nível de rendimento.
 
 IMPORTANTE — Reconhecimento regional e nacional automático: identifique no texto do utilizador o país, região, bloco económico ou organização em causa e, sempre que reconhecer um enquadramento específico aplicável, cite-o explicitamente nas suas conclusões, além da base universal. Enquadramentos a reconhecer: UEMOA/CEDEAO/ECOWAS, SADC, União Africana, União Europeia, Conselho da Europa, Commonwealth, países nórdicos, ASEAN, CARICOM, Liga Árabe, CEPAL/ECLAC, Índia (Gender Budgeting), Filipinas (GAD Budget), Ruanda, México (Anexo Transversal), Marrocos (Rapport Genre), UN Women, Banco Mundial, FMI. Qualquer outro país ou organização sem enquadramento específico conhecido: aplique apenas a base universal, sem inventar um enquadramento que não existe. Se não tiver confiança suficiente, prefira citar só a base universal a inventar uma norma nacional incorreta.
 
@@ -578,7 +718,7 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta — summary, finding, recommendation,
                         className: "text-xs border rounded-md px-2 py-1 outline-none",
                         style: { borderColor: "#DED7C6", color: "#16302E", background: "#FFFFFF", fontFamily: "'Inter', sans-serif" },
                     }, Object.entries(LANGUAGES).map(([code, meta]) => (React.createElement("option", { key: code, value: code }, meta.name)))))),
-            React.createElement("h1", { className: "text-4xl sm:text-5xl mb-4 leading-tight", style: { fontFamily: lang === "ar" ? "'Noto Sans Arabic', sans-serif" : "'Fraunces', serif", fontWeight: 600 } }, s.title),
+            React.createElement("h1", { className: "text-4xl sm:text-5xl mb-4 leading-tight", style: { fontFamily: headingFont, fontWeight: 600 } }, s.title),
             React.createElement("p", { className: "text-base mb-10 max-w-xl", style: { color: "#495C59" } }, s.subtitle),
             status !== "done" && (React.createElement("div", { className: "rounded-lg border p-5", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
                 React.createElement("label", { htmlFor: "osg-input", className: "text-xs uppercase tracking-wide mb-2 block", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#7A8F8C" } }, s.inputLabel),
@@ -608,13 +748,15 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta — summary, finding, recommendation,
                 React.createElement("div", { className: "rounded-lg p-6 mb-4 flex flex-wrap items-start justify-between gap-4", style: { background: "#16302E", color: "#F6F3ED" } },
                     React.createElement("div", { className: "min-w-[200px]" },
                         React.createElement("div", { className: "text-xs uppercase tracking-wide mb-1", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#8FB3AA" } }, s.overallLevelLabel),
-                        React.createElement("div", { className: "text-2xl", style: { fontFamily: lang === "ar" ? "'Noto Sans Arabic', sans-serif" : "'Fraunces', serif", fontWeight: 600 } }, result.overallLevel),
+                        React.createElement("div", { className: "text-2xl", style: { fontFamily: headingFont, fontWeight: 600 } }, result.overallLevel),
                         React.createElement("p", { className: "text-sm mt-2 max-w-md", style: { color: "#C9D6D2" } }, result.summary)),
                     React.createElement("div", { className: "text-4xl flex-shrink-0", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#C9A227" } },
                         result.overallScore, React.createElement("span", { className: "text-base", style: { color: "#8FB3AA" } }, "/4"))),
                 React.createElement("div", { className: "flex items-center gap-4 mb-6 print:hidden flex-wrap" },
                     React.createElement("button", { onClick: () => copiarResultado(result), className: "inline-flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
                         copiado ? React.createElement(Check, { className: "w-3.5 h-3.5" }) : React.createElement(Copy, { className: "w-3.5 h-3.5" }), copiado ? s.copiedResult : s.copyResult),
+                    React.createElement("button", { onClick: () => baixarResultado(result), className: "inline-flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
+                        React.createElement(Download, { className: "w-3.5 h-3.5" }), " " + s.downloadResult),
                     React.createElement("button", { onClick: () => window.print(), className: "inline-flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
                         React.createElement(Printer, { className: "w-3.5 h-3.5" }), " " + s.printResult)),
                 React.createElement("div", { className: "space-y-3" }, mods.map((mod) => {
@@ -648,7 +790,7 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta — summary, finding, recommendation,
 
 try {
     const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(React.createElement(BSGAnalyzer, null));
+    root.render(React.createElement(OSGAnalyzer, null));
 } catch (e) {
     const box = document.getElementById("fatal-error");
     if (box) { box.style.display = "block"; box.textContent = "Erro ao iniciar a aplicação:\n" + (e && e.message ? e.message : String(e)); }
