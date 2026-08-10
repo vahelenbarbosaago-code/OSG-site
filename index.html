@@ -9,6 +9,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @media print {
@@ -92,6 +93,14 @@ async function listarHistorico(accessCode) {
 }
 async function guardarHistorico(accessCode, entry) {
     try { await chamarAPI({ action: "save_history", accessCode, entry }); } catch {}
+}
+async function listarCodigosAdmin(accessCode) {
+    const data = await chamarAPI({ action: "admin_list_codes", accessCode });
+    return data.codes || [];
+}
+async function verHistoricoAdmin(accessCode, targetCode) {
+    const data = await chamarAPI({ action: "admin_view_history", accessCode, targetCode });
+    return data.history || [];
 }
 
 // ---------- Ícones ----------
@@ -271,6 +280,22 @@ const STRINGS = {
         historyBack: "← Voltar à análise",
         logoutLabel: "Sair",
         welcomeOrg: (o) => `Sessão: ${o}`,
+        adminLabel: "Administração",
+        adminPanelTitle: "Painel de Administração",
+        adminBack: "← Voltar à análise",
+        adminTableOrg: "Organização",
+        adminTableCode: "Código",
+        adminTableLimit: "Limite mensal",
+        adminTableUsed: "Usado este mês",
+        adminTableStatus: "Estado",
+        adminActive: "Ativo",
+        adminInactive: "Inativo",
+        adminViewHistory: "Ver histórico",
+        adminNoAccess: "Este código não tem permissões de administração.",
+        adminLoading: "A carregar clientes…",
+        adminEmpty: "Nenhum código de acesso encontrado.",
+        downloadPdf: "Descarregar PDF",
+        downloadWord: "Descarregar Word",
     },
     fr: {
         kicker: "Analyse BSG · Normes internationales",
@@ -315,6 +340,22 @@ const STRINGS = {
         historyBack: "← Retour à l'analyse",
         logoutLabel: "Se déconnecter",
         welcomeOrg: (o) => `Session : ${o}`,
+        adminLabel: "Administration",
+        adminPanelTitle: "Panneau d'administration",
+        adminBack: "← Retour à l'analyse",
+        adminTableOrg: "Organisation",
+        adminTableCode: "Code",
+        adminTableLimit: "Limite mensuelle",
+        adminTableUsed: "Utilisé ce mois-ci",
+        adminTableStatus: "Statut",
+        adminActive: "Actif",
+        adminInactive: "Inactif",
+        adminViewHistory: "Voir l'historique",
+        adminNoAccess: "Ce code n'a pas les droits d'administration.",
+        adminLoading: "Chargement des clients…",
+        adminEmpty: "Aucun code d'accès trouvé.",
+        downloadPdf: "Télécharger le PDF",
+        downloadWord: "Télécharger Word",
     },
     en: {
         kicker: "GRB Analysis · International standards",
@@ -359,6 +400,22 @@ const STRINGS = {
         historyBack: "← Back to analysis",
         logoutLabel: "Log out",
         welcomeOrg: (o) => `Session: ${o}`,
+        adminLabel: "Administration",
+        adminPanelTitle: "Admin Panel",
+        adminBack: "← Back to analysis",
+        adminTableOrg: "Organisation",
+        adminTableCode: "Code",
+        adminTableLimit: "Monthly limit",
+        adminTableUsed: "Used this month",
+        adminTableStatus: "Status",
+        adminActive: "Active",
+        adminInactive: "Inactive",
+        adminViewHistory: "View history",
+        adminNoAccess: "This code does not have admin permissions.",
+        adminLoading: "Loading clients…",
+        adminEmpty: "No access codes found.",
+        downloadPdf: "Download PDF",
+        downloadWord: "Download Word",
     },
     es: {
         kicker: "Análisis PSG · Normas internacionales",
@@ -403,6 +460,22 @@ const STRINGS = {
         historyBack: "← Volver al análisis",
         logoutLabel: "Cerrar sesión",
         welcomeOrg: (o) => `Sesión: ${o}`,
+        adminLabel: "Administración",
+        adminPanelTitle: "Panel de administración",
+        adminBack: "← Volver al análisis",
+        adminTableOrg: "Organización",
+        adminTableCode: "Código",
+        adminTableLimit: "Límite mensual",
+        adminTableUsed: "Usado este mes",
+        adminTableStatus: "Estado",
+        adminActive: "Activo",
+        adminInactive: "Inactivo",
+        adminViewHistory: "Ver historial",
+        adminNoAccess: "Este código no tiene permisos de administración.",
+        adminLoading: "Cargando clientes…",
+        adminEmpty: "No se encontraron códigos de acceso.",
+        downloadPdf: "Descargar PDF",
+        downloadWord: "Descargar Word",
     },
     ar: {
         kicker: "تحليل الميزانية الجندرية · معايير دولية",
@@ -447,6 +520,22 @@ const STRINGS = {
         historyBack: "← العودة إلى التحليل",
         logoutLabel: "تسجيل الخروج",
         welcomeOrg: (o) => `الجلسة: ${o}`,
+        adminLabel: "الإدارة",
+        adminPanelTitle: "لوحة الإدارة",
+        adminBack: "← العودة إلى التحليل",
+        adminTableOrg: "المؤسسة",
+        adminTableCode: "الرمز",
+        adminTableLimit: "الحد الشهري",
+        adminTableUsed: "المستخدم هذا الشهر",
+        adminTableStatus: "الحالة",
+        adminActive: "نشط",
+        adminInactive: "غير نشط",
+        adminViewHistory: "عرض السجل",
+        adminNoAccess: "هذا الرمز لا يملك صلاحيات إدارية.",
+        adminLoading: "جارٍ تحميل العملاء…",
+        adminEmpty: "لم يتم العثور على رموز وصول.",
+        downloadPdf: "تنزيل PDF",
+        downloadWord: "تنزيل Word",
     },
     zh: {
         kicker: "性别响应式预算分析 · 国际标准",
@@ -491,6 +580,22 @@ const STRINGS = {
         historyBack: "← 返回分析",
         logoutLabel: "退出登录",
         welcomeOrg: (o) => `会话：${o}`,
+        adminLabel: "管理",
+        adminPanelTitle: "管理面板",
+        adminBack: "← 返回分析",
+        adminTableOrg: "机构",
+        adminTableCode: "代码",
+        adminTableLimit: "每月限额",
+        adminTableUsed: "本月已用",
+        adminTableStatus: "状态",
+        adminActive: "启用",
+        adminInactive: "停用",
+        adminViewHistory: "查看历史",
+        adminNoAccess: "此代码没有管理权限。",
+        adminLoading: "正在加载客户…",
+        adminEmpty: "未找到访问代码。",
+        downloadPdf: "下载 PDF",
+        downloadWord: "下载 Word",
     },
     ru: {
         kicker: "Анализ гендерного бюджета · Международные стандарты",
@@ -535,6 +640,22 @@ const STRINGS = {
         historyBack: "← Назад к анализу",
         logoutLabel: "Выйти",
         welcomeOrg: (o) => `Сеанс: ${o}`,
+        adminLabel: "Администрирование",
+        adminPanelTitle: "Панель администратора",
+        adminBack: "← Назад к анализу",
+        adminTableOrg: "Организация",
+        adminTableCode: "Код",
+        adminTableLimit: "Месячный лимит",
+        adminTableUsed: "Использовано за месяц",
+        adminTableStatus: "Статус",
+        adminActive: "Активен",
+        adminInactive: "Неактивен",
+        adminViewHistory: "Просмотреть историю",
+        adminNoAccess: "У этого кода нет прав администратора.",
+        adminLoading: "Загрузка клиентов…",
+        adminEmpty: "Коды доступа не найдены.",
+        downloadPdf: "Скачать PDF",
+        downloadWord: "Скачать Word",
     },
     sw: {
         kicker: "Uchambuzi wa Bajeti Inayozingatia Jinsia · Viwango vya Kimataifa",
@@ -579,6 +700,22 @@ const STRINGS = {
         historyBack: "← Rudi kwenye uchambuzi",
         logoutLabel: "Toka",
         welcomeOrg: (o) => `Kipindi: ${o}`,
+        adminLabel: "Utawala",
+        adminPanelTitle: "Dashibodi ya Utawala",
+        adminBack: "← Rudi kwenye uchambuzi",
+        adminTableOrg: "Shirika",
+        adminTableCode: "Msimbo",
+        adminTableLimit: "Kikomo cha mwezi",
+        adminTableUsed: "Kimetumika mwezi huu",
+        adminTableStatus: "Hali",
+        adminActive: "Inatumika",
+        adminInactive: "Haitumiki",
+        adminViewHistory: "Ona historia",
+        adminNoAccess: "Msimbo huu hauna ruhusa za utawala.",
+        adminLoading: "Inapakia wateja…",
+        adminEmpty: "Hakuna misimbo ya ufikiaji iliyopatikana.",
+        downloadPdf: "Pakua PDF",
+        downloadWord: "Pakua Word",
     },
 };
 
@@ -684,9 +821,13 @@ function OSGAnalyzer() {
     const [gateStatus, setGateStatus] = useState("checking"); // checking | gate | ok | invalid
     const [gateInput, setGateInput] = useState("");
     const [orgName, setOrgName] = useState("");
+    const [isAdmin, setIsAdmin] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
     const [history, setHistory] = useState([]);
     const [historyLoading, setHistoryLoading] = useState(false);
+    const [showAdmin, setShowAdmin] = useState(false);
+    const [adminCodes, setAdminCodes] = useState([]);
+    const [adminLoading, setAdminLoading] = useState(false);
 
     useEffect(() => {
         let cancelado = false;
@@ -696,6 +837,7 @@ function OSGAnalyzer() {
                 const data = await validarCodigo(accessCode);
                 if (cancelado) return;
                 setOrgName(data.org || "");
+                setIsAdmin(data.admin === true);
                 setGateStatus("ok");
             } catch {
                 if (cancelado) return;
@@ -715,6 +857,7 @@ function OSGAnalyzer() {
             try { localStorage.setItem("osg_access_code", codigo); } catch {}
             setAccessCode(codigo);
             setOrgName(data.org || "");
+            setIsAdmin(data.admin === true);
             setGateStatus("ok");
         } catch {
             setGateStatus("invalid");
@@ -723,18 +866,30 @@ function OSGAnalyzer() {
     function sair() {
         try { localStorage.removeItem("osg_access_code"); } catch {}
         setAccessCode(""); setOrgName(""); setGateInput(""); setGateStatus("gate");
-        setShowHistory(false); reiniciarSemLimpar();
+        setIsAdmin(false); setShowHistory(false); setShowAdmin(false);
     }
     async function abrirHistorico() {
-        setShowHistory(true); setHistoryLoading(true);
+        setShowAdmin(false); setShowHistory(true); setHistoryLoading(true);
         try { setHistory(await listarHistorico(accessCode)); }
         catch { setHistory([]); }
         finally { setHistoryLoading(false); }
     }
     function verHistoricoItem(item) {
-        setResult(item.result); setExemploAtivo(null); setStatus("done"); setShowHistory(false);
+        setResult(item.result); setExemploAtivo(null); setStatus("done");
+        setShowHistory(false); setShowAdmin(false);
     }
-    function reiniciarSemLimpar() {}
+    async function abrirAdmin() {
+        setShowHistory(false); setShowAdmin(true); setAdminLoading(true);
+        try { setAdminCodes(await listarCodigosAdmin(accessCode)); }
+        catch { setAdminCodes([]); }
+        finally { setAdminLoading(false); }
+    }
+    async function verHistoricoDeCodigo(codigo) {
+        setHistoryLoading(true); setShowAdmin(false); setShowHistory(true);
+        try { setHistory(await verHistoricoAdmin(accessCode, codigo)); }
+        catch { setHistory([]); }
+        finally { setHistoryLoading(false); }
+    }
 
     async function extrairTextoPdf(arrayBuffer) {
         if (typeof pdfjsLib !== "undefined" && pdfjsLib.GlobalWorkerOptions) {
@@ -797,6 +952,95 @@ function OSGAnalyzer() {
         const a = document.createElement("a");
         a.href = url;
         a.download = `analise-osg-${lang}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function baixarPdf(result) {
+        if (typeof jspdf === "undefined") return;
+        const { jsPDF } = jspdf;
+        const doc = new jsPDF({ unit: "pt", format: "a4" });
+        const margem = 48;
+        let y = margem;
+        const largura = doc.internal.pageSize.getWidth() - margem * 2;
+
+        function novaLinha(altura) {
+            y += altura;
+            if (y > doc.internal.pageSize.getHeight() - margem) { doc.addPage(); y = margem; }
+        }
+        function texto(txt, opts = {}) {
+            const tamanho = opts.size || 10;
+            const negrito = opts.bold ? "bold" : "normal";
+            doc.setFont("helvetica", negrito);
+            doc.setFontSize(tamanho);
+            if (opts.color) doc.setTextColor(...opts.color); else doc.setTextColor(20, 30, 30);
+            const linhas = doc.splitTextToSize(txt, largura);
+            linhas.forEach((l) => {
+                doc.text(l, margem, y);
+                novaLinha((tamanho * 1.3));
+            });
+        }
+
+        doc.setFillColor(22, 48, 46);
+        doc.rect(0, 0, doc.internal.pageSize.getWidth(), 90, "F");
+        doc.setTextColor(246, 243, 237);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(18);
+        doc.text("Analisador OSG", margem, 40);
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "normal");
+        doc.text(`${s.overallLevelLabel}: ${result.overallLevel}  (${result.overallScore}/4)`, margem, 62);
+        y = 118;
+        texto(result.summary || "", { size: 11, color: [62, 76, 73] });
+        novaLinha(8);
+
+        mods.forEach((mod) => {
+            const m = result.modules.find((r) => r.key === mod.key);
+            if (!m) return;
+            texto(`${mod.label} — ${levels[m.score]}`, { bold: true, size: 11, color: [31, 93, 91] });
+            texto(m.finding, { size: 10 });
+            texto("→ " + m.recommendation, { size: 10, color: [31, 93, 91] });
+            novaLinha(6);
+        });
+
+        if (result.lineItems && result.lineItems.length > 0) {
+            novaLinha(4);
+            texto(s.lineItemsLabel, { bold: true, size: 12 });
+            result.lineItems.forEach((li) => {
+                texto(`[Cat. ${li.category}] ${li.name} — ${li.comment}`, { size: 9 });
+            });
+        }
+
+        doc.save(`analise-osg-${lang}.pdf`);
+    }
+
+    function baixarWord(result) {
+        const mods_html = mods.map((mod) => {
+            const m = result.modules.find((r) => r.key === mod.key);
+            if (!m) return "";
+            return `<h3 style="color:#1F5D5B;font-size:13pt;margin-bottom:2pt;">${mod.label} — ${levels[m.score]}</h3>
+                <p style="margin:0 0 4pt 0;">${m.finding}</p>
+                <p style="margin:0 0 12pt 0;color:#1F5D5B;">→ ${m.recommendation}</p>`;
+        }).join("");
+        const linhas_html = (result.lineItems || []).map((li) =>
+            `<tr><td style="padding:4pt;border:1px solid #DED7C6;">Cat. ${li.category}</td><td style="padding:4pt;border:1px solid #DED7C6;">${li.name}</td><td style="padding:4pt;border:1px solid #DED7C6;">${li.comment}</td></tr>`
+        ).join("");
+        const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8"><title>Analisador OSG</title></head>
+<body style="font-family:Calibri, sans-serif;">
+<h1 style="color:#16302E;">Analisador OSG</h1>
+<h2 style="color:#C9A227;">${s.overallLevelLabel}: ${result.overallLevel} (${result.overallScore}/4)</h2>
+<p>${result.summary || ""}</p>
+${mods_html}
+${linhas_html ? `<h3>${s.lineItemsLabel}</h3><table style="border-collapse:collapse;width:100%;"><tr><th style="border:1px solid #DED7C6;padding:4pt;">Cat.</th><th style="border:1px solid #DED7C6;padding:4pt;">${s.inputLabel}</th><th style="border:1px solid #DED7C6;padding:4pt;"></th></tr>${linhas_html}</table>` : ""}
+</body></html>`;
+        const blob = new Blob(['\ufeff', html], { type: "application/msword" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `analise-osg-${lang}.doc`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -924,6 +1168,7 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta — summary, finding, recommendation,
                 React.createElement("div", { className: "flex items-center gap-3 flex-wrap" },
                     orgName && React.createElement("span", { className: "text-xs", style: { color: "#9AA6A3" } }, s.welcomeOrg(orgName)),
                     React.createElement("button", { onClick: abrirHistorico, className: "text-xs underline", style: { color: "#1F5D5B" } }, s.historyLabel),
+                    isAdmin && React.createElement("button", { onClick: abrirAdmin, className: "text-xs underline", style: { color: "#1F5D5B" } }, s.adminLabel),
                     React.createElement("button", { onClick: sair, className: "text-xs underline", style: { color: "#9AA6A3" } }, s.logoutLabel),
                     React.createElement("div", { className: "flex items-center gap-1.5" },
                         React.createElement(Globe, { className: "w-3.5 h-3.5", style: { color: "#7A8F8C" } }),
@@ -962,6 +1207,30 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta — summary, finding, recommendation,
                             React.createElement("span", { className: "text-sm font-medium" }, item.result ? item.result.overallLevel : "—"),
                             React.createElement("span", { className: "text-xs", style: { color: "#9AA6A3" } }, item.savedAt ? new Date(item.savedAt).toLocaleDateString() : "")),
                         React.createElement("p", { className: "text-xs mt-1 truncate", style: { color: "#7A8F8C" } }, item.inputExcerpt || ""))))))),
+            showAdmin && (React.createElement("div", { className: "rounded-lg border p-5 mb-4", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
+                React.createElement("div", { className: "flex items-center justify-between mb-3" },
+                    React.createElement("h2", { className: "text-sm font-medium" }, s.adminPanelTitle),
+                    React.createElement("button", { onClick: () => setShowAdmin(false), className: "text-xs underline", style: { color: "#7A8F8C" } }, s.adminBack)),
+                adminLoading && React.createElement(Loader2, { className: "w-4 h-4 animate-spin", style: { color: "#7A8F8C" } }),
+                !adminLoading && adminCodes.length === 0 && React.createElement("p", { className: "text-xs", style: { color: "#9AA6A3" } }, s.adminEmpty),
+                !adminLoading && adminCodes.length > 0 && React.createElement("div", { className: "overflow-x-auto" },
+                    React.createElement("table", { className: "w-full text-xs" },
+                        React.createElement("thead", null,
+                            React.createElement("tr", { style: { borderBottom: "1px solid #DED7C6" } },
+                                React.createElement("th", { className: "text-left py-2 pr-3" }, s.adminTableOrg),
+                                React.createElement("th", { className: "text-left py-2 pr-3" }, s.adminTableCode),
+                                React.createElement("th", { className: "text-left py-2 pr-3" }, s.adminTableLimit),
+                                React.createElement("th", { className: "text-left py-2 pr-3" }, s.adminTableUsed),
+                                React.createElement("th", { className: "text-left py-2 pr-3" }, s.adminTableStatus),
+                                React.createElement("th", { className: "text-left py-2" }, ""))),
+                        React.createElement("tbody", null, adminCodes.map((c, idx) => (
+                            React.createElement("tr", { key: idx, style: { borderBottom: "1px solid #EDE8DC" } },
+                                React.createElement("td", { className: "py-2 pr-3" }, c.org || "—"),
+                                React.createElement("td", { className: "py-2 pr-3", style: { fontFamily: "'IBM Plex Mono', monospace" } }, c.code),
+                                React.createElement("td", { className: "py-2 pr-3" }, c.limit),
+                                React.createElement("td", { className: "py-2 pr-3" }, c.usedThisMonth),
+                                React.createElement("td", { className: "py-2 pr-3" }, React.createElement("span", { style: { color: c.active ? "#1F5D5B" : "#B5541F" } }, c.active ? s.adminActive : s.adminInactive)),
+                                React.createElement("td", { className: "py-2" }, React.createElement("button", { onClick: () => verHistoricoDeCodigo(c.code), className: "underline", style: { color: "#1F5D5B" } }, s.adminViewHistory)))))))))),
             status === "idle" && lang === "pt" && (React.createElement("div", { className: "mt-4" },
                 React.createElement("div", { className: "text-xs uppercase tracking-wide mb-2", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#9AA6A3" } }, s.examplesLabel),
                 React.createElement("div", { className: "flex flex-wrap gap-x-5 gap-y-2" }, Object.entries(EXEMPLOS_PT).map(([code, ex]) => (React.createElement("button", { key: code, onClick: () => verExemplo(code), className: "inline-flex items-center gap-2 text-sm", style: { color: "#1F5D5B" } },
@@ -984,6 +1253,10 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta — summary, finding, recommendation,
                         copiado ? React.createElement(Check, { className: "w-3.5 h-3.5" }) : React.createElement(Copy, { className: "w-3.5 h-3.5" }), copiado ? s.copiedResult : s.copyResult),
                     React.createElement("button", { onClick: () => baixarResultado(result), className: "inline-flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
                         React.createElement(Download, { className: "w-3.5 h-3.5" }), " " + s.downloadResult),
+                    React.createElement("button", { onClick: () => baixarPdf(result), className: "inline-flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
+                        React.createElement(Download, { className: "w-3.5 h-3.5" }), " " + s.downloadPdf),
+                    React.createElement("button", { onClick: () => baixarWord(result), className: "inline-flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
+                        React.createElement(Download, { className: "w-3.5 h-3.5" }), " " + s.downloadWord),
                     React.createElement("button", { onClick: () => window.print(), className: "inline-flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
                         React.createElement(Printer, { className: "w-3.5 h-3.5" }), " " + s.printResult)),
                 React.createElement("div", { className: "space-y-3" }, mods.map((mod) => {
