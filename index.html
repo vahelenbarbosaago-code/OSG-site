@@ -292,6 +292,11 @@ const STRINGS = {
         compareBack: "← Voltar à administração",
         compareOverall: "Nível geral",
         compareNoData: "Sem análises guardadas para comparar.",
+        paymentChecking: "A confirmar o pagamento…",
+        paymentError: "Não foi possível confirmar o pagamento. Se já pagaste, aguarda um minuto e recarrega a página, ou contacta o suporte.",
+        paymentSuccessTitle: "Pagamento confirmado!",
+        paymentSuccessCode: "O teu código de acesso é:",
+        paymentSuccessUse: "Usar este código",
         adminLabel: "Administração",
         adminPanelTitle: "Painel de Administração",
         adminBack: "← Voltar à análise",
@@ -360,6 +365,11 @@ const STRINGS = {
         compareBack: "← Retour à l'administration",
         compareOverall: "Niveau global",
         compareNoData: "Aucune analyse enregistrée à comparer.",
+        paymentChecking: "Confirmation du paiement…",
+        paymentError: "Impossible de confirmer le paiement. Si vous avez déjà payé, attendez une minute et actualisez la page, ou contactez le support.",
+        paymentSuccessTitle: "Paiement confirmé !",
+        paymentSuccessCode: "Votre code d'accès est :",
+        paymentSuccessUse: "Utiliser ce code",
         adminLabel: "Administration",
         adminPanelTitle: "Panneau d'administration",
         adminBack: "← Retour à l'analyse",
@@ -428,6 +438,11 @@ const STRINGS = {
         compareBack: "← Back to administration",
         compareOverall: "Overall level",
         compareNoData: "No saved analyses to compare.",
+        paymentChecking: "Confirming payment…",
+        paymentError: "Could not confirm the payment. If you already paid, wait a minute and reload the page, or contact support.",
+        paymentSuccessTitle: "Payment confirmed!",
+        paymentSuccessCode: "Your access code is:",
+        paymentSuccessUse: "Use this code",
         adminLabel: "Administration",
         adminPanelTitle: "Admin Panel",
         adminBack: "← Back to analysis",
@@ -496,6 +511,11 @@ const STRINGS = {
         compareBack: "← Volver a la administración",
         compareOverall: "Nivel general",
         compareNoData: "No hay análisis guardados para comparar.",
+        paymentChecking: "Confirmando el pago…",
+        paymentError: "No se pudo confirmar el pago. Si ya pagó, espere un minuto y recargue la página, o contacte con soporte.",
+        paymentSuccessTitle: "¡Pago confirmado!",
+        paymentSuccessCode: "Su código de acceso es:",
+        paymentSuccessUse: "Usar este código",
         adminLabel: "Administración",
         adminPanelTitle: "Panel de administración",
         adminBack: "← Volver al análisis",
@@ -564,6 +584,11 @@ const STRINGS = {
         compareBack: "← العودة إلى الإدارة",
         compareOverall: "المستوى العام",
         compareNoData: "لا توجد تحليلات محفوظة للمقارنة.",
+        paymentChecking: "جارٍ تأكيد الدفع…",
+        paymentError: "تعذّر تأكيد الدفع. إذا كنت قد دفعت بالفعل، انتظر دقيقة وأعد تحميل الصفحة، أو تواصل مع الدعم.",
+        paymentSuccessTitle: "تم تأكيد الدفع!",
+        paymentSuccessCode: "رمز الوصول الخاص بك هو:",
+        paymentSuccessUse: "استخدام هذا الرمز",
         adminLabel: "الإدارة",
         adminPanelTitle: "لوحة الإدارة",
         adminBack: "← العودة إلى التحليل",
@@ -632,6 +657,11 @@ const STRINGS = {
         compareBack: "← 返回管理",
         compareOverall: "总体水平",
         compareNoData: "没有可比较的已保存分析。",
+        paymentChecking: "正在确认付款…",
+        paymentError: "无法确认付款。如果您已付款，请等待一分钟后刷新页面，或联系支持团队。",
+        paymentSuccessTitle: "付款已确认！",
+        paymentSuccessCode: "您的访问码是：",
+        paymentSuccessUse: "使用此代码",
         adminLabel: "管理",
         adminPanelTitle: "管理面板",
         adminBack: "← 返回分析",
@@ -700,6 +730,11 @@ const STRINGS = {
         compareBack: "← Назад к администрированию",
         compareOverall: "Общий уровень",
         compareNoData: "Нет сохранённых анализов для сравнения.",
+        paymentChecking: "Подтверждение платежа…",
+        paymentError: "Не удалось подтвердить платёж. Если вы уже оплатили, подождите минуту и обновите страницу, либо обратитесь в поддержку.",
+        paymentSuccessTitle: "Платёж подтверждён!",
+        paymentSuccessCode: "Ваш код доступа:",
+        paymentSuccessUse: "Использовать этот код",
         adminLabel: "Администрирование",
         adminPanelTitle: "Панель администратора",
         adminBack: "← Назад к анализу",
@@ -768,6 +803,11 @@ const STRINGS = {
         compareBack: "← Rudi kwenye utawala",
         compareOverall: "Kiwango cha jumla",
         compareNoData: "Hakuna uchambuzi uliohifadhiwa wa kulinganisha.",
+        paymentChecking: "Inathibitisha malipo…",
+        paymentError: "Imeshindwa kuthibitisha malipo. Kama tayari umelipa, subiri dakika moja kisha upakie upya ukurasa, au wasiliana na msaada.",
+        paymentSuccessTitle: "Malipo yamethibitishwa!",
+        paymentSuccessCode: "Msimbo wako wa ufikiaji ni:",
+        paymentSuccessUse: "Tumia msimbo huu",
         adminLabel: "Utawala",
         adminPanelTitle: "Dashibodi ya Utawala",
         adminBack: "← Rudi kwenye uchambuzi",
@@ -888,7 +928,7 @@ function OSGAnalyzer() {
     const [accessCode, setAccessCode] = useState(() => {
         try { return localStorage.getItem("osg_access_code") || ""; } catch { return ""; }
     });
-    const [gateStatus, setGateStatus] = useState("checking"); // checking | gate | ok | invalid
+    const [gateStatus, setGateStatus] = useState("checking"); // checking | gate | ok | invalid | payment
     const [gateInput, setGateInput] = useState("");
     const [orgName, setOrgName] = useState("");
     const [isAdmin, setIsAdmin] = useState(false);
@@ -898,6 +938,8 @@ function OSGAnalyzer() {
     const [showAdmin, setShowAdmin] = useState(false);
     const [adminCodes, setAdminCodes] = useState([]);
     const [adminLoading, setAdminLoading] = useState(false);
+    const [paymentCode, setPaymentCode] = useState(null);
+    const [paymentError, setPaymentError] = useState(false);
     const [compareSelected, setCompareSelected] = useState(() => new Set());
     const [showCompare, setShowCompare] = useState(false);
     const [compareData, setCompareData] = useState([]);
@@ -906,6 +948,26 @@ function OSGAnalyzer() {
     useEffect(() => {
         let cancelado = false;
         async function verificar() {
+            // Se voltámos de um pagamento Stripe (URL com ?session_id=...),
+            // tenta buscar o código gerado automaticamente, com algumas
+            // tentativas — o webhook do Stripe pode demorar 1-2 segundos.
+            const params = new URLSearchParams(window.location.search);
+            const sessionId = params.get("session_id");
+            if (sessionId) {
+                setGateStatus("payment");
+                for (let tentativa = 0; tentativa < 6; tentativa++) {
+                    try {
+                        const data = await chamarAPI({ action: "get_purchased_code", sessionId });
+                        if (cancelado) return;
+                        setPaymentCode(data.code);
+                        return;
+                    } catch {
+                        await new Promise((r) => setTimeout(r, 2500));
+                    }
+                }
+                if (!cancelado) setPaymentError(true);
+                return;
+            }
             if (!accessCode) { setGateStatus("gate"); return; }
             try {
                 const data = await validarCodigo(accessCode);
@@ -921,6 +983,15 @@ function OSGAnalyzer() {
         verificar();
         return () => { cancelado = true; };
     }, [accessCode]);
+
+    function usarCodigoComprado() {
+        if (!paymentCode) return;
+        try { localStorage.setItem("osg_access_code", paymentCode); } catch {}
+        setAccessCode(paymentCode);
+        setPaymentCode(null);
+        setGateStatus("checking");
+        window.history.replaceState({}, "", window.location.pathname);
+    }
 
     async function entrarComCodigo() {
         const codigo = gateInput.trim();
@@ -1227,6 +1298,28 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta — summary, finding, evidence, recom
     }
 
     if (gateStatus !== "ok") {
+        if (gateStatus === "payment") {
+            return (React.createElement("div", { className: "min-h-screen w-full flex items-center justify-center px-6", dir: isRTL ? "rtl" : "ltr", style: { background: "#F6F3ED", fontFamily: bodyFont, color: "#16302E" } },
+                React.createElement("div", { className: "w-full max-w-sm text-center" },
+                    React.createElement("div", { className: "flex items-center gap-2 mb-6 justify-center" },
+                        React.createElement(Scale, { className: "w-6 h-6", style: { color: "#C9A227" }, strokeWidth: 1.75 }),
+                        React.createElement("span", { className: "text-sm font-medium" }, "Analisador OSG")),
+                    React.createElement("div", { className: "rounded-lg border p-6", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
+                        !paymentCode && !paymentError && React.createElement(React.Fragment, null,
+                            React.createElement(Loader2, { className: "w-6 h-6 animate-spin mx-auto mb-3", style: { color: "#1F5D5B" } }),
+                            React.createElement("p", { className: "text-sm", style: { color: "#7A8F8C" } }, s.paymentChecking)),
+                        paymentError && React.createElement("p", { className: "text-sm", style: { color: "#B5541F" } }, s.paymentError),
+                        paymentCode && React.createElement(React.Fragment, null,
+                            React.createElement(Check, { className: "w-8 h-8 mx-auto mb-3", style: { color: "#1F5D5B" } }),
+                            React.createElement("h1", { className: "text-base font-medium mb-2", style: { fontFamily: headingFont } }, s.paymentSuccessTitle),
+                            React.createElement("p", { className: "text-xs mb-1", style: { color: "#7A8F8C" } }, s.paymentSuccessCode),
+                            React.createElement("p", { className: "text-lg font-mono font-bold mb-4 tracking-wide", style: { color: "#C9A227" } }, paymentCode),
+                            React.createElement("button", {
+                                onClick: usarCodigoComprado,
+                                className: "w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium",
+                                style: { background: "#1F5D5B", color: "#F6F3ED" },
+                            }, s.paymentSuccessUse))))));
+        }
         return (React.createElement("div", { className: "min-h-screen w-full flex items-center justify-center px-6", dir: isRTL ? "rtl" : "ltr", style: { background: "#F6F3ED", fontFamily: bodyFont, color: "#16302E" } },
             React.createElement("div", { className: "w-full max-w-sm" },
                 React.createElement("div", { className: "flex items-center gap-2 mb-6 justify-center" },
