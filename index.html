@@ -61,7 +61,7 @@ function dividirEmPartes(texto, tamanhoAlvo) {
 // Extração intermédia: mantida sempre em português como "idioma de trabalho"
 // interno — só a síntese final é traduzida para o idioma escolhido pelo
 // utilizador, para evitar perdas de nuance em traduções encadeadas.
-const EXTRACTION_SYSTEM = `Você prepara extratos de uma parte de um documento orçamental extenso, para uma análise posterior de Orçamento Sensível ao Género (OSG). Este é o excerto {N} de um documento maior. Leia o texto e extraia, em português, apenas o que for relevante para avaliar: (1) declarações/notas orçamentais de género, (2) documentação orçamental que mencione género, (3) classificação ou natureza de linhas/projetos orçamentais, (4) dados de execução/desempenho desagregados por sexo, (5) avaliação de impacto ou exame legislativo sobre género. Inclua também até 8 linhas orçamentais ou projetos com montante, se existirem neste excerto. Seja factual e conciso — não invente informação que não esteja no texto, e não repita o texto integralmente. Se este excerto não tiver nada relevante, devolva notas vazias. Responda APENAS com JSON válido, sem markdown: {"notas": "<até 250 palavras>", "linhas": [{"nome": "...", "montante": "...", "observacao": "..."}]}`;
+const EXTRACTION_SYSTEM = `Você prepara extratos de uma parte de um documento orçamental extenso, para uma análise posterior de Orçamento Sensível ao Género (OSG). Este é o excerto {N} de um documento maior. Leia o texto e extraia, em português, apenas o que for relevante para avaliar: (1) declarações/notas orçamentais de género, (2) documentação orçamental que mencione género, (3) classificação ou natureza de linhas/projetos orçamentais, (4) dados de execução/desempenho desagregados por sexo, (5) avaliação de impacto ou exame legislativo sobre género. Inclua também até 8 linhas orçamentais ou projetos com montante, se existirem neste excerto. Preserve detalhes concretos e citáveis tal como aparecem no texto — números exatos, nomes de documentos ou instrumentos, datas, artigos de lei, nomes de projetos — em vez de resumir de forma vaga; a análise final depende destes detalhes precisos para se fundamentar corretamente. Seja factual — nunca invente informação, números ou nomes que não estejam literalmente no texto — e conciso, sem repetir o texto integralmente. Se este excerto não tiver nada relevante, devolva notas vazias em vez de forçar uma interpretação. Responda APENAS com JSON válido, sem markdown: {"notas": "<até 250 palavras, com detalhes concretos preservados>", "linhas": [{"nome": "...", "montante": "...", "observacao": "..."}]}`;
 
 async function chamarAPI(payload) {
     const response = await fetch(PROXY_URL, {
@@ -280,6 +280,7 @@ const STRINGS = {
         historyBack: "← Voltar à análise",
         logoutLabel: "Sair",
         welcomeOrg: (o) => `Sessão: ${o}`,
+        evidenceLabel: "Evidência no texto",
         adminLabel: "Administração",
         adminPanelTitle: "Painel de Administração",
         adminBack: "← Voltar à análise",
@@ -340,6 +341,7 @@ const STRINGS = {
         historyBack: "← Retour à l'analyse",
         logoutLabel: "Se déconnecter",
         welcomeOrg: (o) => `Session : ${o}`,
+        evidenceLabel: "Élément du texte",
         adminLabel: "Administration",
         adminPanelTitle: "Panneau d'administration",
         adminBack: "← Retour à l'analyse",
@@ -400,6 +402,7 @@ const STRINGS = {
         historyBack: "← Back to analysis",
         logoutLabel: "Log out",
         welcomeOrg: (o) => `Session: ${o}`,
+        evidenceLabel: "Evidence in text",
         adminLabel: "Administration",
         adminPanelTitle: "Admin Panel",
         adminBack: "← Back to analysis",
@@ -460,6 +463,7 @@ const STRINGS = {
         historyBack: "← Volver al análisis",
         logoutLabel: "Cerrar sesión",
         welcomeOrg: (o) => `Sesión: ${o}`,
+        evidenceLabel: "Evidencia en el texto",
         adminLabel: "Administración",
         adminPanelTitle: "Panel de administración",
         adminBack: "← Volver al análisis",
@@ -520,6 +524,7 @@ const STRINGS = {
         historyBack: "← العودة إلى التحليل",
         logoutLabel: "تسجيل الخروج",
         welcomeOrg: (o) => `الجلسة: ${o}`,
+        evidenceLabel: "الدليل في النص",
         adminLabel: "الإدارة",
         adminPanelTitle: "لوحة الإدارة",
         adminBack: "← العودة إلى التحليل",
@@ -580,6 +585,7 @@ const STRINGS = {
         historyBack: "← 返回分析",
         logoutLabel: "退出登录",
         welcomeOrg: (o) => `会话：${o}`,
+        evidenceLabel: "文本中的证据",
         adminLabel: "管理",
         adminPanelTitle: "管理面板",
         adminBack: "← 返回分析",
@@ -640,6 +646,7 @@ const STRINGS = {
         historyBack: "← Назад к анализу",
         logoutLabel: "Выйти",
         welcomeOrg: (o) => `Сеанс: ${o}`,
+        evidenceLabel: "Основание в тексте",
         adminLabel: "Администрирование",
         adminPanelTitle: "Панель администратора",
         adminBack: "← Назад к анализу",
@@ -700,6 +707,7 @@ const STRINGS = {
         historyBack: "← Rudi kwenye uchambuzi",
         logoutLabel: "Toka",
         welcomeOrg: (o) => `Kipindi: ${o}`,
+        evidenceLabel: "Ushahidi katika maandishi",
         adminLabel: "Utawala",
         adminPanelTitle: "Dashibodi ya Utawala",
         adminBack: "← Rudi kwenye uchambuzi",
@@ -779,7 +787,9 @@ function resultToPlainText(result, lang, s) {
         const m = result.modules.find((r) => r.key === mod.key);
         if (!m) return;
         lines.push(`${mod.label} — ${levels[m.score]}`);
-        lines.push(`  ${m.finding}`); lines.push(`  → ${m.recommendation}`); lines.push("");
+        lines.push(`  ${m.finding}`);
+        if (m.evidence) lines.push(`  [${s.evidenceLabel}: ${m.evidence}]`);
+        lines.push(`  → ${m.recommendation}`); lines.push("");
     });
     if (result.lineItems && result.lineItems.length > 0) {
         lines.push(s.lineItemsLabel + ":");
@@ -1001,6 +1011,7 @@ function OSGAnalyzer() {
             if (!m) return;
             texto(`${mod.label} — ${levels[m.score]}`, { bold: true, size: 11, color: [31, 93, 91] });
             texto(m.finding, { size: 10 });
+            if (m.evidence) texto(`${s.evidenceLabel}: ${m.evidence}`, { size: 9, color: [122, 143, 140] });
             texto("→ " + m.recommendation, { size: 10, color: [31, 93, 91] });
             novaLinha(6);
         });
@@ -1022,6 +1033,7 @@ function OSGAnalyzer() {
             if (!m) return "";
             return `<h3 style="color:#1F5D5B;font-size:13pt;margin-bottom:2pt;">${mod.label} — ${levels[m.score]}</h3>
                 <p style="margin:0 0 4pt 0;">${m.finding}</p>
+                ${m.evidence ? `<p style="margin:0 0 4pt 0;color:#7A8F8C;font-size:9pt;">${s.evidenceLabel}: ${m.evidence}</p>` : ""}
                 <p style="margin:0 0 12pt 0;color:#1F5D5B;">→ ${m.recommendation}</p>`;
         }).join("");
         const linhas_html = (result.lineItems || []).map((li) =>
@@ -1054,29 +1066,35 @@ ${linhas_html ? `<h3>${s.lineItemsLabel}</h3><table style="border-collapse:colla
 
 IMPORTANTE — Reconhecimento regional e nacional automático: identifique no texto do utilizador o país, região, bloco económico ou organização em causa e, sempre que reconhecer um enquadramento específico aplicável, cite-o explicitamente nas suas conclusões, além da base universal. Enquadramentos a reconhecer: UEMOA/CEDEAO/ECOWAS, SADC, União Africana, União Europeia, Conselho da Europa, Commonwealth, países nórdicos, ASEAN, CARICOM, Liga Árabe, CEPAL/ECLAC, Índia (Gender Budgeting), Filipinas (GAD Budget), Ruanda, México (Anexo Transversal), Marrocos (Rapport Genre), UN Women, Banco Mundial, FMI. Qualquer outro país ou organização sem enquadramento específico conhecido: aplique apenas a base universal, sem inventar um enquadramento que não existe. Se não tiver confiança suficiente, prefira citar só a base universal a inventar uma norma nacional incorreta.
 
+REGRA DE FUNDAMENTAÇÃO (obrigatória, a mais importante desta tarefa): cada pontuação e cada "finding" têm de assentar exclusivamente em informação que está literalmente presente no texto fornecido pelo utilizador. Nunca invente factos, números, nomes de documentos, datas ou instrumentos que não tenha visto no texto. Se o texto não mencionar nada sobre uma dimensão específica, isso significa pontuação 0 nessa dimensão e o "finding" deve dizer explicitamente que não há menção no texto — não infira boa prática a partir do silêncio, e não presuma que "provavelmente existe" algo só porque seria comum nesse tipo de país ou organização. É preferível uma pontuação baixa e honesta do que uma pontuação otimista sem base no texto.
+
+Para cada dimensão, o campo "evidence" deve conter uma referência curta e direta ao ponto exato do texto do utilizador que justifica a pontuação (uma paráfrase muito próxima do texto original, não uma citação literal longa) — ou, se não houver evidência no texto para essa dimensão, "evidence" deve dizer isso explicitamente (ex.: "Não mencionado no texto fornecido").
+
 Para a Dimensão 1, avalie se existe uma declaração orçamental de género estruturada: (i) análise da situação, (ii) efeitos/objetivos, (iii) atividades, (iv) indicadores desagregados por sexo, (v) orçamento associado.
 
 PARTE A — Avalie o orçamento segundo estas 5 dimensões, cada uma pontuada de 0 a 4:
-0 = Não iniciado: nenhuma evidência da prática.
-1 = Emergente: menções pontuais/isoladas, sem instrumento formal.
-2 = Em desenvolvimento: instrumento formal mas parcial (não cobre todos os ministérios/programas).
-3 = Avançado: aplicação consistente à maioria dos programas, com dados, mas falta base legal permanente ou avaliação de impacto.
-4 = Exemplar: consagrado em lei, aplicado universalmente, com dados desagregados, avaliação de impacto e prestação de contas pública.
-Regra: um instrumento formal mas parcial nunca deve passar de 2.
+0 = Não iniciado: nenhuma evidência da prática no texto.
+1 = Emergente: menções pontuais/isoladas no texto, sem instrumento formal.
+2 = Em desenvolvimento: o texto descreve um instrumento formal mas parcial (não cobre todos os ministérios/programas).
+3 = Avançado: o texto mostra aplicação consistente à maioria dos programas, com dados, mas falta base legal permanente ou avaliação de impacto.
+4 = Exemplar: o texto confirma prática consagrada em lei, aplicada universalmente, com dados desagregados, avaliação de impacto e prestação de contas pública.
+Regra: um instrumento formal mas parcial (segundo o texto) nunca deve passar de 2 — reserve 3 e 4 apenas quando o texto demonstrar cobertura efetivamente ampla ou universal, não intenção ou desenho de processo.
 
 Dimensões:
 ${modLines}
 
-PARTE B — Classificação por linha orçamental (até 6 linhas): Categoria 1 (neutro), Categoria 2 (específico de género), Categoria 3 (potencial impacto, requer comentário). Se o texto não detalhar linhas suficientes, devolva array vazio.
+PARTE B — Classificação por linha orçamental (até 6 linhas): Categoria 1 (neutro), Categoria 2 (específico de género), Categoria 3 (potencial impacto, requer comentário). Baseie-se apenas em linhas/projetos efetivamente mencionados no texto — não invente linhas orçamentais. Se o texto não detalhar linhas suficientes, devolva array vazio.
 
-Regra para recomendações: cada "recommendation" deve ser o passo seguinte para subir exatamente 1 nível na escada acima, não o estado ideal final.
+Regra para recomendações: cada "recommendation" deve ser o passo seguinte, concreto e realista, para subir exatamente 1 nível na escada acima a partir do que o texto mostra — não o estado ideal final, e não uma recomendação genérica desligada do que foi descrito.
+
+AUTOVERIFICAÇÃO (faça isto mentalmente antes de responder, não inclua na resposta): releia cada uma das 5 pontuações que atribuiu e confirme que (a) corresponde exatamente à âncora de maturidade 0-4 descrita acima, (b) tem uma frase do "evidence" que a sustenta diretamente, e (c) não é mais generosa do que o texto permite. Corrija qualquer pontuação que não passe neste teste antes de produzir o JSON final.
 
 Responda APENAS com um JSON válido, sem markdown, neste formato exato:
-{"overallScore": <média das 5 pontuações, 1 casa decimal>, "overallLevel": "<nível geral>", "summary": "<1 frase curta, máx 25 palavras>", "modules": [{"key": "<key>", "score": <0-4>, "finding": "<1 frase, máx 20 palavras>", "recommendation": "<1 frase acionável, máx 20 palavras>"}], "lineItems": [{"name": "<nome curto>", "category": <1|2|3>, "comment": "<1 frase, máx 15 palavras>"}]}
+{"overallScore": <média das 5 pontuações, 1 casa decimal>, "overallLevel": "<nível geral>", "summary": "<1 frase curta, máx 25 palavras>", "modules": [{"key": "<key>", "score": <0-4>, "finding": "<1 frase, máx 20 palavras>", "evidence": "<referência curta ao texto original, máx 20 palavras, ou \\"Não mencionado no texto fornecido\\">", "recommendation": "<1 frase acionável, máx 20 palavras>"}], "lineItems": [{"name": "<nome curto>", "category": <1|2|3>, "comment": "<1 frase, máx 15 palavras>"}]}
 
-Use as keys exatas: ${keysList}. Seja direto e crítico — não seja excessivamente elogioso se a informação for vaga ou insuficiente.
+Use as keys exatas: ${keysList}. Seja direto e crítico — não seja excessivamente elogioso se a informação for vaga ou insuficiente, e nunca prefira uma resposta "simpática" a uma resposta fiel ao que o texto realmente mostra.
 
-IMPORTANTE SOBRE O IDIOMA: toda a resposta — summary, finding, recommendation, comment, e overallLevel — deve ser escrita inteiramente em ${LANG_NAMES_PT[lang]}, incluindo terminologia técnica traduzida adequadamente. Mantenha as keys JSON exatamente como especificado (não traduza as keys), apenas os valores de texto devem estar em ${LANG_NAMES_PT[lang]}.`;
+IMPORTANTE SOBRE O IDIOMA: toda a resposta — summary, finding, evidence, recommendation, comment, e overallLevel — deve ser escrita inteiramente em ${LANG_NAMES_PT[lang]}, incluindo terminologia técnica traduzida adequadamente. Mantenha as keys JSON exatamente como especificado (não traduza as keys), apenas os valores de texto devem estar em ${LANG_NAMES_PT[lang]}.`;
     }
 
     async function analisar() {
@@ -1268,6 +1286,7 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta — summary, finding, recommendation,
                             React.createElement("span", { className: "text-xs flex-shrink-0", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#7A8F8C" } }, levels[m.score])),
                         React.createElement(LevelBar, { score: m.score }),
                         React.createElement("p", { className: "text-sm mt-3", style: { color: "#3E4C49" } }, m.finding),
+                        m.evidence && React.createElement("p", { className: "text-xs mt-1.5 italic", style: { color: "#9AA6A3" } }, `${s.evidenceLabel}: ${m.evidence}`),
                         React.createElement("p", { className: "text-sm mt-1.5 flex items-start gap-1.5", style: { color: "#1F5D5B" } },
                             React.createElement(ArrowEnd, { className: "w-3.5 h-3.5 mt-0.5 flex-shrink-0" }), m.recommendation)));
                 })),
