@@ -62,19 +62,36 @@ function dividirEmPartes(texto, tamanhoAlvo) {
 // utilizador, para evitar perdas de nuance em traduções encadeadas.
 const EXTRACTION_SYSTEM = `Você prepara extratos de uma parte de um documento orçamental extenso, para uma análise posterior de Orçamento Sensível ao Género (OSG). Este é o excerto {N} de um documento maior. Leia o texto e extraia, em português, apenas o que for relevante para avaliar: (1) declarações/notas orçamentais de género, (2) documentação orçamental que mencione género, (3) classificação ou natureza de linhas/projetos orçamentais, (4) dados de execução/desempenho desagregados por sexo, (5) avaliação de impacto ou exame legislativo sobre género. Inclua também até 8 linhas orçamentais ou projetos com montante, se existirem neste excerto. Seja factual e conciso — não invente informação que não esteja no texto, e não repita o texto integralmente. Se este excerto não tiver nada relevante, devolva notas vazias. Responda APENAS com JSON válido, sem markdown: {"notas": "<até 250 palavras>", "linhas": [{"nome": "...", "montante": "...", "observacao": "..."}]}`;
 
-async function chamarWorker(system, userContent, maxTokens) {
+async function chamarAPI(payload) {
     const response = await fetch(PROXY_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ system, messages: [{ role: "user", content: userContent }], max_tokens: maxTokens }),
+        body: JSON.stringify(payload),
     });
-    const data = await response.json();
+    let data;
+    try { data = await response.json(); } catch { data = {}; }
     if (!response.ok) {
-        throw new Error((data && data.error && data.error.message) || `Erro da API (código ${response.status}).`);
+        const err = new Error((data && data.error) || `Erro da API (código ${response.status}).`);
+        err.status = response.status;
+        throw err;
     }
+    return data;
+}
+async function chamarWorker(system, userContent, maxTokens, accessCode) {
+    const data = await chamarAPI({ system, messages: [{ role: "user", content: userContent }], max_tokens: maxTokens, accessCode });
     const text = (data.content || []).map((b) => b.text || "").join("");
     if (!text.trim()) throw new Error("A resposta veio vazia.");
     return text;
+}
+async function validarCodigo(accessCode) {
+    return chamarAPI({ action: "validate_code", accessCode });
+}
+async function listarHistorico(accessCode) {
+    const data = await chamarAPI({ action: "list_history", accessCode });
+    return data.history || [];
+}
+async function guardarHistorico(accessCode, entry) {
+    try { await chamarAPI({ action: "save_history", accessCode, entry }); } catch {}
 }
 
 // ---------- Ícones ----------
@@ -242,6 +259,18 @@ const STRINGS = {
         errIncompleteModules: "A resposta da análise está incompleta (módulos em falta).", errInvalidModule: "A resposta da análise contém dados inválidos num módulo.",
         errInvalidLineItems: "A resposta da análise está incompleta (classificação de linhas inválida).", errGeneral: "Não foi possível concluir a análise. Tente novamente.",
         langLabel: "Idioma",
+        gateTitle: "Acesso ao Analisador OSG",
+        gateSubtitle: "Introduza o código de acesso fornecido pela sua organização.",
+        accessCodePlaceholder: "Código de acesso",
+        accessCodeButton: "Entrar",
+        accessCodeChecking: "A verificar…",
+        accessCodeInvalid: "Código de acesso inválido ou inativo. Verifique com o administrador.",
+        errUsageLimit: "Limite mensal de análises atingido. Contacte o administrador para aumentar o plano.",
+        historyLabel: "Histórico",
+        historyEmpty: "Ainda não há análises guardadas.",
+        historyBack: "← Voltar à análise",
+        logoutLabel: "Sair",
+        welcomeOrg: (o) => `Sessão: ${o}`,
     },
     fr: {
         kicker: "Analyse BSG · Normes internationales",
@@ -274,6 +303,18 @@ const STRINGS = {
         errIncompleteModules: "La réponse de l'analyse est incomplète (modules manquants).", errInvalidModule: "La réponse de l'analyse contient des données invalides dans un module.",
         errInvalidLineItems: "La réponse de l'analyse est incomplète (classification invalide).", errGeneral: "Impossible de terminer l'analyse. Veuillez réessayer.",
         langLabel: "Langue",
+        gateTitle: "Accès à l'Analyseur OSG",
+        gateSubtitle: "Saisissez le code d'accès fourni par votre organisation.",
+        accessCodePlaceholder: "Code d'accès",
+        accessCodeButton: "Entrer",
+        accessCodeChecking: "Vérification…",
+        accessCodeInvalid: "Code d'accès invalide ou inactif. Vérifiez auprès de l'administrateur.",
+        errUsageLimit: "Limite mensuelle d'analyses atteinte. Contactez l'administrateur pour augmenter le forfait.",
+        historyLabel: "Historique",
+        historyEmpty: "Aucune analyse enregistrée pour l'instant.",
+        historyBack: "← Retour à l'analyse",
+        logoutLabel: "Se déconnecter",
+        welcomeOrg: (o) => `Session : ${o}`,
     },
     en: {
         kicker: "GRB Analysis · International standards",
@@ -306,6 +347,18 @@ const STRINGS = {
         errIncompleteModules: "The analysis response is incomplete (modules missing).", errInvalidModule: "The analysis response contains invalid data in a module.",
         errInvalidLineItems: "The analysis response is incomplete (invalid line classification).", errGeneral: "Could not complete the analysis. Please try again.",
         langLabel: "Language",
+        gateTitle: "Access to the OSG Analyser",
+        gateSubtitle: "Enter the access code provided by your organisation.",
+        accessCodePlaceholder: "Access code",
+        accessCodeButton: "Enter",
+        accessCodeChecking: "Checking…",
+        accessCodeInvalid: "Invalid or inactive access code. Check with your administrator.",
+        errUsageLimit: "Monthly analysis limit reached. Contact your administrator to upgrade the plan.",
+        historyLabel: "History",
+        historyEmpty: "No saved analyses yet.",
+        historyBack: "← Back to analysis",
+        logoutLabel: "Log out",
+        welcomeOrg: (o) => `Session: ${o}`,
     },
     es: {
         kicker: "Análisis PSG · Normas internacionales",
@@ -338,6 +391,18 @@ const STRINGS = {
         errIncompleteModules: "La respuesta del análisis está incompleta (faltan módulos).", errInvalidModule: "La respuesta del análisis contiene datos inválidos en un módulo.",
         errInvalidLineItems: "La respuesta del análisis está incompleta (clasificación inválida).", errGeneral: "No se pudo completar el análisis. Inténtelo de nuevo.",
         langLabel: "Idioma",
+        gateTitle: "Acceso al Analizador OSG",
+        gateSubtitle: "Introduzca el código de acceso proporcionado por su organización.",
+        accessCodePlaceholder: "Código de acceso",
+        accessCodeButton: "Entrar",
+        accessCodeChecking: "Verificando…",
+        accessCodeInvalid: "Código de acceso inválido o inactivo. Consulte con el administrador.",
+        errUsageLimit: "Límite mensual de análisis alcanzado. Contacte al administrador para ampliar el plan.",
+        historyLabel: "Historial",
+        historyEmpty: "Aún no hay análisis guardados.",
+        historyBack: "← Volver al análisis",
+        logoutLabel: "Cerrar sesión",
+        welcomeOrg: (o) => `Sesión: ${o}`,
     },
     ar: {
         kicker: "تحليل الميزانية الجندرية · معايير دولية",
@@ -370,6 +435,18 @@ const STRINGS = {
         errIncompleteModules: "رد التحليل غير مكتمل (الوحدات مفقودة).", errInvalidModule: "يحتوي رد التحليل على بيانات غير صالحة في إحدى الوحدات.",
         errInvalidLineItems: "رد التحليل غير مكتمل (تصنيف غير صالح).", errGeneral: "تعذّر إكمال التحليل. حاول مرة أخرى.",
         langLabel: "اللغة",
+        gateTitle: "الدخول إلى محلل OSG",
+        gateSubtitle: "أدخل رمز الوصول الذي قدّمته مؤسستك.",
+        accessCodePlaceholder: "رمز الوصول",
+        accessCodeButton: "دخول",
+        accessCodeChecking: "جارٍ التحقق…",
+        accessCodeInvalid: "رمز الوصول غير صالح أو غير نشط. تحقق مع المسؤول.",
+        errUsageLimit: "تم بلوغ الحد الشهري للتحليلات. تواصل مع المسؤول لترقية الخطة.",
+        historyLabel: "السجل",
+        historyEmpty: "لا توجد تحليلات محفوظة بعد.",
+        historyBack: "← العودة إلى التحليل",
+        logoutLabel: "تسجيل الخروج",
+        welcomeOrg: (o) => `الجلسة: ${o}`,
     },
     zh: {
         kicker: "性别响应式预算分析 · 国际标准",
@@ -402,6 +479,18 @@ const STRINGS = {
         errIncompleteModules: "分析结果不完整（缺少模块）。", errInvalidModule: "分析结果中某个模块包含无效数据。",
         errInvalidLineItems: "分析结果不完整（科目分类无效）。", errGeneral: "无法完成分析，请重试。",
         langLabel: "语言",
+        gateTitle: "登录 OSG 分析器",
+        gateSubtitle: "请输入您所在机构提供的访问码。",
+        accessCodePlaceholder: "访问码",
+        accessCodeButton: "进入",
+        accessCodeChecking: "正在验证…",
+        accessCodeInvalid: "访问码无效或已停用。请联系管理员。",
+        errUsageLimit: "已达到每月分析次数上限。请联系管理员升级方案。",
+        historyLabel: "历史记录",
+        historyEmpty: "尚无已保存的分析。",
+        historyBack: "← 返回分析",
+        logoutLabel: "退出登录",
+        welcomeOrg: (o) => `会话：${o}`,
     },
     ru: {
         kicker: "Анализ гендерного бюджета · Международные стандарты",
@@ -434,6 +523,18 @@ const STRINGS = {
         errIncompleteModules: "Ответ анализа неполный (отсутствуют модули).", errInvalidModule: "Ответ анализа содержит недопустимые данные в одном из модулей.",
         errInvalidLineItems: "Ответ анализа неполный (недопустимая классификация статей).", errGeneral: "Не удалось завершить анализ. Попробуйте снова.",
         langLabel: "Язык",
+        gateTitle: "Вход в Анализатор OSG",
+        gateSubtitle: "Введите код доступа, предоставленный вашей организацией.",
+        accessCodePlaceholder: "Код доступа",
+        accessCodeButton: "Войти",
+        accessCodeChecking: "Проверка…",
+        accessCodeInvalid: "Неверный или неактивный код доступа. Уточните у администратора.",
+        errUsageLimit: "Достигнут месячный лимит анализов. Обратитесь к администратору для расширения тарифа.",
+        historyLabel: "История",
+        historyEmpty: "Пока нет сохранённых анализов.",
+        historyBack: "← Назад к анализу",
+        logoutLabel: "Выйти",
+        welcomeOrg: (o) => `Сеанс: ${o}`,
     },
     sw: {
         kicker: "Uchambuzi wa Bajeti Inayozingatia Jinsia · Viwango vya Kimataifa",
@@ -466,6 +567,18 @@ const STRINGS = {
         errIncompleteModules: "Jibu la uchambuzi halijakamilika (moduli hazipo).", errInvalidModule: "Jibu la uchambuzi lina data batili katika moduli moja.",
         errInvalidLineItems: "Jibu la uchambuzi halijakamilika (uainishaji batili).", errGeneral: "Imeshindwa kukamilisha uchambuzi. Tafadhali jaribu tena.",
         langLabel: "Lugha",
+        gateTitle: "Ingia kwenye Kichambuzi cha OSG",
+        gateSubtitle: "Weka msimbo wa ufikiaji uliotolewa na shirika lako.",
+        accessCodePlaceholder: "Msimbo wa ufikiaji",
+        accessCodeButton: "Ingia",
+        accessCodeChecking: "Inathibitisha…",
+        accessCodeInvalid: "Msimbo wa ufikiaji si sahihi au haujawezeshwa. Wasiliana na msimamizi.",
+        errUsageLimit: "Kikomo cha uchambuzi cha mwezi kimefikiwa. Wasiliana na msimamizi ili kupandisha mpango.",
+        historyLabel: "Historia",
+        historyEmpty: "Hakuna uchambuzi uliohifadhiwa bado.",
+        historyBack: "← Rudi kwenye uchambuzi",
+        logoutLabel: "Toka",
+        welcomeOrg: (o) => `Kipindi: ${o}`,
     },
 };
 
@@ -563,6 +676,65 @@ function OSGAnalyzer() {
     const [ficheiroNome, setFicheiroNome] = useState("");
     const [extraindo, setExtraindo] = useState(false);
     const [erroFicheiro, setErroFicheiro] = useState("");
+
+    // ---- Portal de acesso ----
+    const [accessCode, setAccessCode] = useState(() => {
+        try { return localStorage.getItem("osg_access_code") || ""; } catch { return ""; }
+    });
+    const [gateStatus, setGateStatus] = useState("checking"); // checking | gate | ok | invalid
+    const [gateInput, setGateInput] = useState("");
+    const [orgName, setOrgName] = useState("");
+    const [showHistory, setShowHistory] = useState(false);
+    const [history, setHistory] = useState([]);
+    const [historyLoading, setHistoryLoading] = useState(false);
+
+    useEffect(() => {
+        let cancelado = false;
+        async function verificar() {
+            if (!accessCode) { setGateStatus("gate"); return; }
+            try {
+                const data = await validarCodigo(accessCode);
+                if (cancelado) return;
+                setOrgName(data.org || "");
+                setGateStatus("ok");
+            } catch {
+                if (cancelado) return;
+                setGateStatus("gate");
+            }
+        }
+        verificar();
+        return () => { cancelado = true; };
+    }, [accessCode]);
+
+    async function entrarComCodigo() {
+        const codigo = gateInput.trim();
+        if (!codigo) return;
+        setGateStatus("checking");
+        try {
+            const data = await validarCodigo(codigo);
+            try { localStorage.setItem("osg_access_code", codigo); } catch {}
+            setAccessCode(codigo);
+            setOrgName(data.org || "");
+            setGateStatus("ok");
+        } catch {
+            setGateStatus("invalid");
+        }
+    }
+    function sair() {
+        try { localStorage.removeItem("osg_access_code"); } catch {}
+        setAccessCode(""); setOrgName(""); setGateInput(""); setGateStatus("gate");
+        setShowHistory(false); reiniciarSemLimpar();
+    }
+    async function abrirHistorico() {
+        setShowHistory(true); setHistoryLoading(true);
+        try { setHistory(await listarHistorico(accessCode)); }
+        catch { setHistory([]); }
+        finally { setHistoryLoading(false); }
+    }
+    function verHistoricoItem(item) {
+        setResult(item.result); setExemploAtivo(null); setStatus("done"); setShowHistory(false);
+    }
+    function reiniciarSemLimpar() {}
 
     async function extrairTextoPdf(arrayBuffer) {
         if (typeof pdfjsLib !== "undefined" && pdfjsLib.GlobalWorkerOptions) {
@@ -674,20 +846,28 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta — summary, finding, recommendation,
                 setProgresso(s.progressChunking(partes.length));
                 const extratos = await Promise.all(partes.map(async (parte, i) => {
                     const prompt = EXTRACTION_SYSTEM.replace("{N}", `${i + 1} de ${partes.length}`);
-                    try { return parseAnalysisJson(await chamarWorker(prompt, parte, 1200)); }
+                    try { return parseAnalysisJson(await chamarWorker(prompt, parte, 1200, accessCode)); }
                     catch { return { notas: "", linhas: [] }; }
                 }));
                 setProgresso(s.progressSynthesizing);
                 conteudoParaAnalise = extratos.map((ex, i) => `--- Excerto ${i + 1}/${extratos.length} ---\nNotas: ${ex.notas || "(sem informação relevante)"}\nLinhas: ${JSON.stringify(ex.linhas || [])}`).join("\n\n");
             }
-            const text = await chamarWorker(system, conteudoParaAnalise, 4096);
+            const text = await chamarWorker(system, conteudoParaAnalise, 4096, accessCode);
             let parsed;
             try { parsed = parseAnalysisJson(text); }
             catch { throw new Error(s.errInvalidFormat); }
             validateResult(parsed, s);
             setResult(parsed); setStatus("done");
+            guardarHistorico(accessCode, { lang, inputExcerpt: input.slice(0, 400), result: parsed });
         } catch (e) {
-            setErrorMsg(e instanceof Error && e.message ? e.message : s.errGeneral);
+            if (e && e.status === 401) {
+                setErrorMsg(s.accessCodeInvalid);
+                setGateStatus("gate");
+            } else if (e && e.status === 429) {
+                setErrorMsg(s.errUsageLimit);
+            } else {
+                setErrorMsg(e instanceof Error && e.message ? e.message : s.errGeneral);
+            }
             setStatus("error");
         } finally {
             setProgresso("");
@@ -704,20 +884,55 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta — summary, finding, recommendation,
         setInput(ex.input); setResult(ex.result); setExemploAtivo(pais); setStatus("done");
     }
 
+    if (gateStatus !== "ok") {
+        return (React.createElement("div", { className: "min-h-screen w-full flex items-center justify-center px-6", dir: isRTL ? "rtl" : "ltr", style: { background: "#F6F3ED", fontFamily: bodyFont, color: "#16302E" } },
+            React.createElement("div", { className: "w-full max-w-sm" },
+                React.createElement("div", { className: "flex items-center gap-2 mb-6 justify-center" },
+                    React.createElement(Scale, { className: "w-6 h-6", style: { color: "#C9A227" }, strokeWidth: 1.75 }),
+                    React.createElement("span", { className: "text-sm font-medium" }, "Analisador OSG")),
+                React.createElement("div", { className: "rounded-lg border p-6", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
+                    React.createElement("h1", { className: "text-lg font-medium mb-1", style: { fontFamily: headingFont } }, s.gateTitle),
+                    React.createElement("p", { className: "text-sm mb-4", style: { color: "#7A8F8C" } }, s.gateSubtitle),
+                    React.createElement("input", {
+                        type: "text", value: gateInput, onChange: (e) => setGateInput(e.target.value),
+                        onKeyDown: (e) => { if (e.key === "Enter") entrarComCodigo(); },
+                        placeholder: s.accessCodePlaceholder, autoFocus: true,
+                        className: "w-full border rounded-md px-3 py-2 text-sm outline-none mb-3",
+                        style: { borderColor: "#DED7C6" },
+                    }),
+                    gateStatus === "invalid" && React.createElement("p", { className: "text-xs mb-3", style: { color: "#B5541F" } }, s.accessCodeInvalid),
+                    React.createElement("button", {
+                        onClick: entrarComCodigo, disabled: !gateInput.trim() || gateStatus === "checking",
+                        className: "w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium disabled:opacity-40",
+                        style: { background: "#1F5D5B", color: "#F6F3ED" },
+                    }, gateStatus === "checking" ? React.createElement(React.Fragment, null, React.createElement(Loader2, { className: "w-4 h-4 animate-spin" }), " " + s.accessCodeChecking) : s.accessCodeButton)),
+                React.createElement("div", { className: "flex items-center gap-1.5 mt-4 justify-center" },
+                    React.createElement(Globe, { className: "w-3.5 h-3.5", style: { color: "#9AA6A3" } }),
+                    React.createElement("select", {
+                        value: lang, onChange: (e) => setLang(e.target.value),
+                        className: "text-xs border rounded-md px-2 py-1 outline-none",
+                        style: { borderColor: "#DED7C6", color: "#16302E", background: "#FFFFFF" },
+                    }, Object.entries(LANGUAGES).map(([code, meta]) => (React.createElement("option", { key: code, value: code }, meta.name))))))));
+    }
+
     return (React.createElement("div", { className: "min-h-screen w-full", dir: isRTL ? "rtl" : "ltr", style: { background: "#F6F3ED", fontFamily: bodyFont, color: "#16302E" } },
         React.createElement("div", { className: "max-w-3xl mx-auto px-6 py-14" },
             React.createElement("div", { className: "flex items-center justify-between gap-3 mb-3 flex-wrap" },
                 React.createElement("div", { className: "flex items-center gap-3" },
                     React.createElement(Scale, { className: "w-6 h-6", style: { color: "#C9A227" }, strokeWidth: 1.75 }),
                     React.createElement("span", { className: "text-xs tracking-[0.2em] uppercase", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#7A8F8C" } }, s.kicker)),
-                React.createElement("div", { className: "flex items-center gap-1.5" },
-                    React.createElement(Globe, { className: "w-3.5 h-3.5", style: { color: "#7A8F8C" } }),
-                    React.createElement("select", {
-                        value: lang, onChange: (e) => setLang(e.target.value),
-                        "aria-label": s.langLabel,
-                        className: "text-xs border rounded-md px-2 py-1 outline-none",
-                        style: { borderColor: "#DED7C6", color: "#16302E", background: "#FFFFFF", fontFamily: "'Inter', sans-serif" },
-                    }, Object.entries(LANGUAGES).map(([code, meta]) => (React.createElement("option", { key: code, value: code }, meta.name)))))),
+                React.createElement("div", { className: "flex items-center gap-3 flex-wrap" },
+                    orgName && React.createElement("span", { className: "text-xs", style: { color: "#9AA6A3" } }, s.welcomeOrg(orgName)),
+                    React.createElement("button", { onClick: abrirHistorico, className: "text-xs underline", style: { color: "#1F5D5B" } }, s.historyLabel),
+                    React.createElement("button", { onClick: sair, className: "text-xs underline", style: { color: "#9AA6A3" } }, s.logoutLabel),
+                    React.createElement("div", { className: "flex items-center gap-1.5" },
+                        React.createElement(Globe, { className: "w-3.5 h-3.5", style: { color: "#7A8F8C" } }),
+                        React.createElement("select", {
+                            value: lang, onChange: (e) => setLang(e.target.value),
+                            "aria-label": s.langLabel,
+                            className: "text-xs border rounded-md px-2 py-1 outline-none",
+                            style: { borderColor: "#DED7C6", color: "#16302E", background: "#FFFFFF", fontFamily: "'Inter', sans-serif" },
+                        }, Object.entries(LANGUAGES).map(([code, meta]) => (React.createElement("option", { key: code, value: code }, meta.name))))))),
             React.createElement("h1", { className: "text-4xl sm:text-5xl mb-4 leading-tight", style: { fontFamily: headingFont, fontWeight: 600 } }, s.title),
             React.createElement("p", { className: "text-base mb-10 max-w-xl", style: { color: "#495C59" } }, s.subtitle),
             status !== "done" && (React.createElement("div", { className: "rounded-lg border p-5", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
@@ -735,6 +950,18 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta — summary, finding, recommendation,
                     React.createElement("button", { onClick: analisar, disabled: !input.trim() || status === "loading", className: "inline-flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-medium transition-opacity disabled:opacity-40", style: { background: "#1F5D5B", color: "#F6F3ED" } }, status === "loading" ? (React.createElement(React.Fragment, null,
                         React.createElement(Loader2, { className: "w-4 h-4 animate-spin" }), " ", progresso || s.analyzingButton)) : (React.createElement(React.Fragment, null,
                         s.analyzeButton + " ", React.createElement(ArrowEnd, { className: "w-4 h-4" }))))))),
+            showHistory && (React.createElement("div", { className: "rounded-lg border p-5 mb-4", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
+                React.createElement("div", { className: "flex items-center justify-between mb-3" },
+                    React.createElement("h2", { className: "text-sm font-medium" }, s.historyLabel),
+                    React.createElement("button", { onClick: () => setShowHistory(false), className: "text-xs underline", style: { color: "#7A8F8C" } }, s.historyBack)),
+                historyLoading && React.createElement(Loader2, { className: "w-4 h-4 animate-spin", style: { color: "#7A8F8C" } }),
+                !historyLoading && history.length === 0 && React.createElement("p", { className: "text-xs", style: { color: "#9AA6A3" } }, s.historyEmpty),
+                !historyLoading && history.length > 0 && React.createElement("div", { className: "space-y-2" }, history.map((item, idx) => (
+                    React.createElement("button", { key: idx, onClick: () => verHistoricoItem(item), className: "w-full text-left rounded-md border p-3 hover:bg-gray-50", style: { borderColor: "#EDE8DC" } },
+                        React.createElement("div", { className: "flex items-center justify-between" },
+                            React.createElement("span", { className: "text-sm font-medium" }, item.result ? item.result.overallLevel : "—"),
+                            React.createElement("span", { className: "text-xs", style: { color: "#9AA6A3" } }, item.savedAt ? new Date(item.savedAt).toLocaleDateString() : "")),
+                        React.createElement("p", { className: "text-xs mt-1 truncate", style: { color: "#7A8F8C" } }, item.inputExcerpt || ""))))))),
             status === "idle" && lang === "pt" && (React.createElement("div", { className: "mt-4" },
                 React.createElement("div", { className: "text-xs uppercase tracking-wide mb-2", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#9AA6A3" } }, s.examplesLabel),
                 React.createElement("div", { className: "flex flex-wrap gap-x-5 gap-y-2" }, Object.entries(EXEMPLOS_PT).map(([code, ex]) => (React.createElement("button", { key: code, onClick: () => verExemplo(code), className: "inline-flex items-center gap-2 text-sm", style: { color: "#1F5D5B" } },
