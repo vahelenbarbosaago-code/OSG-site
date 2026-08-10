@@ -484,14 +484,26 @@ function BSGAnalyzer() {
         try {
             const system = `Você é um avaliador técnico internacional de Orçamento Sensível ao Género (BSG / Gender-Responsive Budgeting). A sua avaliação de referência universal segue as Boas Práticas de Orçamentação de Género da OCDE (OECD Best Practices for Gender Budgeting, 2023), o módulo suplementar de Gestão das Finanças Públicas Sensíveis ao Género do PEFA (GRPFM, reforma 2020) e o indicador ODS 5.c.1 da ONU sobre sistemas de acompanhamento de financiamento para a igualdade de género. Esta base é aplicável a qualquer país, independentemente da sua região ou nível de rendimento.
 
-IMPORTANTE — Reconhecimento regional automático: identifique no texto do utilizador o país, região ou organização em causa e, sempre que reconhecer um enquadramento específico aplicável, cite-o explicitamente nas suas conclusões, além da base universal acima. Exemplos de enquadramentos regionais a reconhecer:
-- Países da UEMOA/CEDEAO (África Ocidental): módulos de formação BSG da UEMOA (2024), formato de "déclaration budgétaire sensible au genre"
+IMPORTANTE — Reconhecimento regional e nacional automático: identifique no texto do utilizador o país, região, bloco económico ou organização em causa e, sempre que reconhecer um enquadramento específico aplicável, cite-o explicitamente nas suas conclusões, além da base universal acima. Enquadramentos regionais e blocos económicos a reconhecer:
+- Países da UEMOA/CEDEAO/ECOWAS (África Ocidental): módulos de formação BSG da UEMOA (2024), formato de "déclaration budgétaire sensible au genre"
+- Estados-membros da SADC (África Austral): SADC Protocol on Gender and Development (2008, revisto 2016)
+- Estados-membros da União Africana: Protocolo de Maputo, Agenda 2063, Estratégia de Género da UA
 - Estados-membros da União Europeia: EU Gender Action Plan III, orientações do EIGE (European Institute for Gender Equality)
+- Países do Conselho da Europa (inclui não-UE): Estratégia de Igualdade de Género do Conselho da Europa
 - Países da Commonwealth: orientações do Commonwealth Secretariat sobre orçamentação de género
-- Estados-membros da União Africana: Protocolo de Maputo, Agenda 2063
 - Países nórdicos: orientações do Conselho Nórdico de Ministros
-- Qualquer outro país: aplique apenas a base universal (OCDE/PEFA/ODS) sem inventar um enquadramento regional que não existe
-Se não conseguir identificar o país/região com confiança, ou se o enquadramento regional específico não for do seu conhecimento, avalie apenas com a base universal e não invente nomes de circulares, leis ou instrumentos que não tenha confirmado existirem.
+- Estados-membros da ASEAN (Sudeste Asiático): ASEAN Gender Mainstreaming Strategic Framework
+- Estados-membros da CARICOM (Caraíbas): quadro de género da CARICOM
+- Países da Liga Árabe: orientações da Arab Women Organization sobre orçamentação de género
+- Países da América Latina: orientações da CEPAL/ECLAC sobre orçamentos com perspetiva de género
+- Índia: mandato de "Gender Budgeting" do Ministério das Finanças (declarações de género no orçamento da União desde 2005)
+- Filipinas: mandato legal do "GAD Budget" (Gender and Development), mínimo de 5% do orçamento
+- Ruanda: obrigação constitucional de orçamentação sensível ao género
+- México: "Anexo Transversal de Erogaciones para la Igualdad entre Mujeres y Hombres"
+- Marrocos: "Rapport Genre" anexado à Lei do Orçamento desde 2005
+- Quando aplicável e relevante, mencione também orientações globais não regionais: UN Women (Gender-Responsive Budgeting guidance), Banco Mundial e FMI (notas técnicas sobre orçamentação de género)
+- Qualquer outro país ou organização sem enquadramento específico conhecido: aplique apenas a base universal (OCDE/PEFA/ODS) sem inventar um enquadramento regional que não existe
+Se não conseguir identificar o país/região com confiança, ou se o enquadramento regional ou nacional específico não for do seu conhecimento com certeza, avalie apenas com a base universal e não invente nomes de circulares, leis ou instrumentos que não tenha confirmado existirem — é preferível citar só a base universal do que inventar uma norma nacional incorreta.
 
 Para a Dimensão 1, avalie se existe uma declaração ou nota orçamental de género estruturada: idealmente (i) análise da situação com foco nos problemas de género, (ii) efeitos/objetivos a produzir para resolver essas questões, (iii) atividades associadas, (iv) pelo menos um indicador por efeito, ventilado por sexo, e (v) o orçamento alocado, incluindo qualquer dotação específica para género. A ausência de qualquer um destes 5 elementos deve baixar a nota desta dimensão.
 
@@ -592,7 +604,7 @@ Use as keys exatas dos módulos: ${MODULES.map((m) => m.key).join(", ")}. No cam
                 React.createElement(Scale, { className: "w-6 h-6", style: { color: "#C9A227" }, strokeWidth: 1.75 }),
                 React.createElement("span", { className: "text-xs tracking-[0.2em] uppercase", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#7A8F8C" } }, "An\u00E1lise BSG \u00B7 Padr\u00F5es internacionais")),
             React.createElement("h1", { className: "text-4xl sm:text-5xl mb-4 leading-tight", style: { fontFamily: "'Fraunces', serif", fontWeight: 600 } }, "O seu or\u00E7amento fala a favor de quem?"),
-            React.createElement("p", { className: "text-base mb-10 max-w-xl", style: { color: "#495C59" } }, "Descreva um or\u00E7amento, programa ou linha de despesa de qualquer pa\u00EDs ou organiza\u00E7\u00E3o. A an\u00E1lise aplica a metodologia internacional de refer\u00EAncia das Boas Pr\u00E1ticas de G\u00E9nero da OCDE (2023) e do m\u00F3dulo PEFA GRPFM, e reconhece automaticamente o enquadramento regional aplic\u00E1vel \u2014 UEMOA, Uni\u00E3o Europeia, Commonwealth, Uni\u00E3o Africana, ONU Mulheres, entre outros \u2014 quando identific\u00E1vel no texto."),
+            React.createElement("p", { className: "text-base mb-10 max-w-xl", style: { color: "#495C59" } }, "Descreva um or\u00E7amento, programa ou linha de despesa de qualquer pa\u00EDs, bloco econ\u00F3mico ou organiza\u00E7\u00E3o do mundo. A an\u00E1lise aplica a metodologia internacional de refer\u00EAncia das Boas Pr\u00E1ticas de G\u00E9nero da OCDE (2023) e do m\u00F3dulo PEFA GRPFM, e reconhece automaticamente o enquadramento nacional ou regional aplic\u00E1vel \u2014 UEMOA/CEDEAO, Uni\u00E3o Europeia, SADC, Uni\u00E3o Africana, Commonwealth, ASEAN, CARICOM, Liga \u00C1rabe, CEPAL, ONU Mulheres e normas nacionais espec\u00EDficas (\u00CDndia, Filipinas, Ruanda, M\u00E9xico, Marrocos, entre outras) \u2014 quando identific\u00E1vel no texto."),
             status !== "done" && (React.createElement("div", { className: "rounded-lg border p-5", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
                 React.createElement("label", { htmlFor: "osg-input", className: "text-xs uppercase tracking-wide mb-2 block", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#7A8F8C" } }, "Descri\u00E7\u00E3o do or\u00E7amento / programa"),
                 React.createElement("textarea", { id: "osg-input", value: input, onChange: (e) => setInput(e.target.value), placeholder: "Ex.: Minist\u00E9rio X, or\u00E7amento de 3 mil milh\u00F5es FCFA, 84% investimento financiado por doadores. Projetos: Empoderamento das Mulheres de Gabu (423M), Educa\u00E7\u00E3o de Base e Igualdade dos G\u00E9neros (300M)...", className: "w-full h-40 resize-none outline-none text-sm leading-relaxed", style: { color: "#16302E" } }),
@@ -680,7 +692,7 @@ Use as keys exatas dos módulos: ${MODULES.map((m) => m.key).join(", ")}. No cam
                     " Analisar outro or\u00E7amento"))),
             React.createElement("div", { className: "mt-14 flex items-center gap-2 text-xs", style: { color: "#9AA6A3" } },
                 React.createElement(FileText, { className: "w-3.5 h-3.5" }),
-                "Fontes: OCDE Best Practices for Gender Budgeting (2023) \u00B7 PEFA GRPFM (2020) \u00B7 Indicador ODS 5.c.1 (ONU) \u00B7 enquadramentos regionais (UEMOA, UE, Commonwealth, UA) quando aplic\u00E1vel."))));
+                "Fontes: OCDE Best Practices for Gender Budgeting (2023) \u00B7 PEFA GRPFM (2020) \u00B7 Indicador ODS 5.c.1 (ONU) \u00B7 enquadramentos nacionais e regionais (UEMOA/CEDEAO, UE, SADC, UA, Commonwealth, ASEAN, CARICOM, Liga \u00C1rabe, CEPAL, ONU Mulheres, entre outros) quando aplic\u00E1vel."))));
 }
 try {
     const root = ReactDOM.createRoot(document.getElementById("root"));
