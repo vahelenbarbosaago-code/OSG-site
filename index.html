@@ -72,7 +72,15 @@ async function chamarAPI(payload) {
     let data;
     try { data = await response.json(); } catch { data = {}; }
     if (!response.ok) {
-        const err = new Error((data && data.error) || `Erro da API (código ${response.status}).`);
+        // O campo "error" pode vir como texto simples (erros do próprio
+        // Worker) ou como objeto {message: "..."} quando o Worker devolve
+        // diretamente a resposta de erro da API da Anthropic — sem isto,
+        // "new Error(objeto)" produzia a mensagem inútil "[object Object]".
+        let mensagem;
+        if (typeof data?.error === "string") mensagem = data.error;
+        else if (data?.error?.message) mensagem = data.error.message;
+        else mensagem = `Erro da API (código ${response.status}).`;
+        const err = new Error(mensagem);
         err.status = response.status;
         throw err;
     }
