@@ -253,41 +253,49 @@ const GENDER_MARKER_INFO_I18N = {
         G0: { label: "G0 — Não visa a igualdade de género", short: "Não visa género", color: "#9AA6A3" },
         G1: { label: "G1 — Componente de género (objetivo significativo)", short: "Objetivo significativo", color: "#C9A227" },
         G2: { label: "G2 — Promoção direta da igualdade de género (objetivo principal)", short: "Objetivo principal", color: "#1F5D5B" },
+        G3: { label: "G3 — Prevenção e resposta à violência baseada no género (VBG)", short: "Violência baseada no género", color: "#7A3B69" },
     },
     fr: {
         G0: { label: "G0 — Ne vise pas l'égalité de genre", short: "Ne vise pas le genre", color: "#9AA6A3" },
         G1: { label: "G1 — Composante de genre (objectif significatif)", short: "Objectif significatif", color: "#C9A227" },
         G2: { label: "G2 — Promotion directe de l'égalité de genre (objectif principal)", short: "Objectif principal", color: "#1F5D5B" },
+        G3: { label: "G3 — Prévention et réponse à la violence basée sur le genre (VBG)", short: "Violence basée sur le genre", color: "#7A3B69" },
     },
     en: {
         G0: { label: "G0 — Does not target gender equality", short: "Not targeted", color: "#9AA6A3" },
         G1: { label: "G1 — Gender component (significant objective)", short: "Significant objective", color: "#C9A227" },
         G2: { label: "G2 — Direct promotion of gender equality (principal objective)", short: "Principal objective", color: "#1F5D5B" },
+        G3: { label: "G3 — Prevention of and response to gender-based violence (GBV)", short: "Gender-based violence", color: "#7A3B69" },
     },
     es: {
         G0: { label: "G0 — No se orienta a la igualdad de género", short: "No orientado al género", color: "#9AA6A3" },
         G1: { label: "G1 — Componente de género (objetivo significativo)", short: "Objetivo significativo", color: "#C9A227" },
         G2: { label: "G2 — Promoción directa de la igualdad de género (objetivo principal)", short: "Objetivo principal", color: "#1F5D5B" },
+        G3: { label: "G3 — Prevención y respuesta a la violencia basada en género (VBG)", short: "Violencia basada en género", color: "#7A3B69" },
     },
     ar: {
         G0: { label: "G0 — لا يستهدف المساواة بين الجنسين", short: "لا يستهدف النوع الاجتماعي", color: "#9AA6A3" },
         G1: { label: "G1 — مكوّن جندري (هدف مهم)", short: "هدف مهم", color: "#C9A227" },
         G2: { label: "G2 — تعزيز مباشر للمساواة بين الجنسين (هدف رئيسي)", short: "هدف رئيسي", color: "#1F5D5B" },
+        G3: { label: "G3 — الوقاية والاستجابة للعنف القائم على النوع الاجتماعي", short: "العنف القائم على النوع الاجتماعي", color: "#7A3B69" },
     },
     zh: {
         G0: { label: "G0——不针对性别平等", short: "不针对性别", color: "#9AA6A3" },
         G1: { label: "G1——性别相关组成部分（重要目标）", short: "重要目标", color: "#C9A227" },
         G2: { label: "G2——直接促进性别平等（主要目标）", short: "主要目标", color: "#1F5D5B" },
+        G3: { label: "G3——预防和应对基于性别的暴力", short: "基于性别的暴力", color: "#7A3B69" },
     },
     ru: {
         G0: { label: "G0 — Не нацелен на гендерное равенство", short: "Не нацелен на гендер", color: "#9AA6A3" },
         G1: { label: "G1 — Гендерный компонент (значимая цель)", short: "Значимая цель", color: "#C9A227" },
         G2: { label: "G2 — Прямое содействие гендерному равенству (главная цель)", short: "Главная цель", color: "#1F5D5B" },
+        G3: { label: "G3 — Предотвращение и реагирование на гендерное насилие", short: "Гендерное насилие", color: "#7A3B69" },
     },
     sw: {
         G0: { label: "G0 — Hailengi usawa wa kijinsia", short: "Hailengi jinsia", color: "#9AA6A3" },
         G1: { label: "G1 — Kipengele cha kijinsia (lengo muhimu)", short: "Lengo muhimu", color: "#C9A227" },
         G2: { label: "G2 — Ukuzaji wa moja kwa moja wa usawa wa kijinsia (lengo kuu)", short: "Lengo kuu", color: "#1F5D5B" },
+        G3: { label: "G3 — Kuzuia na kukabiliana na ukatili wa kijinsia (VBG)", short: "Ukatili wa kijinsia", color: "#7A3B69" },
     },
 };
 
@@ -315,6 +323,18 @@ const STRINGS = {
         markerNote: "Escala G0/G1/G2 da OCDE-CAD, adotada pela União Europeia e pelo modelo Pro PALOP-TL ISC/UEMOA.",
         tallyLabel: "Distribuição do marcador",
         fullReportBenchmark: "Referência internacional",
+        manualOverrideLabel: "Ajustado manualmente",
+        benchmarkUE: "UE — meta de 85% (G1+G2+G3)",
+        benchmarkWB: "Banco Mundial — meta de 55% (G1+G2+G3)",
+        benchmarkUNDP: "PNUD 2030 — meta de 15% em G2",
+        benchmarkUNCT: "ONU (UNCT) — limiar de 70% em G2/G3 (proxy por nº de linhas, não por valor orçamental)",
+        frameworksToggle: "Ver todas as normas internacionais em vigor",
+        frameworksToggleHide: "Ocultar normas internacionais",
+        frameworksTitle: "Enquadramento internacional de referência",
+        roadmapTitle: "Próximos passos",
+        roadmapShort: "Curto prazo (0-6 meses)",
+        roadmapMedium: "Médio prazo (6-18 meses)",
+        roadmapLong: "Longo prazo (18+ meses)",
         restartButton: "Analisar outro orçamento",
         footerSources: "Fontes: OCDE Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Indicador ODS 5.c.1 (ONU) · enquadramentos nacionais e regionais quando aplicável.",
         fileTooLarge: (mb) => `Este ficheiro tem ${mb} MB — o limite é 30 MB. Tente exportar só a secção relevante.`,
@@ -414,6 +434,18 @@ const STRINGS = {
         markerNote: "Échelle G0/G1/G2 de l'OCDE-CAD, adoptée par l'Union européenne et le modèle Pro PALOP-TL ISC/UEMOA.",
         tallyLabel: "Répartition du marqueur",
         fullReportBenchmark: "Référence internationale",
+        manualOverrideLabel: "Ajusté manuellement",
+        benchmarkUE: "UE — objectif de 85 % (G1+G2+G3)",
+        benchmarkWB: "Banque mondiale — objectif de 55 % (G1+G2+G3)",
+        benchmarkUNDP: "PNUD 2030 — objectif de 15 % en G2",
+        benchmarkUNCT: "ONU (UNCT) — seuil de 70 % en G2/G3 (approximation par nombre de lignes, non par valeur budgétaire)",
+        frameworksToggle: "Voir toutes les normes internationales en vigueur",
+        frameworksToggleHide: "Masquer les normes internationales",
+        frameworksTitle: "Cadre international de référence",
+        roadmapTitle: "Prochaines étapes",
+        roadmapShort: "Court terme (0-6 mois)",
+        roadmapMedium: "Moyen terme (6-18 mois)",
+        roadmapLong: "Long terme (18+ mois)",
         restartButton: "Analyser un autre budget",
         footerSources: "Sources : OCDE Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Indicateur ODD 5.c.1 (ONU) · cadres nationaux et régionaux le cas échéant.",
         fileTooLarge: (mb) => `Ce fichier fait ${mb} Mo — la limite est de 30 Mo. Essayez d'exporter uniquement la section pertinente.`,
@@ -513,6 +545,18 @@ const STRINGS = {
         markerNote: "OECD-DAC G0/G1/G2 scale, adopted by the European Union and the Pro PALOP-TL ISC/UEMOA model.",
         tallyLabel: "Marker distribution",
         fullReportBenchmark: "International benchmark",
+        manualOverrideLabel: "Manually adjusted",
+        benchmarkUE: "EU — 85% target (G1+G2+G3)",
+        benchmarkWB: "World Bank — 55% target (G1+G2+G3)",
+        benchmarkUNDP: "UNDP 2030 — 15% target in G2",
+        benchmarkUNCT: "UN (UNCT) — 70% threshold in G2/G3 (proxy by line count, not budget value)",
+        frameworksToggle: "See all international standards in force",
+        frameworksToggleHide: "Hide international standards",
+        frameworksTitle: "International reference framework",
+        roadmapTitle: "Next steps",
+        roadmapShort: "Short term (0-6 months)",
+        roadmapMedium: "Medium term (6-18 months)",
+        roadmapLong: "Long term (18+ months)",
         restartButton: "Analyse another budget",
         footerSources: "Sources: OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · SDG Indicator 5.c.1 (UN) · national and regional frameworks where applicable.",
         fileTooLarge: (mb) => `This file is ${mb} MB — the limit is 30 MB. Try exporting just the relevant section.`,
@@ -612,6 +656,18 @@ const STRINGS = {
         markerNote: "Escala G0/G1/G2 de la OCDE-CAD, adoptada por la Unión Europea y el modelo Pro PALOP-TL ISC/UEMOA.",
         tallyLabel: "Distribución del marcador",
         fullReportBenchmark: "Referencia internacional",
+        manualOverrideLabel: "Ajustado manualmente",
+        benchmarkUE: "UE — meta del 85% (G1+G2+G3)",
+        benchmarkWB: "Banco Mundial — meta del 55% (G1+G2+G3)",
+        benchmarkUNDP: "PNUD 2030 — meta del 15% en G2",
+        benchmarkUNCT: "ONU (UNCT) — umbral del 70% en G2/G3 (aproximación por nº de líneas, no por valor presupuestario)",
+        frameworksToggle: "Ver todas las normas internacionales vigentes",
+        frameworksToggleHide: "Ocultar normas internacionales",
+        frameworksTitle: "Marco internacional de referencia",
+        roadmapTitle: "Próximos pasos",
+        roadmapShort: "Corto plazo (0-6 meses)",
+        roadmapMedium: "Medio plazo (6-18 meses)",
+        roadmapLong: "Largo plazo (18+ meses)",
         restartButton: "Analizar otro presupuesto",
         footerSources: "Fuentes: OCDE Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Indicador ODS 5.c.1 (ONU) · marcos nacionales y regionales cuando corresponda.",
         fileTooLarge: (mb) => `Este archivo tiene ${mb} MB — el límite es 30 MB. Intente exportar solo la sección relevante.`,
@@ -711,6 +767,18 @@ const STRINGS = {
         markerNote: "مقياس G0/G1/G2 لمنظمة التعاون الاقتصادي والتنمية (لجنة المساعدة الإنمائية)، الذي اعتمده الاتحاد الأوروبي ونموذج Pro PALOP-TL ISC/UEMOA.",
         tallyLabel: "توزيع المؤشر",
         fullReportBenchmark: "المرجعية الدولية",
+        manualOverrideLabel: "معدَّل يدوياً",
+        benchmarkUE: "الاتحاد الأوروبي — هدف 85% (G1+G2+G3)",
+        benchmarkWB: "البنك الدولي — هدف 55% (G1+G2+G3)",
+        benchmarkUNDP: "برنامج الأمم المتحدة الإنمائي 2030 — هدف 15% في G2",
+        benchmarkUNCT: "الأمم المتحدة (UNCT) — عتبة 70% في G2/G3 (تقدير حسب عدد البنود، وليس القيمة المالية)",
+        frameworksToggle: "عرض جميع المعايير الدولية المعمول بها",
+        frameworksToggleHide: "إخفاء المعايير الدولية",
+        frameworksTitle: "الإطار الدولي المرجعي",
+        roadmapTitle: "الخطوات التالية",
+        roadmapShort: "المدى القصير (0-6 أشهر)",
+        roadmapMedium: "المدى المتوسط (6-18 شهراً)",
+        roadmapLong: "المدى الطويل (أكثر من 18 شهراً)",
         restartButton: "تحليل ميزانية أخرى",
         footerSources: "المصادر: OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · مؤشر هدف التنمية المستدامة 5.c.1 (الأمم المتحدة) · أطر وطنية وإقليمية عند الاقتضاء.",
         fileTooLarge: (mb) => `حجم هذا الملف ${mb} ميغابايت — والحد الأقصى هو 30 ميغابايت. حاول تصدير القسم المعني فقط.`,
@@ -810,6 +878,18 @@ const STRINGS = {
         markerNote: "OECD-DAC G0/G1/G2 量表，已被欧盟及 Pro PALOP-TL ISC/UEMOA 模式采用。",
         tallyLabel: "标记分布",
         fullReportBenchmark: "国际基准",
+        manualOverrideLabel: "手动调整",
+        benchmarkUE: "欧盟——目标85%（G1+G2+G3）",
+        benchmarkWB: "世界银行——目标55%（G1+G2+G3）",
+        benchmarkUNDP: "联合国开发计划署2030——G2目标15%",
+        benchmarkUNCT: "联合国国家工作队——G2/G3占70%的门槛（按条目数量估算，非预算金额）",
+        frameworksToggle: "查看所有现行国际标准",
+        frameworksToggleHide: "隐藏国际标准",
+        frameworksTitle: "国际参考框架",
+        roadmapTitle: "下一步行动",
+        roadmapShort: "短期（0-6个月）",
+        roadmapMedium: "中期（6-18个月）",
+        roadmapLong: "长期（18个月以上）",
         restartButton: "分析另一份预算",
         footerSources: "来源：OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · 联合国可持续发展目标指标5.c.1 · 适用时的国家和区域框架。",
         fileTooLarge: (mb) => `该文件为 ${mb} MB — 上限为30 MB。请尝试仅导出相关部分。`,
@@ -909,6 +989,18 @@ const STRINGS = {
         markerNote: "Шкала G0/G1/G2 ОЭСР-КСР, принятая Европейским союзом и моделью Pro PALOP-TL ISC/UEMOA.",
         tallyLabel: "Распределение маркеров",
         fullReportBenchmark: "Международный ориентир",
+        manualOverrideLabel: "Скорректировано вручную",
+        benchmarkUE: "ЕС — целевой показатель 85% (G1+G2+G3)",
+        benchmarkWB: "Всемирный банк — целевой показатель 55% (G1+G2+G3)",
+        benchmarkUNDP: "ПРООН 2030 — целевой показатель 15% в G2",
+        benchmarkUNCT: "ООН (UNCT) — порог 70% в G2/G3 (оценка по числу статей, а не по бюджетной стоимости)",
+        frameworksToggle: "Показать все действующие международные стандарты",
+        frameworksToggleHide: "Скрыть международные стандарты",
+        frameworksTitle: "Международная система координат",
+        roadmapTitle: "Дальнейшие шаги",
+        roadmapShort: "Краткосрочно (0-6 месяцев)",
+        roadmapMedium: "Среднесрочно (6-18 месяцев)",
+        roadmapLong: "Долгосрочно (18+ месяцев)",
         restartButton: "Анализировать другой бюджет",
         footerSources: "Источники: OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Индикатор ЦУР 5.c.1 (ООН) · национальные и региональные основы, если применимо.",
         fileTooLarge: (mb) => `Этот файл весит ${mb} МБ — лимит составляет 30 МБ. Попробуйте экспортировать только нужный раздел.`,
@@ -1008,6 +1100,18 @@ const STRINGS = {
         markerNote: "Kipimo cha G0/G1/G2 cha OECD-DAC, kilichopitishwa na Umoja wa Ulaya na muundo wa Pro PALOP-TL ISC/UEMOA.",
         tallyLabel: "Mgawanyo wa alama",
         fullReportBenchmark: "Kigezo cha kimataifa",
+        manualOverrideLabel: "Imerekebishwa kwa mkono",
+        benchmarkUE: "EU — lengo la 85% (G1+G2+G3)",
+        benchmarkWB: "Benki ya Dunia — lengo la 55% (G1+G2+G3)",
+        benchmarkUNDP: "UNDP 2030 — lengo la 15% kwa G2",
+        benchmarkUNCT: "UN (UNCT) — kikomo cha 70% kwa G2/G3 (makadirio kwa idadi ya vipengele, si thamani ya bajeti)",
+        frameworksToggle: "Ona viwango vyote vya kimataifa vinavyotumika",
+        frameworksToggleHide: "Ficha viwango vya kimataifa",
+        frameworksTitle: "Mfumo wa kimataifa wa marejeleo",
+        roadmapTitle: "Hatua zinazofuata",
+        roadmapShort: "Muda mfupi (miezi 0-6)",
+        roadmapMedium: "Muda wa kati (miezi 6-18)",
+        roadmapLong: "Muda mrefu (zaidi ya miezi 18)",
         restartButton: "Chambua bajeti nyingine",
         footerSources: "Vyanzo: OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Kiashiria cha SDG 5.c.1 (UN) · mifumo ya kitaifa na kikanda inapohitajika.",
         fileTooLarge: (mb) => `Faili hii ina MB ${mb} — kikomo ni MB 30. Jaribu kuhamisha sehemu husika pekee.`,
@@ -1102,11 +1206,39 @@ const EXEMPLO_GB_RESULT = {
         { name: "Promoção da Igualdade e Equidade do Género", marker: "G2", comment: "Objetivo principal é a igualdade de género; financiamento interno." },
         { name: "Programa Educação de Base e Igualdade dos Géneros", marker: "G1", comment: "Educação é o objetivo principal; género é uma componente, não o fim último." },
         { name: "Empoderamento das Mulheres de Gabu", marker: "G2", comment: "Objetivo principal é o empoderamento das mulheres; dependente de doador." },
-        { name: "Eliminação da Mutilação Genital Feminina - Fase 4", marker: "G2", comment: "Objetivo principal é eliminar uma prática discriminatória de género." },
+        { name: "Eliminação da Mutilação Genital Feminina - Fase 4", marker: "G3", comment: "Objetivo principal é a prevenção e resposta a uma prática de violência baseada no género." },
         { name: "Autonomização e Inclusão Financeira das Mulheres e Jovens", marker: "G1", comment: "Inclusão financeira mais ampla, com componente específica para mulheres." },
     ],
 };
 const EXEMPLOS_PT = { gb: { input: EXEMPLO_GB_INPUT, result: EXEMPLO_GB_RESULT, label: "Guiné-Bissau" } };
+
+// ---------- Enquadramento internacional de referência ----------
+// Panorama das principais normas e marcadores de género em vigor a nível
+// internacional e regional, para consulta rápida dentro da ferramenta.
+// Conteúdo disponível em português e inglês; os restantes idiomas usam o
+// inglês como alternativa (conteúdo de referência, não gerado pela IA).
+const INTERNATIONAL_FRAMEWORKS_I18N = {
+    pt: [
+        { org: "OCDE — Comité de Ajuda ao Desenvolvimento (CAD/DAC)", instrument: "Gender Equality Policy Marker (desde 1997)", scale: "Escala de 3 pontos: 0 (não visado), 1 (objetivo significativo), 2 (objetivo principal)", note: "Reporte obrigatório para os membros do CAD sobre toda a Ajuda Pública ao Desenvolvimento; base do modelo G0/G1/G2." },
+        { org: "União Europeia (Comissão Europeia)", instrument: "Marcador G0/G1/G2 (adaptação do marcador OCDE-CAD)", scale: "G0 / G1 / G2 — mesma lógica do CAD, aplicada às ações externas da UE", note: "Meta: pelo menos 85% das ações devem atingir G1 ou superior." },
+        { org: "Sistema das Nações Unidas (PNUD, UNFPA, ONU Mulheres, UNICEF, UNIDO, etc.)", instrument: "Gender Equality Marker (GEM) — norma UNSDG/UNDG", scale: "Escala de 4 pontos: 0, 1, 2/2a, 3/2b (sem contribuição → objetivo principal)", note: "PNUD: meta de 15% em GEN3 e 0% em GEN0 até 2030. Equipas de País da ONU (UNCT): limiar de 70% dos recursos em GEM2/3." },
+        { org: "Grupo Banco Mundial", instrument: "Gender Tag (Banco Mundial) / Gender Flag (IFC)", scale: "Variável binária: exige simultaneamente análise + ação + indicador de monitorização", note: "Meta institucional: pelo menos 55% das operações aprovadas com o marcador." },
+        { org: "Fundo Monetário Internacional (FMI)", instrument: "Gender Budgeting (GB) Framework e Gender Budgeting Index (GBI)", scale: "Não é um marcador de projeto: índice sistémico em 4 pilares (políticas, quadro legal/institucional, preparação orçamental, execução/auditoria) — classificação Alto/Médio/Baixo", note: "Avalia o sistema de Gestão das Finanças Públicas no seu todo, sem meta percentual única." },
+        { org: "UEMOA", instrument: "Schéma Type d'Institutionnalisation du Genre (STIG) + módulos de Budgétisation Sensible au Genre (BSG)", scale: "Não impõe uma escala única regional — cada Estado-membro desenvolve o seu marcador nacional", note: "Cabo Verde (Pro PALOP-TL ISC) foi o piloto regional que originou o modelo G0/G1/G2 hoje usado na Guiné-Bissau, marcando ~80% dos projetos em 2018." },
+        { org: "CEDEAO / ECOWAS", instrument: "Gender Equality Seal for Public Institutions (GES-PI); ECOWAS Gender Development Centre (EGDC)", scale: "Selo de certificação institucional — não é uma escala aplicada a projetos orçamentais", note: "Foco institucional e de governação (leis, reforma, capacitação, parcerias)." },
+        { org: "União Africana (UA)", instrument: "Agenda 2063 (Aspiração 6); Política de Género da UA", scale: "Referencial político-normativo continental — sem marcador orçamental de projeto", note: "Orienta as estratégias nacionais e regionais, incluindo a Estratégia de Género da UEMOA e as PNIEG nacionais." },
+    ],
+    en: [
+        { org: "OECD — Development Assistance Committee (DAC)", instrument: "Gender Equality Policy Marker (since 1997)", scale: "3-point scale: 0 (not targeted), 1 (significant objective), 2 (principal objective)", note: "Mandatory reporting for DAC members on all Official Development Assistance; the basis of the G0/G1/G2 model." },
+        { org: "European Union (European Commission)", instrument: "G0/G1/G2 marker (adapted from the OECD-DAC marker)", scale: "G0 / G1 / G2 — same logic as DAC, applied to EU external actions", note: "Target: at least 85% of actions must reach G1 or higher." },
+        { org: "United Nations System (UNDP, UNFPA, UN Women, UNICEF, UNIDO, etc.)", instrument: "Gender Equality Marker (GEM) — UNSDG/UNDG standard", scale: "4-point scale: 0, 1, 2/2a, 3/2b (no contribution → principal objective)", note: "UNDP: target of 15% in GEN3 and 0% in GEN0 by 2030. UN Country Teams (UNCT): 70% financial threshold for GEM2/3." },
+        { org: "World Bank Group", instrument: "Gender Tag (World Bank) / Gender Flag (IFC)", scale: "Binary variable: requires analysis + action + monitoring indicator together", note: "Institutional target: at least 55% of approved operations carrying the tag." },
+        { org: "International Monetary Fund (IMF)", instrument: "Gender Budgeting (GB) Framework and Gender Budgeting Index (GBI)", scale: "Not a project marker: systemic index across 4 pillars (policies, legal/institutional framework, budget preparation, execution/audit) — High/Medium/Low rating", note: "Assesses the whole Public Financial Management system, with no single percentage target." },
+        { org: "UEMOA (West African Economic and Monetary Union)", instrument: "Schéma Type d'Institutionnalisation du Genre (STIG) + Gender-Responsive Budgeting (BSG) modules", scale: "No single regional scale — each member state develops its own national marker", note: "Cabo Verde (Pro PALOP-TL ISC) was the regional pilot that originated the G0/G1/G2 model now used in Guinea-Bissau, marking ~80% of projects in 2018." },
+        { org: "ECOWAS", instrument: "Gender Equality Seal for Public Institutions (GES-PI); ECOWAS Gender Development Centre (EGDC)", scale: "Institutional certification seal — not a scale applied to budget projects", note: "Institutional and governance focus (laws, reform, capacity-building, partnerships)." },
+        { org: "African Union (AU)", instrument: "Agenda 2063 (Aspiration 6); AU Gender Policy", scale: "Continental political-normative reference — no project-level budget marker", note: "Guides national and regional strategies, including UEMOA's Gender Strategy and national gender equality policies." },
+    ],
+};
 
 function useGoogleFonts() {
     useEffect(() => {
@@ -1149,17 +1281,20 @@ function validateFullReport(parsed) {
     if (!Array.isArray(parsed.recommendations)) throw new Error("invalid_report");
     if (!Array.isArray(parsed.annexEvidence)) throw new Error("invalid_report");
     if (typeof parsed.internationalBenchmark !== "string") parsed.internationalBenchmark = "";
+    if (!parsed.roadmap || typeof parsed.roadmap !== "object") parsed.roadmap = { shortTerm: [], mediumTerm: [], longTerm: [] };
+    ["shortTerm", "mediumTerm", "longTerm"].forEach((k) => { if (!Array.isArray(parsed.roadmap[k])) parsed.roadmap[k] = []; });
 }
 
 // Contagem determinística dos marcadores G0/G1/G2 por linha orçamental —
 // calculada em JS a partir do resultado, nunca pedida à IA, para que a
 // percentagem apresentada seja sempre exata e não sujeita a alucinação.
 function computeMarkerTally(lineItems) {
-    const tally = { G0: 0, G1: 0, G2: 0 };
+    const tally = { G0: 0, G1: 0, G2: 0, G3: 0 };
     (lineItems || []).forEach((li) => { if (tally[li.marker] !== undefined) tally[li.marker]++; });
-    const total = tally.G0 + tally.G1 + tally.G2;
+    const total = tally.G0 + tally.G1 + tally.G2 + tally.G3;
     const pct = (n) => (total > 0 ? Math.round((n / total) * 100) : 0);
-    return { ...tally, total, pctG0: pct(tally.G0), pctG1: pct(tally.G1), pctG2: pct(tally.G2) };
+    const g1g2g3 = tally.G1 + tally.G2 + tally.G3;
+    return { ...tally, total, pctG0: pct(tally.G0), pctG1: pct(tally.G1), pctG2: pct(tally.G2), pctG3: pct(tally.G3), pctG1G2G3: pct(g1g2g3) };
 }
 
 function resultToPlainText(result, lang, s) {
@@ -1235,6 +1370,7 @@ function OSGAnalyzer() {
     const [ficheiroNome, setFicheiroNome] = useState("");
     const [extraindo, setExtraindo] = useState(false);
     const [erroFicheiro, setErroFicheiro] = useState("");
+    const [showFrameworks, setShowFrameworks] = useState(false);
 
     // ---- Relatório completo ----
     const [fullReport, setFullReport] = useState(null);
@@ -1490,7 +1626,7 @@ function OSGAnalyzer() {
             novaLinha(4);
             texto(s.lineItemsLabel, { bold: true, size: 12 });
             const tallyPdf = computeMarkerTally(result.lineItems);
-            texto(`${s.tallyLabel}: G0 ${tallyPdf.G0} (${tallyPdf.pctG0}%) · G1 ${tallyPdf.G1} (${tallyPdf.pctG1}%) · G2 ${tallyPdf.G2} (${tallyPdf.pctG2}%)`, { size: 9, color: [122, 143, 140] });
+            texto(`${s.tallyLabel}: G0 ${tallyPdf.G0} (${tallyPdf.pctG0}%) · G1 ${tallyPdf.G1} (${tallyPdf.pctG1}%) · G2 ${tallyPdf.G2} (${tallyPdf.pctG2}%) · G3 ${tallyPdf.G3} (${tallyPdf.pctG3}%)`, { size: 9, color: [122, 143, 140] });
             result.lineItems.forEach((li) => {
                 texto(`[${li.marker}] ${li.name} — ${li.comment}`, { size: 9 });
             });
@@ -1519,7 +1655,7 @@ function OSGAnalyzer() {
 <h2 style="color:#C9A227;">${s.overallLevelLabel}: ${result.overallLevel} (${result.overallScore}/4)</h2>
 <p>${result.summary || ""}</p>
 ${mods_html}
-${linhas_html ? `<h3>${s.lineItemsLabel}</h3><p style="font-size:9pt;color:#7A8F8C;">${s.markerNote || ""}</p><p style="font-size:9pt;color:#7A8F8C;">${s.tallyLabel}: G0 ${tallyWord.G0} (${tallyWord.pctG0}%) · G1 ${tallyWord.G1} (${tallyWord.pctG1}%) · G2 ${tallyWord.G2} (${tallyWord.pctG2}%)</p><table style="border-collapse:collapse;width:100%;"><tr><th style="border:1px solid #DED7C6;padding:4pt;">Marcador</th><th style="border:1px solid #DED7C6;padding:4pt;">${s.inputLabel}</th><th style="border:1px solid #DED7C6;padding:4pt;"></th></tr>${linhas_html}</table>` : ""}
+${linhas_html ? `<h3>${s.lineItemsLabel}</h3><p style="font-size:9pt;color:#7A8F8C;">${s.markerNote || ""}</p><p style="font-size:9pt;color:#7A8F8C;">${s.tallyLabel}: G0 ${tallyWord.G0} (${tallyWord.pctG0}%) · G1 ${tallyWord.G1} (${tallyWord.pctG1}%) · G2 ${tallyWord.G2} (${tallyWord.pctG2}%) · G3 ${tallyWord.G3} (${tallyWord.pctG3}%)</p><table style="border-collapse:collapse;width:100%;"><tr><th style="border:1px solid #DED7C6;padding:4pt;">Marcador</th><th style="border:1px solid #DED7C6;padding:4pt;">${s.inputLabel}</th><th style="border:1px solid #DED7C6;padding:4pt;"></th></tr>${linhas_html}</table>` : ""}
 </body></html>`;
         const blob = new Blob(['\ufeff', html], { type: "application/msword" });
         const url = URL.createObjectURL(blob);
@@ -1564,6 +1700,8 @@ G1 — Componente de género (objetivo significativo, mas não principal). CRIT�
 
 G2 — Promoção direta da igualdade de género (objetivo principal). CRITÉRIO MÍNIMO: a igualdade de género ou o empoderamento de mulheres/raparigas é, segundo o texto, o objetivo principal e explícito da linha/projeto (não um efeito secundário), e o financiamento da linha é predominantemente dedicado a esse fim (ex.: nome do projeto e descrição centram-se em género; "eliminação da MGF", "empoderamento económico das mulheres").
 
+G3 — Prevenção e resposta à violência baseada no género (VBG): subcategoria de G2 usada quando o objetivo principal e explícito da linha/projeto é especificamente prevenir ou responder a violência baseada no género (ex.: combate ao tráfico de mulheres e crianças, apoio a vítimas de violência doméstica, eliminação de mutilação genital feminina, unidades de atendimento a vítimas). Use G3 em vez de G2 sempre que o foco VBG for explícito no texto; caso contrário, mantenha G2 para outros objetivos principais de género.
+
 Regra de desempate: se não tiver a certeza entre G0 e G1, ou entre G1 e G2, escolha sempre o nível mais baixo (mais conservador) e explique a incerteza no "comment" — nunca "arredonde para cima" com base em suposições sobre o que o projeto provavelmente inclui. Baseie-se apenas em linhas/projetos efetivamente mencionados no texto — não invente linhas orçamentais. Se o texto não detalhar linhas suficientes, devolva array vazio.
 
 Regra para recomendações: cada "recommendation" deve ser o passo seguinte, concreto e realista, para subir exatamente 1 nível na escada acima a partir do que o texto mostra — não o estado ideal final, e não uma recomendação genérica desligada do que foi descrito.
@@ -1571,7 +1709,7 @@ Regra para recomendações: cada "recommendation" deve ser o passo seguinte, con
 AUTOVERIFICAÇÃO (faça isto mentalmente antes de responder, não inclua na resposta): releia cada uma das 5 pontuações que atribuiu e confirme que (a) corresponde exatamente à âncora de maturidade 0-4 descrita acima, (b) tem uma frase do "evidence" que a sustenta diretamente, e (c) não é mais generosa do que o texto permite. Releia também cada marcador G0/G1/G2 atribuído na Parte B e confirme que cumpre os critérios mínimos exigidos (não apenas o nome do projeto) — desça o nível se a evidência for insuficiente. Corrija qualquer pontuação ou marcador que não passe neste teste antes de produzir o JSON final.
 
 Responda APENAS com um JSON válido, sem markdown, neste formato exato:
-{"overallScore": <média das 5 pontuações, 1 casa decimal>, "overallLevel": "<nível geral>", "summary": "<1 frase curta, máx 25 palavras>", "modules": [{"key": "<key>", "score": <0-4>, "finding": "<1 frase, máx 20 palavras>", "evidence": "<referência curta ao texto original, máx 20 palavras, ou \\"Não mencionado no texto fornecido\\">", "recommendation": "<1 frase acionável, máx 20 palavras>"}], "lineItems": [{"name": "<nome curto>", "marker": "<G0|G1|G2>", "comment": "<1 frase, máx 15 palavras>"}]}
+{"overallScore": <média das 5 pontuações, 1 casa decimal>, "overallLevel": "<nível geral>", "summary": "<1 frase curta, máx 25 palavras>", "modules": [{"key": "<key>", "score": <0-4>, "finding": "<1 frase, máx 20 palavras>", "evidence": "<referência curta ao texto original, máx 20 palavras, ou \\"Não mencionado no texto fornecido\\">", "recommendation": "<1 frase acionável, máx 20 palavras>"}], "lineItems": [{"name": "<nome curto>", "marker": "<G0|G1|G2|G3>", "comment": "<1 frase, máx 15 palavras>"}]}
 
 Use as keys exatas: ${keysList}. Seja direto e crítico — não seja excessivamente elogioso se a informação for vaga ou insuficiente, e nunca prefira uma resposta "simpática" a uma resposta fiel ao que o texto realmente mostra.
 
@@ -1621,7 +1759,7 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta deve ser escrita inteiramente em ${LA
 Segue-se a análise já produzida anteriormente (pontuações e conclusões por dimensão), que deve usar como base factual — não a contradiga nem invente novos factos além do que ela e o texto original do orçamento já estabelecem:
 ${analiseResumo}
 
-Distribuição do Marcador de Género já calculada matematicamente a partir das linhas classificadas (dado factual, não recalcule nem contradiga estes números): G0 = ${tally.G0} linhas (${tally.pctG0}%), G1 = ${tally.G1} linhas (${tally.pctG1}%), G2 = ${tally.G2} linhas (${tally.pctG2}%), num total de ${tally.total} linhas classificadas.
+Distribuição do Marcador de Género já calculada matematicamente a partir das linhas classificadas (dado factual, não recalcule nem contradiga estes números): G0 = ${tally.G0} linhas (${tally.pctG0}%), G1 = ${tally.G1} linhas (${tally.pctG1}%), G2 = ${tally.G2} linhas (${tally.pctG2}%), G3/VBG = ${tally.G3} linhas (${tally.pctG3}%), num total de ${tally.total} linhas classificadas. G1+G2+G3 combinados = ${tally.pctG1G2G3}%.
 
 Texto original do orçamento fornecido pelo utilizador (fonte factual para o relatório):
 """
@@ -1645,6 +1783,8 @@ Produza um relatório com as seguintes secções:
 
 5. "recommendations": array de 4 a 7 recomendações concretas e acionáveis (cada uma 1-2 frases), ordenadas por prioridade, cobrindo as lacunas mais importantes identificadas — mais desenvolvidas que as recomendações curtas da análise original, mas sem contradizê-las.
 
+5b. "roadmap": um roteiro de próximos passos concretos, agrupado em 3 horizontes temporais, cada um com 2-4 ações objetivas e realistas (não repita literalmente as "recommendations" — desdobre-as em passos práticos e sequenciados): {"shortTerm": ["..."] (0-6 meses, ações administrativas rápidas e de baixo custo), "mediumTerm": ["..."] (6-18 meses, mudanças de processo, formação, ferramentas), "longTerm": ["..."] (18+ meses, mudanças estruturais/legais, institucionalização plena)}.
+
 6. "annexEvidence": array de até 8 itens, cada um com "item" (nome curto do que está a ser evidenciado, ex.: nome do projeto ou dimensão) e "quote" (paráfrase curta, máx 25 palavras, de um trecho relevante do texto original fornecido — nunca uma citação literal longa, e nunca inventada).
 
 7. "internationalBenchmark": parágrafo de 70-100 palavras que posiciona a distribuição G0/G1/G2 já calculada (use os números exatos fornecidos acima, não invente outros) face a padrões de referência publicamente conhecidos e estáveis — sem inventar estatísticas do país em causa: a União Europeia exige que pelo menos 85% das ações tenham marcador G1 ou superior; o PNUD tem como meta 15% em GEN3 (equivalente a G2) até 2030 e 0% em GEN0; o Banco Mundial exige o seu "gender tag" em pelo menos 55% das operações aprovadas. Compare a percentagem de G1+G2 da análise com estas referências (ex.: "muito abaixo do referencial de 85% da UE") e conclua com uma frase sobre a distância a percorrer. Não afirme que o país está formalmente sujeito a estas metas — são pontos de comparação internacional, não obrigações legais do país analisado.
@@ -1652,7 +1792,7 @@ Produza um relatório com as seguintes secções:
 AUTOVERIFICAÇÃO (mental, não incluir na resposta): confirme que "sectorAnalysis" só tem conteúdo se o texto original realmente tiver estrutura setorial/ministerial suficiente, que nenhuma "narrative" contradiz a pontuação já atribuída na análise, e que nenhum facto foi inventado além do texto original e da análise fornecida.
 
 Responda APENAS com um JSON válido, sem markdown, neste formato exato:
-{"executiveSummary": "...", "methodology": "...", "dimensionAnalysis": [{"key": "<key>", "narrative": "..."}], "sectorAnalysis": "...", "recommendations": ["...", "..."], "annexEvidence": [{"item": "...", "quote": "..."}], "internationalBenchmark": "..."}
+{"executiveSummary": "...", "methodology": "...", "dimensionAnalysis": [{"key": "<key>", "narrative": "..."}], "sectorAnalysis": "...", "recommendations": ["...", "..."], "annexEvidence": [{"item": "...", "quote": "..."}], "internationalBenchmark": "...", "roadmap": {"shortTerm": ["...", "..."], "mediumTerm": ["...", "..."], "longTerm": ["...", "..."]}}
 
 Use as keys exatas de dimensão: ${MODULE_KEYS.join(", ")}.
 
@@ -1803,6 +1943,21 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta deve ser escrita inteiramente em ${LA
             texto(`${i + 1}. ${r}`, { size: 10 });
         });
 
+        if (report.roadmap && (report.roadmap.shortTerm.length || report.roadmap.mediumTerm.length || report.roadmap.longTerm.length)) {
+            secaoTitulo(s.roadmapTitle);
+            const roadmapSections = [
+                [s.roadmapShort, report.roadmap.shortTerm],
+                [s.roadmapMedium, report.roadmap.mediumTerm],
+                [s.roadmapLong, report.roadmap.longTerm],
+            ];
+            roadmapSections.forEach(([label, items]) => {
+                if (!items || items.length === 0) return;
+                texto(label, { bold: true, size: 10, color: [31, 93, 91] });
+                items.forEach((it) => texto(`• ${it}`, { size: 9.5 }));
+                novaLinha(3);
+            });
+        }
+
         if (report.annexEvidence && report.annexEvidence.length > 0) {
             secaoTitulo(s.fullReportAnnex);
             report.annexEvidence.forEach((ev) => {
@@ -1822,6 +1977,12 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta deve ser escrita inteiramente em ${LA
                 <p style="margin:0 0 12pt 0;">${d.narrative}</p>`;
         }).join("");
         const recs_html = (report.recommendations || []).map((r, i) => `<li style="margin-bottom:6pt;">${r}</li>`).join("");
+        const roadmapSectionHtml = (label, items) => (items && items.length ? `<h3 style="color:#1F5D5B;font-size:12pt;margin-bottom:2pt;">${label}</h3><ul>${items.map((it) => `<li style="margin-bottom:4pt;">${it}</li>`).join("")}</ul>` : "");
+        const roadmap_html = report.roadmap ? [
+            roadmapSectionHtml(s.roadmapShort, report.roadmap.shortTerm),
+            roadmapSectionHtml(s.roadmapMedium, report.roadmap.mediumTerm),
+            roadmapSectionHtml(s.roadmapLong, report.roadmap.longTerm),
+        ].join("") : "";
         const anexo_html = (report.annexEvidence || []).map((ev) =>
             `<tr><td style="padding:4pt;border:1px solid #DED7C6;font-weight:bold;">${ev.item}</td><td style="padding:4pt;border:1px solid #DED7C6;font-style:italic;">${ev.quote}</td></tr>`
         ).join("");
@@ -1848,6 +2009,8 @@ ${report.internationalBenchmark && report.internationalBenchmark.trim() ? `<h2 s
 <h2 style="color:#16302E;">${s.fullReportRecommendations}</h2>
 <ol>${recs_html}</ol>
 
+${roadmap_html ? `<h2 style="color:#16302E;">${s.roadmapTitle}</h2>${roadmap_html}` : ""}
+
 ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style="border-collapse:collapse;width:100%;">${anexo_html}</table>` : ""}
 </body></html>`;
         const blob = new Blob(['\ufeff', html], { type: "application/msword" });
@@ -1861,6 +2024,15 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
         URL.revokeObjectURL(url);
     }
 
+    // Permite corrigir manualmente o marcador G0/G1/G2/G3 atribuído pela IA
+    // a uma linha orçamental — o utilizador tem sempre a palavra final.
+    function alterarMarcador(idx, novoMarcador) {
+        setResult((prev) => {
+            if (!prev || !prev.lineItems) return prev;
+            const lineItems = prev.lineItems.map((li, i) => i === idx ? { ...li, marker: novoMarcador, manualOverride: true } : li);
+            return { ...prev, lineItems };
+        });
+    }
     function reiniciar() {
         setInput(""); setResult(null); setExemploAtivo(null); setStatus("idle");
         setCopiado(false); setFicheiroNome(""); setErroFicheiro("");
@@ -2131,23 +2303,44 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
                     (() => {
                         const tally = computeMarkerTally(result.lineItems);
                         if (tally.total === 0) return null;
+                        const benchmarks = [
+                            { label: s.benchmarkUE, value: tally.pctG1G2G3, target: 85 },
+                            { label: s.benchmarkUNCT, value: tally.pctG1G2G3, target: 70 },
+                            { label: s.benchmarkWB, value: tally.pctG1G2G3, target: 55 },
+                            { label: s.benchmarkUNDP, value: tally.pctG2 + tally.pctG3, target: 15 },
+                        ];
                         return React.createElement("div", { className: "mb-4 rounded-lg border p-3", style: { borderColor: "#DED7C6", background: "#FBFAF6" } },
                             React.createElement("div", { className: "text-xs uppercase tracking-wide mb-2", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#9AA6A3" } }, s.tallyLabel),
                             React.createElement("div", { className: "flex h-2.5 rounded-full overflow-hidden mb-2", style: { background: "#E4DFD3" } },
+                                tally.pctG3 > 0 && React.createElement("div", { style: { width: tally.pctG3 + "%", background: markerInfo.G3.color } }),
                                 tally.pctG2 > 0 && React.createElement("div", { style: { width: tally.pctG2 + "%", background: markerInfo.G2.color } }),
                                 tally.pctG1 > 0 && React.createElement("div", { style: { width: tally.pctG1 + "%", background: markerInfo.G1.color } }),
                                 tally.pctG0 > 0 && React.createElement("div", { style: { width: tally.pctG0 + "%", background: markerInfo.G0.color } })),
-                            React.createElement("div", { className: "flex gap-4 text-xs", style: { color: "#7A8F8C" } },
+                            React.createElement("div", { className: "flex flex-wrap gap-x-4 gap-y-1 text-xs mb-3", style: { color: "#7A8F8C" } },
                                 React.createElement("span", null, `G0: ${tally.G0} (${tally.pctG0}%)`),
                                 React.createElement("span", null, `G1: ${tally.G1} (${tally.pctG1}%)`),
-                                React.createElement("span", null, `G2: ${tally.G2} (${tally.pctG2}%)`)));
+                                React.createElement("span", null, `G2: ${tally.G2} (${tally.pctG2}%)`),
+                                tally.G3 > 0 && React.createElement("span", null, `G3: ${tally.G3} (${tally.pctG3}%)`)),
+                            React.createElement("div", { className: "text-xs uppercase tracking-wide mb-1.5 pt-2", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#9AA6A3", borderTop: "1px solid #EDE8DC" } }, s.fullReportBenchmark),
+                            React.createElement("div", { className: "space-y-1" }, benchmarks.map((b, i) => (
+                                React.createElement("div", { key: i, className: "flex items-center justify-between text-xs" },
+                                    React.createElement("span", { style: { color: "#7A8F8C" } }, b.label),
+                                    React.createElement("span", { style: { fontFamily: "'IBM Plex Mono', monospace", fontWeight: 600, color: b.value >= b.target ? "#1F5D5B" : "#B5541F" } }, `${b.value}%`))
+                            ))));
                     })(),
                     React.createElement("div", { className: "rounded-lg border overflow-hidden", style: { borderColor: "#DED7C6", background: "#FFFFFF" } }, result.lineItems.map((li, idx) => {
                         return (React.createElement("div", { key: idx, className: "flex items-start justify-between gap-4 p-3", style: { borderTop: idx > 0 ? "1px solid #EDE8DC" : "none" } },
                             React.createElement("div", null,
                                 React.createElement("div", { className: "text-sm font-medium" }, li.name),
-                                React.createElement("div", { className: "text-xs mt-0.5", style: { color: "#7A8F8C" } }, li.comment)),
-                            React.createElement("span", { className: "text-xs flex-shrink-0 px-2 py-1 rounded font-medium", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#FFFFFF", background: (markerInfo[li.marker] || {}).color || "#9AA6A3" } }, li.marker)));
+                                React.createElement("div", { className: "text-xs mt-0.5", style: { color: "#7A8F8C" } }, li.comment),
+                                li.manualOverride && React.createElement("div", { className: "text-xs mt-1 italic", style: { color: "#C9A227" } }, s.manualOverrideLabel)),
+                            React.createElement("select", {
+                                value: li.marker,
+                                onChange: (e) => alterarMarcador(idx, e.target.value),
+                                "aria-label": s.lineItemsLabel,
+                                className: "text-xs flex-shrink-0 px-2 py-1 rounded font-medium border-0 outline-none cursor-pointer appearance-none text-center",
+                                style: { fontFamily: "'IBM Plex Mono', monospace", color: "#FFFFFF", background: (markerInfo[li.marker] || {}).color || "#9AA6A3" },
+                            }, Object.keys(markerInfo).map((code) => React.createElement("option", { key: code, value: code, style: { color: "#16302E", background: "#FFFFFF" } }, code)))));
                     })))),
 
                 React.createElement("div", { className: "mt-8 rounded-lg border p-5 print:hidden", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
@@ -2222,6 +2415,20 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
                     React.createElement("ol", { className: "space-y-2 list-decimal list-inside" }, (fullReport.recommendations || []).map((r, i) => (
                         React.createElement("li", { key: i, className: "text-sm", style: { color: "#3E4C49" } }, r))))),
 
+                fullReport.roadmap && (fullReport.roadmap.shortTerm.length || fullReport.roadmap.mediumTerm.length || fullReport.roadmap.longTerm.length) && (
+                    React.createElement("div", { className: "rounded-lg border p-5 mb-4", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
+                        React.createElement("h3", { className: "text-xs uppercase tracking-wide mb-3", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#7A8F8C" } }, s.roadmapTitle),
+                        [
+                            [s.roadmapShort, fullReport.roadmap.shortTerm, "#1F5D5B"],
+                            [s.roadmapMedium, fullReport.roadmap.mediumTerm, "#C9A227"],
+                            [s.roadmapLong, fullReport.roadmap.longTerm, "#7A3B69"],
+                        ].map(([label, items, color], i) => (
+                            items && items.length > 0 && React.createElement("div", { key: i, className: i > 0 ? "mt-4" : "" },
+                                React.createElement("div", { className: "text-xs font-medium mb-1.5", style: { color } }, label),
+                                React.createElement("ul", { className: "space-y-1 list-disc list-inside" }, items.map((it, j) => (
+                                    React.createElement("li", { key: j, className: "text-sm", style: { color: "#3E4C49" } }, it)))))
+                        )))),
+
                 fullReport.annexEvidence && fullReport.annexEvidence.length > 0 && (React.createElement("div", { className: "rounded-lg border overflow-hidden mb-6", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
                     React.createElement("h3", { className: "text-xs uppercase tracking-wide p-4 pb-2", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#7A8F8C" } }, s.fullReportAnnex),
                     fullReport.annexEvidence.map((ev, idx) => (
@@ -2229,7 +2436,24 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
                             React.createElement("div", { className: "text-sm font-medium" }, ev.item),
                             React.createElement("div", { className: "text-xs mt-0.5 italic", style: { color: "#9AA6A3" } }, `“${ev.quote}”`))))))
             )),
-            React.createElement("div", { className: "mt-14 flex items-center gap-2 text-xs", style: { color: "#9AA6A3" } },
+            React.createElement("div", { className: "mt-14" },
+                React.createElement("button", {
+                    onClick: () => setShowFrameworks((v) => !v),
+                    className: "inline-flex items-center gap-1.5 text-xs underline print:hidden",
+                    style: { color: "#1F5D5B" },
+                }, showFrameworks ? s.frameworksToggleHide : s.frameworksToggle),
+                showFrameworks && (() => {
+                    const frameworks = INTERNATIONAL_FRAMEWORKS_I18N[lang] || INTERNATIONAL_FRAMEWORKS_I18N.en;
+                    return React.createElement("div", { className: "mt-4 rounded-lg border overflow-hidden", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
+                        React.createElement("h3", { className: "text-sm font-medium p-4 pb-2", style: { fontFamily: headingFont } }, s.frameworksTitle),
+                        frameworks.map((fw, idx) => (
+                            React.createElement("div", { key: idx, className: "px-4 py-3", style: { borderTop: "1px solid #EDE8DC" } },
+                                React.createElement("div", { className: "text-sm font-medium" }, fw.org),
+                                React.createElement("div", { className: "text-xs mt-1", style: { color: "#1F5D5B" } }, fw.instrument),
+                                React.createElement("div", { className: "text-xs mt-1", style: { color: "#3E4C49" } }, fw.scale),
+                                React.createElement("div", { className: "text-xs mt-1 italic", style: { color: "#9AA6A3" } }, fw.note)))));
+                })()),
+            React.createElement("div", { className: "mt-6 flex items-center gap-2 text-xs", style: { color: "#9AA6A3" } },
                 React.createElement(FileText, { className: "w-3.5 h-3.5" }), s.footerSources))));
 }
 
