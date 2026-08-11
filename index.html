@@ -170,6 +170,9 @@ async function listarCodigosAdmin(accessCode) {
     const data = await chamarAPI({ action: "admin_list_codes", accessCode });
     return data.codes || [];
 }
+async function criarCodigoAdmin(accessCode, { org, limit, expiresAt, admin, customCode }) {
+    return chamarAPI({ action: "admin_create_code", accessCode, org, limit, expiresAt, admin, customCode });
+}
 async function verHistoricoAdmin(accessCode, targetCode) {
     const data = await chamarAPI({ action: "admin_view_history", accessCode, targetCode });
     return data.history || [];
@@ -499,6 +502,9 @@ const STRINGS = {
         langLabel: "Idioma",
         gateTitle: "Acesso ao Analisador OSG",
         gateSubtitle: "Introduza o código de acesso fornecido pela sua organização.",
+        gateAboutBlurb: "O Analisador OSG aplica as normas internacionais de orçamentação sensível ao género (OCDE-CAD, UE, PEFA, PNUD) para analisar orçamentos públicos e atribuir o Marcador de Género G0-G3.",
+        gateRequestDemo: "Pedir uma demonstração",
+        gateRequestSubject: "Pedido de demonstração — Analisador OSG",
         accessCodePlaceholder: "Código de acesso",
         accessCodeButton: "Entrar",
         accessCodeChecking: "A verificar…",
@@ -549,6 +555,19 @@ const STRINGS = {
         adminNoAccess: "Este código não tem permissões de administração.",
         adminLoading: "A carregar clientes…",
         adminEmpty: "Nenhum código de acesso encontrado.",
+        adminCreateShow: "Criar novo código de acesso",
+        adminCreateHide: "Ocultar formulário",
+        adminCreateTitle: "Novo código de acesso",
+        adminCreateOrgLabel: "Organização",
+        adminCreateOrgPlaceholder: "Nome da organização",
+        adminCreateLimitLabel: "Limite mensal de análises",
+        adminCreateExpiryLabel: "Validade (opcional)",
+        adminCreateCustomLabel: "Código personalizado (opcional)",
+        adminCreateCustomPlaceholder: "Deixa em branco para gerar automaticamente",
+        adminCreateAdminLabel: "Conceder permissões de administração",
+        adminCreateButton: "Criar código",
+        adminCreateCreating: "A criar…",
+        adminCreateSuccess: (codigo) => `Código criado com sucesso: ${codigo}`,
         downloadPdf: "Descarregar PDF",
         downloadWord: "Descarregar Word",
         fullReportButton: "Gerar relatório completo",
@@ -648,6 +667,9 @@ const STRINGS = {
         langLabel: "Langue",
         gateTitle: "Accès à l'Analyseur OSG",
         gateSubtitle: "Saisissez le code d'accès fourni par votre organisation.",
+        gateAboutBlurb: "L'Analyseur OSG applique les normes internationales de budgétisation sensible au genre (OCDE-CAD, UE, PEFA, PNUD) pour analyser les budgets publics et attribuer le Marqueur de Genre G0-G3.",
+        gateRequestDemo: "Demander une démonstration",
+        gateRequestSubject: "Demande de démonstration — Analyseur OSG",
         accessCodePlaceholder: "Code d'accès",
         accessCodeButton: "Entrer",
         accessCodeChecking: "Vérification…",
@@ -698,6 +720,19 @@ const STRINGS = {
         adminNoAccess: "Ce code n'a pas les droits d'administration.",
         adminLoading: "Chargement des clients…",
         adminEmpty: "Aucun code d'accès trouvé.",
+        adminCreateShow: "Créer un nouveau code d'accès",
+        adminCreateHide: "Masquer le formulaire",
+        adminCreateTitle: "Nouveau code d'accès",
+        adminCreateOrgLabel: "Organisation",
+        adminCreateOrgPlaceholder: "Nom de l'organisation",
+        adminCreateLimitLabel: "Limite mensuelle d'analyses",
+        adminCreateExpiryLabel: "Validité (optionnel)",
+        adminCreateCustomLabel: "Code personnalisé (optionnel)",
+        adminCreateCustomPlaceholder: "Laisser vide pour générer automatiquement",
+        adminCreateAdminLabel: "Accorder les droits d'administration",
+        adminCreateButton: "Créer le code",
+        adminCreateCreating: "Création…",
+        adminCreateSuccess: (codigo) => `Code créé avec succès : ${codigo}`,
         downloadPdf: "Télécharger le PDF",
         downloadWord: "Télécharger Word",
         fullReportButton: "Générer le rapport complet",
@@ -797,6 +832,9 @@ const STRINGS = {
         langLabel: "Language",
         gateTitle: "Access to the OSG Analyser",
         gateSubtitle: "Enter the access code provided by your organisation.",
+        gateAboutBlurb: "The OSG Analyser applies international gender-responsive budgeting standards (OECD-DAC, EU, PEFA, UNDP) to analyse public budgets and assign the G0-G3 Gender Marker.",
+        gateRequestDemo: "Request a demo",
+        gateRequestSubject: "Demo request — OSG Analyser",
         accessCodePlaceholder: "Access code",
         accessCodeButton: "Enter",
         accessCodeChecking: "Checking…",
@@ -847,6 +885,19 @@ const STRINGS = {
         adminNoAccess: "This code does not have admin permissions.",
         adminLoading: "Loading clients…",
         adminEmpty: "No access codes found.",
+        adminCreateShow: "Create new access code",
+        adminCreateHide: "Hide form",
+        adminCreateTitle: "New access code",
+        adminCreateOrgLabel: "Organisation",
+        adminCreateOrgPlaceholder: "Organisation name",
+        adminCreateLimitLabel: "Monthly analysis limit",
+        adminCreateExpiryLabel: "Expiry (optional)",
+        adminCreateCustomLabel: "Custom code (optional)",
+        adminCreateCustomPlaceholder: "Leave blank to generate automatically",
+        adminCreateAdminLabel: "Grant admin permissions",
+        adminCreateButton: "Create code",
+        adminCreateCreating: "Creating…",
+        adminCreateSuccess: (codigo) => `Code created successfully: ${codigo}`,
         downloadPdf: "Download PDF",
         downloadWord: "Download Word",
         fullReportButton: "Generate full report",
@@ -946,6 +997,9 @@ const STRINGS = {
         langLabel: "Idioma",
         gateTitle: "Acceso al Analizador OSG",
         gateSubtitle: "Introduzca el código de acceso proporcionado por su organización.",
+        gateAboutBlurb: "El Analizador OSG aplica las normas internacionales de presupuestación con perspectiva de género (OCDE-CAD, UE, PEFA, PNUD) para analizar presupuestos públicos y asignar el Marcador de Género G0-G3.",
+        gateRequestDemo: "Solicitar una demostración",
+        gateRequestSubject: "Solicitud de demostración — Analizador OSG",
         accessCodePlaceholder: "Código de acceso",
         accessCodeButton: "Entrar",
         accessCodeChecking: "Verificando…",
@@ -996,6 +1050,19 @@ const STRINGS = {
         adminNoAccess: "Este código no tiene permisos de administración.",
         adminLoading: "Cargando clientes…",
         adminEmpty: "No se encontraron códigos de acceso.",
+        adminCreateShow: "Crear nuevo código de acceso",
+        adminCreateHide: "Ocultar formulario",
+        adminCreateTitle: "Nuevo código de acceso",
+        adminCreateOrgLabel: "Organización",
+        adminCreateOrgPlaceholder: "Nombre de la organización",
+        adminCreateLimitLabel: "Límite mensual de análisis",
+        adminCreateExpiryLabel: "Validez (opcional)",
+        adminCreateCustomLabel: "Código personalizado (opcional)",
+        adminCreateCustomPlaceholder: "Deja en blanco para generar automáticamente",
+        adminCreateAdminLabel: "Conceder permisos de administración",
+        adminCreateButton: "Crear código",
+        adminCreateCreating: "Creando…",
+        adminCreateSuccess: (codigo) => `Código creado con éxito: ${codigo}`,
         downloadPdf: "Descargar PDF",
         downloadWord: "Descargar Word",
         fullReportButton: "Generar informe completo",
@@ -1095,6 +1162,9 @@ const STRINGS = {
         langLabel: "اللغة",
         gateTitle: "الدخول إلى محلل OSG",
         gateSubtitle: "أدخل رمز الوصول الذي قدّمته مؤسستك.",
+        gateAboutBlurb: "يطبّق محلل OSG المعايير الدولية للميزانية المستجيبة للنوع الاجتماعي (OCDE-CAD، الاتحاد الأوروبي، PEFA، برنامج الأمم المتحدة الإنمائي) لتحليل الميزانيات العامة وتحديد المؤشر الجندري G0-G3.",
+        gateRequestDemo: "طلب عرض توضيحي",
+        gateRequestSubject: "طلب عرض توضيحي — محلل OSG",
         accessCodePlaceholder: "رمز الوصول",
         accessCodeButton: "دخول",
         accessCodeChecking: "جارٍ التحقق…",
@@ -1145,6 +1215,19 @@ const STRINGS = {
         adminNoAccess: "هذا الرمز لا يملك صلاحيات إدارية.",
         adminLoading: "جارٍ تحميل العملاء…",
         adminEmpty: "لم يتم العثور على رموز وصول.",
+        adminCreateShow: "إنشاء رمز وصول جديد",
+        adminCreateHide: "إخفاء النموذج",
+        adminCreateTitle: "رمز وصول جديد",
+        adminCreateOrgLabel: "المؤسسة",
+        adminCreateOrgPlaceholder: "اسم المؤسسة",
+        adminCreateLimitLabel: "الحد الشهري للتحليلات",
+        adminCreateExpiryLabel: "الصلاحية (اختياري)",
+        adminCreateCustomLabel: "رمز مخصص (اختياري)",
+        adminCreateCustomPlaceholder: "اتركه فارغاً لإنشائه تلقائياً",
+        adminCreateAdminLabel: "منح صلاحيات الإدارة",
+        adminCreateButton: "إنشاء الرمز",
+        adminCreateCreating: "جارٍ الإنشاء…",
+        adminCreateSuccess: (codigo) => `تم إنشاء الرمز بنجاح: ${codigo}`,
         downloadPdf: "تنزيل PDF",
         downloadWord: "تنزيل Word",
         fullReportButton: "إنشاء التقرير الكامل",
@@ -1244,6 +1327,9 @@ const STRINGS = {
         langLabel: "语言",
         gateTitle: "登录 OSG 分析器",
         gateSubtitle: "请输入您所在机构提供的访问码。",
+        gateAboutBlurb: "OSG分析器应用国际性别响应式预算标准（OECD-DAC、欧盟、PEFA、联合国开发计划署）来分析公共预算并分配G0-G3性别标记。",
+        gateRequestDemo: "申请演示",
+        gateRequestSubject: "演示申请——OSG分析器",
         accessCodePlaceholder: "访问码",
         accessCodeButton: "进入",
         accessCodeChecking: "正在验证…",
@@ -1294,6 +1380,19 @@ const STRINGS = {
         adminNoAccess: "此代码没有管理权限。",
         adminLoading: "正在加载客户…",
         adminEmpty: "未找到访问代码。",
+        adminCreateShow: "创建新的访问代码",
+        adminCreateHide: "隐藏表单",
+        adminCreateTitle: "新访问代码",
+        adminCreateOrgLabel: "机构",
+        adminCreateOrgPlaceholder: "机构名称",
+        adminCreateLimitLabel: "每月分析限额",
+        adminCreateExpiryLabel: "有效期（可选）",
+        adminCreateCustomLabel: "自定义代码（可选）",
+        adminCreateCustomPlaceholder: "留空以自动生成",
+        adminCreateAdminLabel: "授予管理员权限",
+        adminCreateButton: "创建代码",
+        adminCreateCreating: "正在创建…",
+        adminCreateSuccess: (codigo) => `代码创建成功：${codigo}`,
         downloadPdf: "下载 PDF",
         downloadWord: "下载 Word",
         fullReportButton: "生成完整报告",
@@ -1393,6 +1492,9 @@ const STRINGS = {
         langLabel: "Язык",
         gateTitle: "Вход в Анализатор OSG",
         gateSubtitle: "Введите код доступа, предоставленный вашей организацией.",
+        gateAboutBlurb: "Анализатор OSG применяет международные стандарты гендерного бюджетирования (ОЭСР-КСР, ЕС, PEFA, ПРООН) для анализа государственных бюджетов и присвоения гендерного маркера G0-G3.",
+        gateRequestDemo: "Запросить демонстрацию",
+        gateRequestSubject: "Запрос демонстрации — Анализатор OSG",
         accessCodePlaceholder: "Код доступа",
         accessCodeButton: "Войти",
         accessCodeChecking: "Проверка…",
@@ -1443,6 +1545,19 @@ const STRINGS = {
         adminNoAccess: "У этого кода нет прав администратора.",
         adminLoading: "Загрузка клиентов…",
         adminEmpty: "Коды доступа не найдены.",
+        adminCreateShow: "Создать новый код доступа",
+        adminCreateHide: "Скрыть форму",
+        adminCreateTitle: "Новый код доступа",
+        adminCreateOrgLabel: "Организация",
+        adminCreateOrgPlaceholder: "Название организации",
+        adminCreateLimitLabel: "Месячный лимит анализов",
+        adminCreateExpiryLabel: "Срок действия (необязательно)",
+        adminCreateCustomLabel: "Собственный код (необязательно)",
+        adminCreateCustomPlaceholder: "Оставьте пустым для автогенерации",
+        adminCreateAdminLabel: "Предоставить права администратора",
+        adminCreateButton: "Создать код",
+        adminCreateCreating: "Создание…",
+        adminCreateSuccess: (codigo) => `Код успешно создан: ${codigo}`,
         downloadPdf: "Скачать PDF",
         downloadWord: "Скачать Word",
         fullReportButton: "Сформировать полный отчёт",
@@ -1542,6 +1657,9 @@ const STRINGS = {
         langLabel: "Lugha",
         gateTitle: "Ingia kwenye Kichambuzi cha OSG",
         gateSubtitle: "Weka msimbo wa ufikiaji uliotolewa na shirika lako.",
+        gateAboutBlurb: "Kichambuzi cha OSG kinatumia viwango vya kimataifa vya bajeti inayozingatia jinsia (OECD-DAC, EU, PEFA, UNDP) kuchambua bajeti za umma na kutoa Alama ya Kijinsia G0-G3.",
+        gateRequestDemo: "Omba onyesho",
+        gateRequestSubject: "Ombi la onyesho — Kichambuzi cha OSG",
         accessCodePlaceholder: "Msimbo wa ufikiaji",
         accessCodeButton: "Ingia",
         accessCodeChecking: "Inathibitisha…",
@@ -1592,6 +1710,19 @@ const STRINGS = {
         adminNoAccess: "Msimbo huu hauna ruhusa za utawala.",
         adminLoading: "Inapakia wateja…",
         adminEmpty: "Hakuna misimbo ya ufikiaji iliyopatikana.",
+        adminCreateShow: "Unda msimbo mpya wa ufikiaji",
+        adminCreateHide: "Ficha fomu",
+        adminCreateTitle: "Msimbo mpya wa ufikiaji",
+        adminCreateOrgLabel: "Shirika",
+        adminCreateOrgPlaceholder: "Jina la shirika",
+        adminCreateLimitLabel: "Kikomo cha uchambuzi cha mwezi",
+        adminCreateExpiryLabel: "Uhalali (si lazima)",
+        adminCreateCustomLabel: "Msimbo maalum (si lazima)",
+        adminCreateCustomPlaceholder: "Acha wazi ili kuzalisha kiotomatiki",
+        adminCreateAdminLabel: "Toa ruhusa za usimamizi",
+        adminCreateButton: "Unda msimbo",
+        adminCreateCreating: "Inaunda…",
+        adminCreateSuccess: (codigo) => `Msimbo umeundwa kwa mafanikio: ${codigo}`,
         downloadPdf: "Pakua PDF",
         downloadWord: "Pakua Word",
         fullReportButton: "Tengeneza ripoti kamili",
@@ -1844,6 +1975,15 @@ function OSGAnalyzer() {
     const [showTrends, setShowTrends] = useState(false);
     const [adminCodes, setAdminCodes] = useState([]);
     const [adminLoading, setAdminLoading] = useState(false);
+    const [showCreateCode, setShowCreateCode] = useState(false);
+    const [novoCodOrg, setNovoCodOrg] = useState("");
+    const [novoCodLimite, setNovoCodLimite] = useState("50");
+    const [novoCodValidade, setNovoCodValidade] = useState("");
+    const [novoCodAdmin, setNovoCodAdmin] = useState(false);
+    const [novoCodPersonalizado, setNovoCodPersonalizado] = useState("");
+    const [criandoCodigo, setCriandoCodigo] = useState(false);
+    const [erroNovoCodigo, setErroNovoCodigo] = useState("");
+    const [codigoRecemCriado, setCodigoRecemCriado] = useState("");
     const [paymentCode, setPaymentCode] = useState(null);
     const [paymentError, setPaymentError] = useState(false);
     const [compareSelected, setCompareSelected] = useState(() => new Set());
@@ -1999,6 +2139,28 @@ function OSGAnalyzer() {
         try { setAdminCodes(await listarCodigosAdmin(accessCode)); }
         catch { setAdminCodes([]); }
         finally { setAdminLoading(false); }
+    }
+    // Cria um código de acesso novo — usado para clientes que pagam por
+    // fatura/transferência (fora do fluxo automático do Stripe).
+    async function criarNovoCodigo() {
+        if (!novoCodOrg.trim()) return;
+        setCriandoCodigo(true); setErroNovoCodigo("");
+        try {
+            const resultado = await criarCodigoAdmin(accessCode, {
+                org: novoCodOrg.trim(),
+                limit: parseInt(novoCodLimite, 10) || 50,
+                expiresAt: novoCodValidade || undefined,
+                admin: novoCodAdmin,
+                customCode: novoCodPersonalizado.trim() || undefined,
+            });
+            setCodigoRecemCriado(resultado.code);
+            setNovoCodOrg(""); setNovoCodLimite("50"); setNovoCodValidade(""); setNovoCodAdmin(false); setNovoCodPersonalizado("");
+            setAdminCodes(await listarCodigosAdmin(accessCode));
+        } catch (e) {
+            setErroNovoCodigo(e instanceof Error && e.message ? e.message : s.errGeneral);
+        } finally {
+            setCriandoCodigo(false);
+        }
     }
     async function verHistoricoDeCodigo(codigo) {
         setHistoryLoading(true); setShowAdmin(false); setShowHistory(true);
@@ -2722,7 +2884,12 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
                         value: lang, onChange: (e) => setLang(e.target.value),
                         className: "text-xs border rounded-md px-2 py-1 outline-none",
                         style: { borderColor: "#DED7C6", color: "#16302E", background: "#FFFFFF" },
-                    }, Object.entries(LANGUAGES).map(([code, meta]) => (React.createElement("option", { key: code, value: code }, meta.name))))))));
+                    }, Object.entries(LANGUAGES).map(([code, meta]) => (React.createElement("option", { key: code, value: code }, meta.name))))),
+                React.createElement("div", { className: "mt-8 pt-6 text-center", style: { borderTop: "1px solid #EDE8DC" } },
+                    React.createElement("p", { className: "text-xs mb-3", style: { color: "#7A8F8C" } }, s.gateAboutBlurb),
+                    React.createElement("div", { className: "flex items-center justify-center gap-4 flex-wrap" },
+                        React.createElement("a", { href: `mailto:vahelenbarbosaago@outlook.com?subject=${encodeURIComponent(s.gateRequestSubject)}`, className: "text-xs underline", style: { color: "#1F5D5B" } }, s.gateRequestDemo),
+                        React.createElement("a", { href: "/privacy.html", target: "_blank", rel: "noopener noreferrer", className: "text-xs underline", style: { color: "#9AA6A3" } }, s.privacyFullLink))))));
     }
 
     return (React.createElement("div", { className: "min-h-screen w-full", dir: isRTL ? "rtl" : "ltr", style: { background: "#F6F3ED", fontFamily: bodyFont, color: "#16302E" } },
@@ -2826,6 +2993,47 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
                 React.createElement("div", { className: "flex items-center justify-between mb-3" },
                     React.createElement("h2", { className: "text-sm font-medium" }, s.adminPanelTitle),
                     React.createElement("button", { onClick: () => setShowAdmin(false), className: "text-xs underline", style: { color: "#7A8F8C" } }, s.adminBack)),
+                React.createElement("button", {
+                    onClick: () => { setShowCreateCode((v) => !v); setCodigoRecemCriado(""); setErroNovoCodigo(""); },
+                    className: "mb-3 text-xs underline", style: { color: "#1F5D5B" },
+                }, showCreateCode ? s.adminCreateHide : s.adminCreateShow),
+                showCreateCode && React.createElement("div", { className: "mb-4 rounded-lg border p-4", style: { borderColor: "#DED7C6", background: "#FBFAF6" } },
+                    React.createElement("h3", { className: "text-sm font-medium mb-3" }, s.adminCreateTitle),
+                    React.createElement("label", { className: "text-xs block mb-1", style: { color: "#7A8F8C" } }, s.adminCreateOrgLabel),
+                    React.createElement("input", {
+                        type: "text", value: novoCodOrg, onChange: (e) => setNovoCodOrg(e.target.value),
+                        placeholder: s.adminCreateOrgPlaceholder,
+                        className: "w-full border rounded-md px-3 py-2 text-sm outline-none mb-3", style: { borderColor: "#DED7C6" },
+                    }),
+                    React.createElement("div", { className: "grid grid-cols-2 gap-3 mb-3" },
+                        React.createElement("div", null,
+                            React.createElement("label", { className: "text-xs block mb-1", style: { color: "#7A8F8C" } }, s.adminCreateLimitLabel),
+                            React.createElement("input", {
+                                type: "number", min: "1", value: novoCodLimite, onChange: (e) => setNovoCodLimite(e.target.value),
+                                className: "w-full border rounded-md px-3 py-2 text-sm outline-none", style: { borderColor: "#DED7C6" },
+                            })),
+                        React.createElement("div", null,
+                            React.createElement("label", { className: "text-xs block mb-1", style: { color: "#7A8F8C" } }, s.adminCreateExpiryLabel),
+                            React.createElement("input", {
+                                type: "date", value: novoCodValidade, onChange: (e) => setNovoCodValidade(e.target.value),
+                                className: "w-full border rounded-md px-3 py-2 text-sm outline-none", style: { borderColor: "#DED7C6" },
+                            }))),
+                    React.createElement("label", { className: "text-xs block mb-1", style: { color: "#7A8F8C" } }, s.adminCreateCustomLabel),
+                    React.createElement("input", {
+                        type: "text", value: novoCodPersonalizado, onChange: (e) => setNovoCodPersonalizado(e.target.value),
+                        placeholder: s.adminCreateCustomPlaceholder,
+                        className: "w-full border rounded-md px-3 py-2 text-sm outline-none mb-3", style: { borderColor: "#DED7C6" },
+                    }),
+                    React.createElement("label", { className: "flex items-center gap-2 text-xs mb-4", style: { color: "#7A8F8C" } },
+                        React.createElement("input", { type: "checkbox", checked: novoCodAdmin, onChange: (e) => setNovoCodAdmin(e.target.checked) }),
+                        s.adminCreateAdminLabel),
+                    erroNovoCodigo && React.createElement("p", { className: "text-xs mb-3", style: { color: "#B5541F" } }, erroNovoCodigo),
+                    codigoRecemCriado && React.createElement("p", { className: "text-xs mb-3", style: { color: "#1F5D5B" } }, s.adminCreateSuccess(codigoRecemCriado)),
+                    React.createElement("button", {
+                        onClick: criarNovoCodigo, disabled: !novoCodOrg.trim() || criandoCodigo,
+                        className: "inline-flex items-center gap-2 px-4 py-2 rounded-md text-xs font-medium disabled:opacity-40",
+                        style: { background: "#1F5D5B", color: "#F6F3ED" },
+                    }, criandoCodigo ? s.adminCreateCreating : s.adminCreateButton)),
                 adminLoading && React.createElement(Loader2, { className: "w-4 h-4 animate-spin", style: { color: "#7A8F8C" } }),
                 !adminLoading && adminCodes.length === 0 && React.createElement("p", { className: "text-xs", style: { color: "#9AA6A3" } }, s.adminEmpty),
                 !adminLoading && adminCodes.length > 0 && React.createElement("div", { className: "overflow-x-auto" },
