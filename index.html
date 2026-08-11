@@ -91,12 +91,45 @@ function dividirEmPartes(texto, tamanhoAlvo) {
 // utilizador, para evitar perdas de nuance em traduções encadeadas.
 const EXTRACTION_SYSTEM = `Você prepara extratos de uma parte de um documento orçamental extenso, para uma análise posterior de Orçamento Sensível ao Género (OSG). Este é o excerto {N} de um documento maior. Leia o texto e extraia, em português, apenas o que for relevante para avaliar: (1) declarações/notas orçamentais de género, (2) documentação orçamental que mencione género, (3) classificação ou natureza de linhas/projetos orçamentais, (4) dados de execução/desempenho desagregados por sexo, (5) avaliação de impacto ou exame legislativo sobre género. Inclua também até 8 linhas orçamentais ou projetos com montante, se existirem neste excerto. Preserve detalhes concretos e citáveis tal como aparecem no texto — números exatos, nomes de documentos ou instrumentos, datas, artigos de lei, nomes de projetos — em vez de resumir de forma vaga; a análise final depende destes detalhes precisos para se fundamentar corretamente. Seja factual — nunca invente informação, números ou nomes que não estejam literalmente no texto — e conciso, sem repetir o texto integralmente. Se este excerto não tiver nada relevante, devolva notas vazias em vez de forçar uma interpretação. Responda APENAS com JSON válido, sem markdown: {"notas": "<até 250 palavras, com detalhes concretos preservados>", "linhas": [{"nome": "...", "montante": "...", "observacao": "..."}]}`;
 
-async function chamarAPI(payload) {
-    const response = await fetch(PROXY_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-    });
+const TIMEOUT_PEDIDO_MS = 120000; // 2 minutos — chega para análises grandes
+async function chamarAPI(payload, tentativa) {
+    tentativa = tentativa || 0;
+    // Deteção de "sem ligação" — falha imediatamente com uma mensagem
+    // específica, em vez de deixar o pedido tentar e falhar de forma
+    // confusa mais tarde.
+    if (typeof navigator !== "undefined" && navigator.onLine === false) {
+        const err = new Error("OFFLINE");
+        err.offline = true;
+        throw err;
+    }
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_PEDIDO_MS);
+    let response;
+    try {
+        response = await fetch(PROXY_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+            signal: controller.signal,
+        });
+    } catch (falhaRede) {
+        clearTimeout(timeoutId);
+        if (falhaRede && falhaRede.name === "AbortError") {
+            const err = new Error("TIMEOUT");
+            err.timeout = true;
+            throw err;
+        }
+        // Falha de rede momentânea (não um erro da API) — tenta mais uma
+        // vez antes de desistir, com um pequeno atraso.
+        if (tentativa < 1) {
+            await new Promise((r) => setTimeout(r, 1200));
+            return chamarAPI(payload, tentativa + 1);
+        }
+        const err = new Error("NETWORK");
+        err.network = true;
+        throw err;
+    }
+    clearTimeout(timeoutId);
     let data;
     try { data = await response.json(); } catch { data = {}; }
     if (!response.ok) {
@@ -491,6 +524,11 @@ const STRINGS = {
         accessCodeChecking: "A verificar…",
         accessCodeInvalid: "Código de acesso inválido ou inativo. Verifique com o administrador.",
         errUsageLimit: "Limite mensal de análises atingido. Contacte o administrador para aumentar o plano.",
+        errOffline: "Estás offline. Verifica a tua ligação à internet e tenta novamente.",
+        errTimeout: "O pedido demorou demasiado tempo e foi cancelado. Tenta novamente.",
+        errNetwork: "Falha de rede ao contactar o servidor. Tenta novamente.",
+        exportMenuLabel: "Exportar",
+        unsavedLeaveWarning: "Tens correções manuais por guardar. Sair mesmo assim?",
         historyLabel: "Histórico",
         historyEmpty: "Ainda não há análises guardadas.",
         historyBack: "← Voltar à análise",
@@ -634,6 +672,11 @@ const STRINGS = {
         accessCodeChecking: "Vérification…",
         accessCodeInvalid: "Code d'accès invalide ou inactif. Vérifiez auprès de l'administrateur.",
         errUsageLimit: "Limite mensuelle d'analyses atteinte. Contactez l'administrateur pour augmenter le forfait.",
+        errOffline: "Vous êtes hors ligne. Vérifiez votre connexion internet et réessayez.",
+        errTimeout: "La requête a pris trop de temps et a été annulée. Réessayez.",
+        errNetwork: "Échec réseau lors de la connexion au serveur. Réessayez.",
+        exportMenuLabel: "Exporter",
+        unsavedLeaveWarning: "Vous avez des corrections manuelles non enregistrées. Quitter quand même ?",
         historyLabel: "Historique",
         historyEmpty: "Aucune analyse enregistrée pour l'instant.",
         historyBack: "← Retour à l'analyse",
@@ -777,6 +820,11 @@ const STRINGS = {
         accessCodeChecking: "Checking…",
         accessCodeInvalid: "Invalid or inactive access code. Check with your administrator.",
         errUsageLimit: "Monthly analysis limit reached. Contact your administrator to upgrade the plan.",
+        errOffline: "You are offline. Check your internet connection and try again.",
+        errTimeout: "The request took too long and was cancelled. Please try again.",
+        errNetwork: "Network failure while contacting the server. Please try again.",
+        exportMenuLabel: "Export",
+        unsavedLeaveWarning: "You have unsaved manual corrections. Leave anyway?",
         historyLabel: "History",
         historyEmpty: "No saved analyses yet.",
         historyBack: "← Back to analysis",
@@ -920,6 +968,11 @@ const STRINGS = {
         accessCodeChecking: "Verificando…",
         accessCodeInvalid: "Código de acceso inválido o inactivo. Consulte con el administrador.",
         errUsageLimit: "Límite mensual de análisis alcanzado. Contacte al administrador para ampliar el plan.",
+        errOffline: "Estás sin conexión. Comprueba tu conexión a internet e inténtalo de nuevo.",
+        errTimeout: "La solicitud tardó demasiado y fue cancelada. Inténtalo de nuevo.",
+        errNetwork: "Fallo de red al contactar con el servidor. Inténtalo de nuevo.",
+        exportMenuLabel: "Exportar",
+        unsavedLeaveWarning: "Tienes correcciones manuales sin guardar. ¿Salir de todos modos?",
         historyLabel: "Historial",
         historyEmpty: "Aún no hay análisis guardados.",
         historyBack: "← Volver al análisis",
@@ -1063,6 +1116,11 @@ const STRINGS = {
         accessCodeChecking: "جارٍ التحقق…",
         accessCodeInvalid: "رمز الوصول غير صالح أو غير نشط. تحقق مع المسؤول.",
         errUsageLimit: "تم بلوغ الحد الشهري للتحليلات. تواصل مع المسؤول لترقية الخطة.",
+        errOffline: "أنت غير متصل بالإنترنت. تحقق من اتصالك وحاول مرة أخرى.",
+        errTimeout: "استغرق الطلب وقتاً طويلاً وتم إلغاؤه. حاول مرة أخرى.",
+        errNetwork: "فشل الشبكة أثناء الاتصال بالخادم. حاول مرة أخرى.",
+        exportMenuLabel: "تصدير",
+        unsavedLeaveWarning: "لديك تصحيحات يدوية غير محفوظة. هل تريد المغادرة على أي حال؟",
         historyLabel: "السجل",
         historyEmpty: "لا توجد تحليلات محفوظة بعد.",
         historyBack: "← العودة إلى التحليل",
@@ -1206,6 +1264,11 @@ const STRINGS = {
         accessCodeChecking: "正在验证…",
         accessCodeInvalid: "访问码无效或已停用。请联系管理员。",
         errUsageLimit: "已达到每月分析次数上限。请联系管理员升级方案。",
+        errOffline: "您已离线。请检查网络连接后重试。",
+        errTimeout: "请求耗时过长已被取消，请重试。",
+        errNetwork: "连接服务器时网络故障，请重试。",
+        exportMenuLabel: "导出",
+        unsavedLeaveWarning: "您有尚未保存的手动修正。仍要离开吗？",
         historyLabel: "历史记录",
         historyEmpty: "尚无已保存的分析。",
         historyBack: "← 返回分析",
@@ -1349,6 +1412,11 @@ const STRINGS = {
         accessCodeChecking: "Проверка…",
         accessCodeInvalid: "Неверный или неактивный код доступа. Уточните у администратора.",
         errUsageLimit: "Достигнут месячный лимит анализов. Обратитесь к администратору для расширения тарифа.",
+        errOffline: "Вы не в сети. Проверьте подключение к интернету и попробуйте снова.",
+        errTimeout: "Запрос выполнялся слишком долго и был отменён. Попробуйте снова.",
+        errNetwork: "Сбой сети при обращении к серверу. Попробуйте снова.",
+        exportMenuLabel: "Экспорт",
+        unsavedLeaveWarning: "У вас есть несохранённые ручные исправления. Всё равно уйти?",
         historyLabel: "История",
         historyEmpty: "Пока нет сохранённых анализов.",
         historyBack: "← Назад к анализу",
@@ -1492,6 +1560,11 @@ const STRINGS = {
         accessCodeChecking: "Inathibitisha…",
         accessCodeInvalid: "Msimbo wa ufikiaji si sahihi au haujawezeshwa. Wasiliana na msimamizi.",
         errUsageLimit: "Kikomo cha uchambuzi cha mwezi kimefikiwa. Wasiliana na msimamizi ili kupandisha mpango.",
+        errOffline: "Huna muunganisho wa intaneti. Angalia muunganisho wako na ujaribu tena.",
+        errTimeout: "Ombi lilichukua muda mrefu na limeghairiwa. Tafadhali jaribu tena.",
+        errNetwork: "Hitilafu ya mtandao wakati wa kuwasiliana na seva. Tafadhali jaribu tena.",
+        exportMenuLabel: "Hamisha",
+        unsavedLeaveWarning: "Una masahihisho ya mkono ambayo hayajahifadhiwa. Ungependa kuondoka hata hivyo?",
         historyLabel: "Historia",
         historyEmpty: "Hakuna uchambuzi uliohifadhiwa bado.",
         historyBack: "← Rudi kwenye uchambuzi",
@@ -1757,6 +1830,8 @@ function OSGAnalyzer() {
     const [novaLinhaMarcador, setNovaLinhaMarcador] = useState("G0");
     const [novaLinhaComentario, setNovaLinhaComentario] = useState("");
     const [showAddLine, setShowAddLine] = useState(false);
+    const [showExportMenu, setShowExportMenu] = useState(false);
+    const [showMarkerInfo, setShowMarkerInfo] = useState(false);
     const [sharedView, setSharedView] = useState(false);
     const [manualSessionInput, setManualSessionInput] = useState("");
     const [showFrameworks, setShowFrameworks] = useState(false);
@@ -1813,6 +1888,21 @@ function OSGAnalyzer() {
         document.documentElement.lang = lang;
         document.documentElement.dir = isRTL ? "rtl" : "ltr";
     }, [lang, isRTL]);
+
+    // Avisa antes de fechar/recarregar a página se houver correções
+    // manuais (marcador alterado ou linha adicionada) ainda por guardar
+    // no histórico — evita perder trabalho por engano.
+    useEffect(() => {
+        const temAlteracoesPorGuardar = !!(result && result.lineItems && result.lineItems.some((li) => li.manualOverride || li.manualEntry) && !changesSaved);
+        function avisarAntesDeSair(e) {
+            if (temAlteracoesPorGuardar) {
+                e.preventDefault();
+                e.returnValue = "";
+            }
+        }
+        window.addEventListener("beforeunload", avisarAntesDeSair);
+        return () => window.removeEventListener("beforeunload", avisarAntesDeSair);
+    }, [result, changesSaved]);
 
     useEffect(() => {
         let cancelado = false;
@@ -2241,6 +2331,7 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta deve ser escrita inteiramente em ${LA
 
     async function analisar() {
         if (!input.trim()) return;
+        if (status === "loading") return;
         if (input.trim().length < 40) { setStatus("error"); setErrorMsg(s.errInputTooShort); return; }
         setStatus("loading"); setErrorMsg(""); setExemploAtivo(null);
         setFullReport(null); setFullReportStatus("idle"); setShowFullReport(false);
@@ -2281,7 +2372,13 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta deve ser escrita inteiramente em ${LA
             setResult(parsed); setStatus("done");
             guardarHistorico(accessCode, { lang, inputExcerpt: input.slice(0, 400), result: parsed });
         } catch (e) {
-            if (e && e.status === 401) {
+            if (e && e.offline) {
+                setErrorMsg(s.errOffline);
+            } else if (e && e.timeout) {
+                setErrorMsg(s.errTimeout);
+            } else if (e && e.network) {
+                setErrorMsg(s.errNetwork);
+            } else if (e && e.status === 401) {
                 setErrorMsg(s.accessCodeInvalid);
                 setGateStatus("gate");
             } else if (e && e.status === 429) {
@@ -2297,6 +2394,7 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta deve ser escrita inteiramente em ${LA
 
     async function gerarRelatorioCompleto() {
         if (!result) return;
+        if (fullReportStatus === "loading") return;
         setFullReportStatus("loading");
         try {
             const system = buildFullReportSystemPrompt(result, input);
@@ -2565,7 +2663,7 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
         setInput(""); setResult(null); setExemploAtivo(null); setStatus("idle");
         setCopiado(false); setFicheiroNome(""); setErroFicheiro("");
         setFullReport(null); setFullReportStatus("idle"); setShowFullReport(false);
-        setChangesSaved(false);
+        setChangesSaved(false); setShowExportMenu(false);
     }
     function verExemplo(pais) {
         const ex = EXEMPLOS_PT[pais];
@@ -2821,16 +2919,26 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
                 React.createElement("div", { className: "flex items-center gap-4 mb-6 print:hidden flex-wrap" },
                     React.createElement("button", { onClick: () => copiarResultado(result), className: "inline-flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
                         copiado ? React.createElement(Check, { className: "w-3.5 h-3.5" }) : React.createElement(Copy, { className: "w-3.5 h-3.5" }), copiado ? s.copiedResult : s.copyResult),
-                    React.createElement("button", { onClick: () => baixarResultado(result), className: "inline-flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
-                        React.createElement(Download, { className: "w-3.5 h-3.5" }), " " + s.downloadResult),
-                    React.createElement("button", { onClick: () => baixarPdf(result), className: "inline-flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
-                        React.createElement(Download, { className: "w-3.5 h-3.5" }), " " + s.downloadPdf),
-                    React.createElement("button", { onClick: () => baixarWord(result), className: "inline-flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
-                        React.createElement(Download, { className: "w-3.5 h-3.5" }), " " + s.downloadWord),
-                    React.createElement("button", { onClick: () => window.print(), className: "inline-flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
-                        React.createElement(Printer, { className: "w-3.5 h-3.5" }), " " + s.printResult),
-                    !sharedView && React.createElement("button", { onClick: () => baixarCSV(result), className: "inline-flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
-                        React.createElement(Download, { className: "w-3.5 h-3.5" }), " " + s.downloadCsv),
+                    React.createElement("div", { className: "relative" },
+                        React.createElement("button", {
+                            onClick: () => setShowExportMenu((v) => !v),
+                            className: "inline-flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" },
+                        }, React.createElement(Download, { className: "w-3.5 h-3.5" }), " " + s.exportMenuLabel + (showExportMenu ? " ▴" : " ▾")),
+                        showExportMenu && React.createElement("div", {
+                            className: "absolute z-10 mt-1 rounded-md border overflow-hidden", style: { borderColor: "#DED7C6", background: "#FFFFFF", boxShadow: "0 4px 16px rgba(22,48,46,0.12)", minWidth: "190px" },
+                        }, [
+                            [s.downloadResult, () => baixarResultado(result)],
+                            [s.downloadPdf, () => baixarPdf(result)],
+                            [s.downloadWord, () => baixarWord(result)],
+                            !sharedView && [s.downloadCsv, () => baixarCSV(result)],
+                            [s.printResult, () => window.print()],
+                        ].filter(Boolean).map(([label, onClick], i) => React.createElement("button", {
+                            key: i,
+                            onClick: () => { onClick(); setShowExportMenu(false); },
+                            className: "block w-full text-left px-3 py-2 text-xs",
+                            style: { color: "#3E4C49", borderTop: i > 0 ? "1px solid #EDE8DC" : "none" },
+                        }, label))),
+                    ),
                     !sharedView && React.createElement("button", { onClick: partilharAnalise, className: "inline-flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
                         linkPartilhadoCopiado ? React.createElement(Check, { className: "w-3.5 h-3.5" }) : React.createElement(Copy, { className: "w-3.5 h-3.5" }), " " + (linkPartilhadoCopiado ? s.shareCopied : s.shareButton)),
                     !sharedView && React.createElement("button", {
@@ -2863,9 +2971,13 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
                 result.lineItems && result.lineItems.length > 0 && (React.createElement("div", { className: "mt-6" },
                     React.createElement("div", { className: "flex items-center gap-2 mb-1" },
                         React.createElement(Tag, { className: "w-3.5 h-3.5", style: { color: "#7A8F8C" } }),
-                        React.createElement("h3", { className: "text-xs uppercase tracking-wide", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#7A8F8C" } }, s.lineItemsLabel)),
-                    s.markerNote && React.createElement("p", { className: "text-xs mb-3", style: { color: "#9AA6A3" } }, s.markerNote),
-                    React.createElement("div", { className: "flex flex-wrap gap-3 mb-4" }, Object.entries(markerInfo).map(([code, info]) => (
+                        React.createElement("h3", { className: "text-xs uppercase tracking-wide", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#7A8F8C" } }, s.lineItemsLabel),
+                        React.createElement("button", {
+                            onClick: () => setShowMarkerInfo((v) => !v), "aria-label": s.frameworksToggle,
+                            className: "text-xs flex-shrink-0", style: { color: "#9AA6A3" },
+                        }, "ⓘ")),
+                    showMarkerInfo && s.markerNote && React.createElement("p", { className: "text-xs mb-3", style: { color: "#9AA6A3" } }, s.markerNote),
+                    showMarkerInfo && React.createElement("div", { className: "flex flex-wrap gap-3 mb-4" }, Object.entries(markerInfo).map(([code, info]) => (
                         React.createElement("div", { key: code, className: "flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
                             React.createElement("span", { className: "inline-block w-2.5 h-2.5 rounded-full flex-shrink-0", style: { background: info.color } }),
                             code + " — " + info.short)))),
