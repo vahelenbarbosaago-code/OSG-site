@@ -243,15 +243,52 @@ const CONFIDENCE_LABELS_I18N = {
 };
 const CONFIDENCE_COLOR = { alta: "#1F5D5B", media: "#C9A227", baixa: "#B5541F" };
 
-const CATEGORY_INFO_I18N = {
-    pt: { 1: { label: "Categoria 1 — Neutro", color: "#9AA6A3" }, 2: { label: "Categoria 2 — Específico de género", color: "#1F5D5B" }, 3: { label: "Categoria 3 — Potencial impacto (requer comentário)", color: "#C9A227" } },
-    fr: { 1: { label: "Catégorie 1 — Neutre", color: "#9AA6A3" }, 2: { label: "Catégorie 2 — Spécifique au genre", color: "#1F5D5B" }, 3: { label: "Catégorie 3 — Impact potentiel (nécessite un commentaire)", color: "#C9A227" } },
-    en: { 1: { label: "Category 1 — Neutral", color: "#9AA6A3" }, 2: { label: "Category 2 — Gender-specific", color: "#1F5D5B" }, 3: { label: "Category 3 — Potential impact (requires comment)", color: "#C9A227" } },
-    es: { 1: { label: "Categoría 1 — Neutro", color: "#9AA6A3" }, 2: { label: "Categoría 2 — Específico de género", color: "#1F5D5B" }, 3: { label: "Categoría 3 — Impacto potencial (requiere comentario)", color: "#C9A227" } },
-    ar: { 1: { label: "الفئة 1 — محايدة", color: "#9AA6A3" }, 2: { label: "الفئة 2 — خاصة بالنوع الاجتماعي", color: "#1F5D5B" }, 3: { label: "الفئة 3 — أثر محتمل (يتطلب تعليقاً)", color: "#C9A227" } },
-    zh: { 1: { label: "第一类——中性", color: "#9AA6A3" }, 2: { label: "第二类——性别专项", color: "#1F5D5B" }, 3: { label: "第三类——潜在影响（需要说明）", color: "#C9A227" } },
-    ru: { 1: { label: "Категория 1 — Нейтральная", color: "#9AA6A3" }, 2: { label: "Категория 2 — Гендерно-специфическая", color: "#1F5D5B" }, 3: { label: "Категория 3 — Потенциальное воздействие (требует комментария)", color: "#C9A227" } },
-    sw: { 1: { label: "Kundi la 1 — Lisiloegemea upande", color: "#9AA6A3" }, 2: { label: "Kundi la 2 — Mahususi kwa jinsia", color: "#1F5D5B" }, 3: { label: "Kundi la 3 — Athari inayoweza kutokea (inahitaji maelezo)", color: "#C9A227" } },
+// Marcador de Género (G0/G1/G2) — escala internacional da OCDE-CAD (desde
+// 1997), adotada pela União Europeia e pelo modelo Pro PALOP-TL ISC/UEMOA
+// (usado, entre outros, pela Guiné-Bissau e por Cabo Verde). Substitui a
+// antiga classificação genérica "Categoria 1/2/3" por esta nomenclatura
+// oficialmente reconhecida.
+const GENDER_MARKER_INFO_I18N = {
+    pt: {
+        G0: { label: "G0 — Não visa a igualdade de género", short: "Não visa género", color: "#9AA6A3" },
+        G1: { label: "G1 — Componente de género (objetivo significativo)", short: "Objetivo significativo", color: "#C9A227" },
+        G2: { label: "G2 — Promoção direta da igualdade de género (objetivo principal)", short: "Objetivo principal", color: "#1F5D5B" },
+    },
+    fr: {
+        G0: { label: "G0 — Ne vise pas l'égalité de genre", short: "Ne vise pas le genre", color: "#9AA6A3" },
+        G1: { label: "G1 — Composante de genre (objectif significatif)", short: "Objectif significatif", color: "#C9A227" },
+        G2: { label: "G2 — Promotion directe de l'égalité de genre (objectif principal)", short: "Objectif principal", color: "#1F5D5B" },
+    },
+    en: {
+        G0: { label: "G0 — Does not target gender equality", short: "Not targeted", color: "#9AA6A3" },
+        G1: { label: "G1 — Gender component (significant objective)", short: "Significant objective", color: "#C9A227" },
+        G2: { label: "G2 — Direct promotion of gender equality (principal objective)", short: "Principal objective", color: "#1F5D5B" },
+    },
+    es: {
+        G0: { label: "G0 — No se orienta a la igualdad de género", short: "No orientado al género", color: "#9AA6A3" },
+        G1: { label: "G1 — Componente de género (objetivo significativo)", short: "Objetivo significativo", color: "#C9A227" },
+        G2: { label: "G2 — Promoción directa de la igualdad de género (objetivo principal)", short: "Objetivo principal", color: "#1F5D5B" },
+    },
+    ar: {
+        G0: { label: "G0 — لا يستهدف المساواة بين الجنسين", short: "لا يستهدف النوع الاجتماعي", color: "#9AA6A3" },
+        G1: { label: "G1 — مكوّن جندري (هدف مهم)", short: "هدف مهم", color: "#C9A227" },
+        G2: { label: "G2 — تعزيز مباشر للمساواة بين الجنسين (هدف رئيسي)", short: "هدف رئيسي", color: "#1F5D5B" },
+    },
+    zh: {
+        G0: { label: "G0——不针对性别平等", short: "不针对性别", color: "#9AA6A3" },
+        G1: { label: "G1——性别相关组成部分（重要目标）", short: "重要目标", color: "#C9A227" },
+        G2: { label: "G2——直接促进性别平等（主要目标）", short: "主要目标", color: "#1F5D5B" },
+    },
+    ru: {
+        G0: { label: "G0 — Не нацелен на гендерное равенство", short: "Не нацелен на гендер", color: "#9AA6A3" },
+        G1: { label: "G1 — Гендерный компонент (значимая цель)", short: "Значимая цель", color: "#C9A227" },
+        G2: { label: "G2 — Прямое содействие гендерному равенству (главная цель)", short: "Главная цель", color: "#1F5D5B" },
+    },
+    sw: {
+        G0: { label: "G0 — Hailengi usawa wa kijinsia", short: "Hailengi jinsia", color: "#9AA6A3" },
+        G1: { label: "G1 — Kipengele cha kijinsia (lengo muhimu)", short: "Lengo muhimu", color: "#C9A227" },
+        G2: { label: "G2 — Ukuzaji wa moja kwa moja wa usawa wa kijinsia (lengo kuu)", short: "Lengo kuu", color: "#1F5D5B" },
+    },
 };
 
 const STRINGS = {
@@ -274,7 +311,8 @@ const STRINGS = {
         examplesUnavailable: (l) => `Os exemplos pré-calculados estão disponíveis apenas em português. Escreva ou carregue o seu próprio orçamento para analisar em ${l}.`,
         overallLevelLabel: "Nível geral",
         copyResult: "Copiar resultado", copiedResult: "Copiado", printResult: "Guardar como PDF", downloadResult: "Baixar análise",
-        lineItemsLabel: "Classificação por linha orçamental",
+        lineItemsLabel: "Marcador de Género por linha orçamental (G0/G1/G2)",
+        markerNote: "Escala G0/G1/G2 da OCDE-CAD, adotada pela União Europeia e pelo modelo Pro PALOP-TL ISC/UEMOA.",
         restartButton: "Analisar outro orçamento",
         footerSources: "Fontes: OCDE Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Indicador ODS 5.c.1 (ONU) · enquadramentos nacionais e regionais quando aplicável.",
         fileTooLarge: (mb) => `Este ficheiro tem ${mb} MB — o limite é 30 MB. Tente exportar só a secção relevante.`,
@@ -370,7 +408,8 @@ const STRINGS = {
         examplesUnavailable: (l) => `Les exemples précalculés ne sont disponibles qu'en portugais. Rédigez ou chargez votre propre budget pour l'analyser en ${l}.`,
         overallLevelLabel: "Niveau global",
         copyResult: "Copier le résultat", copiedResult: "Copié", printResult: "Enregistrer en PDF", downloadResult: "Télécharger l'analyse",
-        lineItemsLabel: "Classification par ligne budgétaire",
+        lineItemsLabel: "Marqueur de genre par ligne budgétaire (G0/G1/G2)",
+        markerNote: "Échelle G0/G1/G2 de l'OCDE-CAD, adoptée par l'Union européenne et le modèle Pro PALOP-TL ISC/UEMOA.",
         restartButton: "Analyser un autre budget",
         footerSources: "Sources : OCDE Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Indicateur ODD 5.c.1 (ONU) · cadres nationaux et régionaux le cas échéant.",
         fileTooLarge: (mb) => `Ce fichier fait ${mb} Mo — la limite est de 30 Mo. Essayez d'exporter uniquement la section pertinente.`,
@@ -466,7 +505,8 @@ const STRINGS = {
         examplesUnavailable: (l) => `Pre-calculated examples are only available in Portuguese. Write or upload your own budget to analyse it in ${l}.`,
         overallLevelLabel: "Overall level",
         copyResult: "Copy result", copiedResult: "Copied", printResult: "Save as PDF", downloadResult: "Download analysis",
-        lineItemsLabel: "Budget line classification",
+        lineItemsLabel: "Gender marker by budget line (G0/G1/G2)",
+        markerNote: "OECD-DAC G0/G1/G2 scale, adopted by the European Union and the Pro PALOP-TL ISC/UEMOA model.",
         restartButton: "Analyse another budget",
         footerSources: "Sources: OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · SDG Indicator 5.c.1 (UN) · national and regional frameworks where applicable.",
         fileTooLarge: (mb) => `This file is ${mb} MB — the limit is 30 MB. Try exporting just the relevant section.`,
@@ -562,7 +602,8 @@ const STRINGS = {
         examplesUnavailable: (l) => `Los ejemplos precalculados solo están disponibles en portugués. Escriba o cargue su propio presupuesto para analizarlo en ${l}.`,
         overallLevelLabel: "Nivel general",
         copyResult: "Copiar resultado", copiedResult: "Copiado", printResult: "Guardar como PDF", downloadResult: "Descargar análisis",
-        lineItemsLabel: "Clasificación por partida presupuestaria",
+        lineItemsLabel: "Marcador de género por partida presupuestaria (G0/G1/G2)",
+        markerNote: "Escala G0/G1/G2 de la OCDE-CAD, adoptada por la Unión Europea y el modelo Pro PALOP-TL ISC/UEMOA.",
         restartButton: "Analizar otro presupuesto",
         footerSources: "Fuentes: OCDE Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Indicador ODS 5.c.1 (ONU) · marcos nacionales y regionales cuando corresponda.",
         fileTooLarge: (mb) => `Este archivo tiene ${mb} MB — el límite es 30 MB. Intente exportar solo la sección relevante.`,
@@ -658,7 +699,8 @@ const STRINGS = {
         examplesUnavailable: (l) => `الأمثلة المحسوبة مسبقاً متاحة باللغة البرتغالية فقط. اكتب أو حمّل ميزانيتك الخاصة لتحليلها بـ${l}.`,
         overallLevelLabel: "المستوى العام",
         copyResult: "نسخ النتيجة", copiedResult: "تم النسخ", printResult: "حفظ كملف PDF", downloadResult: "تنزيل التحليل",
-        lineItemsLabel: "تصنيف حسب بند الميزانية",
+        lineItemsLabel: "المؤشر الجندري حسب بند الميزانية (G0/G1/G2)",
+        markerNote: "مقياس G0/G1/G2 لمنظمة التعاون الاقتصادي والتنمية (لجنة المساعدة الإنمائية)، الذي اعتمده الاتحاد الأوروبي ونموذج Pro PALOP-TL ISC/UEMOA.",
         restartButton: "تحليل ميزانية أخرى",
         footerSources: "المصادر: OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · مؤشر هدف التنمية المستدامة 5.c.1 (الأمم المتحدة) · أطر وطنية وإقليمية عند الاقتضاء.",
         fileTooLarge: (mb) => `حجم هذا الملف ${mb} ميغابايت — والحد الأقصى هو 30 ميغابايت. حاول تصدير القسم المعني فقط.`,
@@ -754,7 +796,8 @@ const STRINGS = {
         examplesUnavailable: (l) => `预先计算的示例仅提供葡萄牙语版本。请撰写或上传您自己的预算，以${l}进行分析。`,
         overallLevelLabel: "总体水平",
         copyResult: "复制结果", copiedResult: "已复制", printResult: "另存为PDF", downloadResult: "下载分析报告",
-        lineItemsLabel: "预算科目分类",
+        lineItemsLabel: "按预算科目划分的性别标记（G0/G1/G2）",
+        markerNote: "OECD-DAC G0/G1/G2 量表，已被欧盟及 Pro PALOP-TL ISC/UEMOA 模式采用。",
         restartButton: "分析另一份预算",
         footerSources: "来源：OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · 联合国可持续发展目标指标5.c.1 · 适用时的国家和区域框架。",
         fileTooLarge: (mb) => `该文件为 ${mb} MB — 上限为30 MB。请尝试仅导出相关部分。`,
@@ -850,7 +893,8 @@ const STRINGS = {
         examplesUnavailable: (l) => `Предварительно рассчитанные примеры доступны только на португальском языке. Напишите или загрузите свой бюджет для анализа на ${l}.`,
         overallLevelLabel: "Общий уровень",
         copyResult: "Копировать результат", copiedResult: "Скопировано", printResult: "Сохранить как PDF", downloadResult: "Скачать анализ",
-        lineItemsLabel: "Классификация по бюджетным статьям",
+        lineItemsLabel: "Гендерный маркер по бюджетным статьям (G0/G1/G2)",
+        markerNote: "Шкала G0/G1/G2 ОЭСР-КСР, принятая Европейским союзом и моделью Pro PALOP-TL ISC/UEMOA.",
         restartButton: "Анализировать другой бюджет",
         footerSources: "Источники: OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Индикатор ЦУР 5.c.1 (ООН) · национальные и региональные основы, если применимо.",
         fileTooLarge: (mb) => `Этот файл весит ${mb} МБ — лимит составляет 30 МБ. Попробуйте экспортировать только нужный раздел.`,
@@ -946,7 +990,8 @@ const STRINGS = {
         examplesUnavailable: (l) => `Mifano iliyohesabiwa tayari inapatikana kwa Kireno pekee. Andika au pakia bajeti yako mwenyewe ili kuichambua kwa ${l}.`,
         overallLevelLabel: "Kiwango cha jumla",
         copyResult: "Nakili matokeo", copiedResult: "Imenakiliwa", printResult: "Hifadhi kama PDF", downloadResult: "Pakua uchambuzi",
-        lineItemsLabel: "Uainishaji wa vipengele vya bajeti",
+        lineItemsLabel: "Alama ya kijinsia kwa kila kipengele cha bajeti (G0/G1/G2)",
+        markerNote: "Kipimo cha G0/G1/G2 cha OECD-DAC, kilichopitishwa na Umoja wa Ulaya na muundo wa Pro PALOP-TL ISC/UEMOA.",
         restartButton: "Chambua bajeti nyingine",
         footerSources: "Vyanzo: OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Kiashiria cha SDG 5.c.1 (UN) · mifumo ya kitaifa na kikanda inapohitajika.",
         fileTooLarge: (mb) => `Faili hii ina MB ${mb} — kikomo ni MB 30. Jaribu kuhamisha sehemu husika pekee.`,
@@ -1033,14 +1078,16 @@ const EXEMPLO_GB_RESULT = {
     modules: [
         { key: "diagnostico", score: 1, finding: "Os projetos têm nomes ligados a género, mas sem qualquer instrumento formal de declaração orçamental por trás.", recommendation: "Formalizar a exigência de \"note Genre\" nos projetos de investimento." },
         { key: "documentacao", score: 1, finding: "Montantes de género aparecem dispersos no mapa de investimentos, sem anexo consolidado.", recommendation: "Criar um anexo único \"Orçamento e Género\" na Lei do Orçamento." },
-        { key: "classificacao", score: 1, finding: "Dá para inferir categorias pelos nomes dos projetos, mas não existe uma classificação formal publicada.", recommendation: "Criar uma tabela interna de classificação Cat. 1/2/3." },
+        { key: "classificacao", score: 1, finding: "Dá para inferir categorias pelos nomes dos projetos, mas não existe uma classificação formal publicada.", recommendation: "Formalizar a marcação de todos os projetos na escala G0/G1/G2." },
         { key: "verificacao", score: 1, finding: "O relatório trimestral do Min. da Mulher só reporta execução financeira, sem dados por sexo.", recommendation: "Incluir número de beneficiárias/beneficiários por sexo nos relatórios trimestrais." },
         { key: "avaliacao", score: 0, finding: "Sem evidência de avaliação independente de impacto nem exame parlamentar sobre género.", recommendation: "Introduzir uma secção obrigatória sobre género no relatório parlamentar do OGE." },
     ],
     lineItems: [
-        { name: "Promoção da Igualdade e Equidade do Género", category: 2, comment: "Ação direta de igualdade, financiamento interno." },
-        { name: "Educação de Base e Igualdade dos Géneros", category: 2, comment: "Específico de género, mas 100% doador externo." },
-        { name: "Empoderamento das Mulheres de Gabu", category: 2, comment: "Específico de género, dependente de doador." },
+        { name: "Promoção da Igualdade e Equidade do Género", marker: "G2", comment: "Objetivo principal é a igualdade de género; financiamento interno." },
+        { name: "Programa Educação de Base e Igualdade dos Géneros", marker: "G1", comment: "Educação é o objetivo principal; género é uma componente, não o fim último." },
+        { name: "Empoderamento das Mulheres de Gabu", marker: "G2", comment: "Objetivo principal é o empoderamento das mulheres; dependente de doador." },
+        { name: "Eliminação da Mutilação Genital Feminina - Fase 4", marker: "G2", comment: "Objetivo principal é eliminar uma prática discriminatória de género." },
+        { name: "Autonomização e Inclusão Financeira das Mulheres e Jovens", marker: "G1", comment: "Inclusão financeira mais ampla, com componente específica para mulheres." },
     ],
 };
 const EXEMPLOS_PT = { gb: { input: EXEMPLO_GB_INPUT, result: EXEMPLO_GB_RESULT, label: "Guiné-Bissau" } };
@@ -1102,7 +1149,7 @@ function resultToPlainText(result, lang, s) {
     });
     if (result.lineItems && result.lineItems.length > 0) {
         lines.push(s.lineItemsLabel + ":");
-        result.lineItems.forEach((li) => lines.push(`  [Cat. ${li.category}] ${li.name} — ${li.comment}`));
+        result.lineItems.forEach((li) => lines.push(`  [${li.marker}] ${li.name} — ${li.comment}`));
     }
     return lines.join("\n");
 }
@@ -1145,7 +1192,7 @@ function OSGAnalyzer() {
     const s = STRINGS[lang];
     const mods = MODULES_I18N[lang];
     const levels = LEVEL_LABELS_I18N[lang];
-    const categoryInfo = CATEGORY_INFO_I18N[lang];
+    const markerInfo = GENDER_MARKER_INFO_I18N[lang];
     const isRTL = LANGUAGES[lang].dir === "rtl";
     const bodyFont = lang === "ar" ? "'Noto Sans Arabic', sans-serif" : lang === "zh" ? "'Noto Sans SC', sans-serif" : "'Inter', sans-serif";
     const headingFont = lang === "ar" ? "'Noto Sans Arabic', sans-serif" : lang === "zh" ? "'Noto Sans SC', sans-serif" : "'Fraunces', serif";
@@ -1415,7 +1462,7 @@ function OSGAnalyzer() {
             novaLinha(4);
             texto(s.lineItemsLabel, { bold: true, size: 12 });
             result.lineItems.forEach((li) => {
-                texto(`[Cat. ${li.category}] ${li.name} — ${li.comment}`, { size: 9 });
+                texto(`[${li.marker}] ${li.name} — ${li.comment}`, { size: 9 });
             });
         }
 
@@ -1432,7 +1479,7 @@ function OSGAnalyzer() {
                 <p style="margin:0 0 12pt 0;color:#1F5D5B;">→ ${m.recommendation}</p>`;
         }).join("");
         const linhas_html = (result.lineItems || []).map((li) =>
-            `<tr><td style="padding:4pt;border:1px solid #DED7C6;">Cat. ${li.category}</td><td style="padding:4pt;border:1px solid #DED7C6;">${li.name}</td><td style="padding:4pt;border:1px solid #DED7C6;">${li.comment}</td></tr>`
+            `<tr><td style="padding:4pt;border:1px solid #DED7C6;font-weight:bold;">${li.marker}</td><td style="padding:4pt;border:1px solid #DED7C6;">${li.name}</td><td style="padding:4pt;border:1px solid #DED7C6;">${li.comment}</td></tr>`
         ).join("");
         const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
 <head><meta charset="utf-8"><title>Analisador OSG</title></head>
@@ -1441,7 +1488,7 @@ function OSGAnalyzer() {
 <h2 style="color:#C9A227;">${s.overallLevelLabel}: ${result.overallLevel} (${result.overallScore}/4)</h2>
 <p>${result.summary || ""}</p>
 ${mods_html}
-${linhas_html ? `<h3>${s.lineItemsLabel}</h3><table style="border-collapse:collapse;width:100%;"><tr><th style="border:1px solid #DED7C6;padding:4pt;">Cat.</th><th style="border:1px solid #DED7C6;padding:4pt;">${s.inputLabel}</th><th style="border:1px solid #DED7C6;padding:4pt;"></th></tr>${linhas_html}</table>` : ""}
+${linhas_html ? `<h3>${s.lineItemsLabel}</h3><p style="font-size:9pt;color:#7A8F8C;">${s.markerNote || ""}</p><table style="border-collapse:collapse;width:100%;"><tr><th style="border:1px solid #DED7C6;padding:4pt;">Marcador</th><th style="border:1px solid #DED7C6;padding:4pt;">${s.inputLabel}</th><th style="border:1px solid #DED7C6;padding:4pt;"></th></tr>${linhas_html}</table>` : ""}
 </body></html>`;
         const blob = new Blob(['\ufeff', html], { type: "application/msword" });
         const url = URL.createObjectURL(blob);
@@ -1478,14 +1525,18 @@ Regra: um instrumento formal mas parcial (segundo o texto) nunca deve passar de 
 Dimensões:
 ${modLines}
 
-PARTE B — Classificação por linha orçamental (até 6 linhas): Categoria 1 (neutro), Categoria 2 (específico de género), Categoria 3 (potencial impacto, requer comentário). Baseie-se apenas em linhas/projetos efetivamente mencionados no texto — não invente linhas orçamentais. Se o texto não detalhar linhas suficientes, devolva array vazio.
+PARTE B — Marcador de Género por linha orçamental (até 6 linhas/projetos), segundo a escala G0/G1/G2 da OCDE-CAD (adotada pela União Europeia e pelo modelo Pro PALOP-TL ISC/UEMOA):
+G0 — Não visa a igualdade de género: nenhum objetivo, atividade ou indicador de género identificável no texto para esta linha/projeto.
+G1 — Componente de género (objetivo significativo, mas não principal): a linha/projeto inclui pelo menos um objetivo e/ou indicador de género específico mencionado no texto, mas a igualdade de género não é o seu objetivo principal.
+G2 — Promoção direta da igualdade de género (objetivo principal): a igualdade de género é, segundo o texto, o objetivo principal da linha/projeto (ex.: empoderamento de mulheres/raparigas, eliminação de uma prática discriminatória, redução de uma desigualdade específica).
+Baseie-se apenas em linhas/projetos efetivamente mencionados no texto — não invente linhas orçamentais. Se o nome ou a descrição de um projeto não permitir distinguir G1 de G2 com confiança, prefira G1 (mais conservador) e diga isso no "comment". Se o texto não detalhar linhas suficientes, devolva array vazio.
 
 Regra para recomendações: cada "recommendation" deve ser o passo seguinte, concreto e realista, para subir exatamente 1 nível na escada acima a partir do que o texto mostra — não o estado ideal final, e não uma recomendação genérica desligada do que foi descrito.
 
 AUTOVERIFICAÇÃO (faça isto mentalmente antes de responder, não inclua na resposta): releia cada uma das 5 pontuações que atribuiu e confirme que (a) corresponde exatamente à âncora de maturidade 0-4 descrita acima, (b) tem uma frase do "evidence" que a sustenta diretamente, e (c) não é mais generosa do que o texto permite. Corrija qualquer pontuação que não passe neste teste antes de produzir o JSON final.
 
 Responda APENAS com um JSON válido, sem markdown, neste formato exato:
-{"overallScore": <média das 5 pontuações, 1 casa decimal>, "overallLevel": "<nível geral>", "summary": "<1 frase curta, máx 25 palavras>", "modules": [{"key": "<key>", "score": <0-4>, "finding": "<1 frase, máx 20 palavras>", "evidence": "<referência curta ao texto original, máx 20 palavras, ou \\"Não mencionado no texto fornecido\\">", "recommendation": "<1 frase acionável, máx 20 palavras>"}], "lineItems": [{"name": "<nome curto>", "category": <1|2|3>, "comment": "<1 frase, máx 15 palavras>"}]}
+{"overallScore": <média das 5 pontuações, 1 casa decimal>, "overallLevel": "<nível geral>", "summary": "<1 frase curta, máx 25 palavras>", "modules": [{"key": "<key>", "score": <0-4>, "finding": "<1 frase, máx 20 palavras>", "evidence": "<referência curta ao texto original, máx 20 palavras, ou \\"Não mencionado no texto fornecido\\">", "recommendation": "<1 frase acionável, máx 20 palavras>"}], "lineItems": [{"name": "<nome curto>", "marker": "<G0|G1|G2>", "comment": "<1 frase, máx 15 palavras>"}]}
 
 Use as keys exatas: ${keysList}. Seja direto e crítico — não seja excessivamente elogioso se a informação for vaga ou insuficiente, e nunca prefira uma resposta "simpática" a uma resposta fiel ao que o texto realmente mostra.
 
@@ -2022,15 +2073,20 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
                             React.createElement(ArrowEnd, { className: "w-3.5 h-3.5 mt-0.5 flex-shrink-0" }), m.recommendation)));
                 })),
                 result.lineItems && result.lineItems.length > 0 && (React.createElement("div", { className: "mt-6" },
-                    React.createElement("div", { className: "flex items-center gap-2 mb-3" },
+                    React.createElement("div", { className: "flex items-center gap-2 mb-1" },
                         React.createElement(Tag, { className: "w-3.5 h-3.5", style: { color: "#7A8F8C" } }),
                         React.createElement("h3", { className: "text-xs uppercase tracking-wide", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#7A8F8C" } }, s.lineItemsLabel)),
+                    s.markerNote && React.createElement("p", { className: "text-xs mb-3", style: { color: "#9AA6A3" } }, s.markerNote),
+                    React.createElement("div", { className: "flex flex-wrap gap-3 mb-3" }, Object.entries(markerInfo).map(([code, info]) => (
+                        React.createElement("div", { key: code, className: "flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
+                            React.createElement("span", { className: "inline-block w-2.5 h-2.5 rounded-full flex-shrink-0", style: { background: info.color } }),
+                            code + " — " + info.short)))),
                     React.createElement("div", { className: "rounded-lg border overflow-hidden", style: { borderColor: "#DED7C6", background: "#FFFFFF" } }, result.lineItems.map((li, idx) => {
                         return (React.createElement("div", { key: idx, className: "flex items-start justify-between gap-4 p-3", style: { borderTop: idx > 0 ? "1px solid #EDE8DC" : "none" } },
                             React.createElement("div", null,
                                 React.createElement("div", { className: "text-sm font-medium" }, li.name),
                                 React.createElement("div", { className: "text-xs mt-0.5", style: { color: "#7A8F8C" } }, li.comment)),
-                            React.createElement("span", { className: "text-xs flex-shrink-0 px-2 py-1 rounded", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#FFFFFF", background: (categoryInfo[li.category] || {}).color || "#9AA6A3" } }, "Cat. " + li.category)));
+                            React.createElement("span", { className: "text-xs flex-shrink-0 px-2 py-1 rounded font-medium", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#FFFFFF", background: (markerInfo[li.marker] || {}).color || "#9AA6A3" } }, li.marker)));
                     })))),
 
                 React.createElement("div", { className: "mt-8 rounded-lg border p-5 print:hidden", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
