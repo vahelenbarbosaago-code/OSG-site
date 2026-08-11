@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Política de Privacidade e Termos de Uso — Analisador OSG</title>
+<meta name="theme-color" content="#16302E" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='8' fill='%2316302E'/%3E%3Ccircle cx='20' cy='20' r='15' fill='none' stroke='%23C9A227' stroke-width='1.4' stroke-dasharray='1.8 3.2'/%3E%3Cpath d='M20 10v20M12 15l-4 8a3.5 3.5 0 0 0 7 0l-3-8ZM28 15l-4 8a3.5 3.5 0 0 0 7 0l-3-8ZM12 15h16M14 30h12' stroke='%23C9A227' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  :root { --cream:#F6F3ED; --ink:#16302E; --teal:#1F5D5B; --gold:#C9A227; --grey1:#7A8F8C; --grey2:#9AA6A3; --line:#DED7C6; --hair:#EDE8DC; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--cream); color:var(--ink); font-family:'Inter',sans-serif; line-height:1.6; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 56px 24px 96px; }
+  .back { display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--teal); text-decoration:none; margin-bottom:32px; }
+  .seal { position:relative; width:32px; height:32px; flex-shrink:0; }
+  .header { display:flex; align-items:center; gap:12px; margin-bottom: 8px; }
+  .kicker { font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:var(--grey1); }
+  .rule { height:1px; width:100%; background:linear-gradient(to right, var(--gold), var(--line) 35%, transparent); margin: 20px 0 32px; }
+  h1 { font-family:'Fraunces',serif; font-weight:600; font-size:34px; line-height:1.2; margin: 0 0 6px; }
+  .updated { font-size:13px; color:var(--grey2); font-style:italic; margin-bottom:36px; }
+  h2 { font-family:'Fraunces',serif; font-weight:600; font-size:20px; color:var(--ink); margin:36px 0 12px; border-top:1px solid var(--hair); padding-top:24px; }
+  h3 { font-size:15px; font-weight:600; color:var(--gold); margin: 20px 0 6px; }
+  p, li { font-size:15px; color:#3E4C49; }
+  ul { padding-left: 20px; }
+  li { margin-bottom: 6px; }
+  footer { margin-top: 56px; padding-top: 24px; border-top:1px solid var(--hair); font-size:12px; color:var(--grey2); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="/">← Voltar ao Analisador OSG</a>
+  <div class="header">
+    <div class="seal">
+      <svg viewBox="0 0 40 40" width="32" height="32" aria-hidden="true">
+        <circle cx="20" cy="20" r="18" fill="none" stroke="#C9A227" stroke-width="1" stroke-dasharray="1.5 3"/>
+        <circle cx="20" cy="20" r="13.5" fill="none" stroke="#C9A227" stroke-width="0.75" opacity="0.55"/>
+        <path d="M20 12v16M15 15l-3 6a3 3 0 0 0 6 0l-3-6ZM25 15l-3 6a3 3 0 0 0 6 0l-3-6ZM15 15h10M16 28h8" stroke="#C9A227" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <span class="kicker">Analisador OSG</span>
+  </div>
+  <div class="rule"></div>
+  <h1>Política de Privacidade e Termos de Uso</h1>
+  <div class="updated">Última atualização: 11 de agosto de 2026</div>
+
+  <h2>1. Sobre este documento</h2>
+  <p>O Analisador OSG ("a Ferramenta") é um serviço de análise de Orçamento Sensível ao Género (OSG / Gender-Responsive Budgeting), disponibilizado a organizações e instituições através de um código de acesso individual. Este documento explica que dados são recolhidos, como são tratados, e em que condições a Ferramenta pode ser usada.</p>
+
+  <h2>2. Que dados são recolhidos</h2>
+  <h3>2.1 Texto submetido para análise</h3>
+  <p>O texto orçamental que introduz ou carrega (PDF, Excel, CSV ou TXT) é enviado para um serviço intermediário ("o Worker") que o reencaminha para a API da Anthropic (fornecedora do modelo de inteligência artificial Claude) exclusivamente para gerar a análise solicitada. Este texto não é utilizado pela Anthropic para treinar modelos de IA, ao abrigo dos termos comerciais da API da Anthropic.</p>
+  <h3>2.2 Histórico de análises</h3>
+  <p>Quando uma análise é concluída, um resumo (excerto do texto, resultado da análise, marcadores atribuídos e eventuais correções manuais) é guardado associado ao código de acesso da sua organização, num armazenamento gerido pelo administrador do Analisador OSG (Cloudflare Workers KV). Este histórico é visível apenas para quem tiver o código de acesso dessa organização, e para o administrador da Ferramenta.</p>
+  <h3>2.3 Dados de utilização</h3>
+  <p>É registado o número de análises realizadas por código de acesso e por mês, para efeitos de aplicação dos limites do plano contratado. Não são recolhidos dados de localização em tempo real, nem identificadores publicitários.</p>
+  <h3>2.4 Dados de pagamento</h3>
+  <p>Os pagamentos são processados pela Stripe, Inc. O Analisador OSG não armazena números de cartão de crédito nem outros dados financeiros sensíveis; recebe apenas a confirmação do pagamento e o endereço de email associado, para criar o código de acesso correspondente.</p>
+
+  <h2>3. Como os dados são usados</h2>
+  <ul>
+    <li>Gerar a análise solicitada e o relatório completo, quando pedido.</li>
+    <li>Manter o histórico de análises da organização, para consulta e comparação ao longo do tempo.</li>
+    <li>Aplicar os limites de utilização do plano contratado.</li>
+    <li>Processar o pagamento e emitir o código de acesso correspondente.</li>
+  </ul>
+  <p>Os dados não são vendidos, alugados nem partilhados com terceiros para fins de marketing. Não são utilizados para treinar modelos de inteligência artificial, próprios ou de terceiros.</p>
+
+  <h2>4. Onde os dados são processados</h2>
+  <p>A Ferramenta assenta em três serviços de infraestrutura:</p>
+  <ul>
+    <li>Cloudflare Workers e Cloudflare Workers KV — alojamento do serviço intermediário e armazenamento do histórico e dos códigos de acesso.</li>
+    <li>API da Anthropic — geração da análise através do modelo Claude.</li>
+    <li>Stripe — processamento de pagamentos.</li>
+  </ul>
+  <p>Estes fornecedores processam dados em servidores fora da Guiné-Bissau. Organizações com requisitos legais específicos sobre localização de dados devem confirmar com o administrador da Ferramenta se esta configuração é compatível com as suas obrigações antes de submeterem informação orçamental sensível.</p>
+
+  <h2>5. Recomendações para quem usa a Ferramenta</h2>
+  <ul>
+    <li>Evite incluir dados pessoais identificáveis desnecessários no texto analisado (nomes de beneficiários individuais, números de identificação, moradas).</li>
+    <li>A Ferramenta foi concebida para analisar orçamentos públicos, documentos já do domínio público ou de uso interno da organização — não para processar dados pessoais sensíveis de terceiros.</li>
+    <li>Cada organização é responsável por garantir que a submissão do seu orçamento à Ferramenta cumpre as suas próprias políticas internas de proteção de dados.</li>
+  </ul>
+
+  <h2>6. Retenção e eliminação de dados</h2>
+  <p>O histórico de análises é mantido enquanto o código de acesso da organização estiver ativo. Cada organização pode eliminar entradas individuais do seu próprio histórico a qualquer momento, diretamente na Ferramenta. Para solicitar a eliminação completa do histórico de uma organização, ou a desativação de um código de acesso, contacte o administrador da Ferramenta.</p>
+
+  <h2>7. Natureza da análise (limitações)</h2>
+  <p>A análise apresentada pela Ferramenta é gerada por inteligência artificial com base exclusivamente no texto fornecido pelo utilizador. Não substitui a avaliação de um/a especialista em orçamentação sensível ao género, nem constitui aconselhamento jurídico, financeiro ou de auditoria. Deve ser revista e validada por um/a profissional qualificado/a antes de qualquer uso oficial, decisório ou de publicação institucional.</p>
+
+  <h2>8. Termos de uso</h2>
+  <h3>8.1 Acesso</h3>
+  <p>O acesso à Ferramenta é feito através de um código de acesso associado a uma organização, com um limite mensal de análises definido pelo plano contratado. O código de acesso não deve ser partilhado fora da organização à qual foi atribuído.</p>
+  <h3>8.2 Uso aceitável</h3>
+  <p>A Ferramenta destina-se à análise de orçamentos públicos e documentos de planeamento orçamental sob a perspetiva de género. Não deve ser usada para processar dados pessoais sensíveis de terceiros, nem para fins que violem a legislação aplicável no país de origem da organização.</p>
+  <h3>8.3 Disponibilidade</h3>
+  <p>A Ferramenta é fornecida "tal como está". Apesar dos esforços para garantir disponibilidade e fiabilidade, o administrador não garante funcionamento ininterrupto e não se responsabiliza por perdas resultantes de indisponibilidade temporária, falhas de terceiros (Cloudflare, Anthropic, Stripe) ou uso indevido do código de acesso.</p>
+  <h3>8.4 Alterações</h3>
+  <p>Este documento pode ser atualizado periodicamente. Alterações materiais serão comunicadas às organizações com código de acesso ativo.</p>
+
+  <h2>9. Contacto</h2>
+  <p>Para questões sobre privacidade, tratamento de dados, ou os presentes termos, contacte o administrador do Analisador OSG através dos canais habituais de suporte da sua organização.</p>
+
+  <footer>Analisador OSG · Política de Privacidade e Termos de Uso</footer>
+</div>
+</body>
+</html>
