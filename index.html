@@ -92,7 +92,10 @@ async function listarHistorico(accessCode) {
     return data.history || [];
 }
 async function guardarHistorico(accessCode, entry) {
-    try { await chamarAPI({ action: "save_history", accessCode, entry }); } catch {}
+    try { await chamarAPI({ action: "save_history", accessCode, entry }); return true; } catch { return false; }
+}
+async function apagarHistoricoEntrada(accessCode, item) {
+    return chamarAPI({ action: "delete_history", accessCode, entry: { savedAt: item.savedAt } });
 }
 async function listarCodigosAdmin(accessCode) {
     const data = await chamarAPI({ action: "admin_list_codes", accessCode });
@@ -335,6 +338,65 @@ const STRINGS = {
         roadmapShort: "Curto prazo (0-6 meses)",
         roadmapMedium: "Médio prazo (6-18 meses)",
         roadmapLong: "Longo prazo (18+ meses)",
+        orgActionsTitle: "Recomendações e próximos passos por organização",
+        orgActionsCurrentLabel: "Nível atual",
+        orgActionsNextStep: "Próximo passo",
+        methodologyDisclaimer: "Esta análise foi gerada por inteligência artificial com base exclusivamente no texto fornecido pelo utilizador. Deve ser revista e validada por um/a especialista em orçamentação sensível ao género antes de qualquer uso oficial, decisório ou de publicação institucional.",
+        errInputTooShort: "Escreva pelo menos 40 caracteres antes de analisar (o texto atual é demasiado curto para uma análise fiável).",
+        confirmRestart: "Vais perder a análise atual (a menos que já a tenhas guardada). Queres continuar?",
+        saveChangesButton: "Guardar alterações no histórico",
+        saveChangesSaving: "A guardar…",
+        saveChangesDone: "Alterações guardadas",
+        saveChangesError: "Não foi possível guardar. Tenta novamente.",
+        unsavedChangesNote: "Tens correções manuais por guardar.",
+        auditLabel: "Histórico da alteração",
+        auditPrevious: (prev) => `Valor anterior da IA: ${prev}`,
+        addLineButton: "Adicionar linha manualmente",
+        addLineNamePlaceholder: "Nome do projeto/linha",
+        addLineCommentPlaceholder: "Comentário (opcional)",
+        addLineConfirm: "Adicionar",
+        addLineCancel: "Cancelar",
+        removeLineButton: "Remover linha",
+        downloadCsv: "Descarregar CSV",
+        shareButton: "Copiar link partilhável",
+        shareCopied: "Link copiado",
+        shareBannerText: "Estás a ver uma análise partilhada (só leitura de referência — não está ligada à tua conta nem ao histórico).",
+        shareBannerBack: "Ir para o Analisador OSG",
+        privacyToggle: "Privacidade e tratamento de dados",
+        privacyTitle: "Privacidade e tratamento de dados",
+        privacyText: "O texto que introduzes é enviado para um serviço intermediário (Cloudflare Worker) que o reencaminha para a API da Anthropic apenas para gerar esta análise — não é usado para treinar modelos de IA. O histórico de análises fica associado ao código de acesso da tua organização, num armazenamento gerido pelo administrador do Analisador OSG. Evita incluir dados pessoais identificáveis desnecessários (nomes de beneficiários, números de identificação) no texto analisado. Para questões sobre retenção ou eliminação de dados, contacta o administrador da tua organização.",
+        deleteHistoryButton: "Eliminar",
+        deleteHistoryConfirm: "Eliminar esta análise do histórico permanentemente?",
+        deleteHistoryError: "Não foi possível eliminar (funcionalidade pode ainda não estar disponível no servidor).",
+        paymentManualLabel: "Ou introduz o ID de sessão do pagamento (Stripe)",
+        paymentManualButton: "Verificar",
+        confirmRestart: "Vais perder a análise atual (a menos que já a tenhas guardada). Queres continuar?",
+        saveChangesButton: "Guardar alterações no histórico",
+        saveChangesSaving: "A guardar…",
+        saveChangesDone: "Alterações guardadas",
+        saveChangesError: "Não foi possível guardar. Tenta novamente.",
+        unsavedChangesNote: "Tens correções manuais por guardar.",
+        auditLabel: "Histórico da alteração",
+        auditPrevious: (prev) => `Valor anterior da IA: ${prev}`,
+        addLineButton: "Adicionar linha manualmente",
+        addLineNamePlaceholder: "Nome do projeto/linha",
+        addLineCommentPlaceholder: "Comentário (opcional)",
+        addLineConfirm: "Adicionar",
+        addLineCancel: "Cancelar",
+        removeLineButton: "Remover linha",
+        downloadCsv: "Descarregar CSV",
+        shareButton: "Copiar link partilhável",
+        shareCopied: "Link copiado",
+        shareBannerText: "Estás a ver uma análise partilhada (só leitura de referência — não está ligada à tua conta nem ao histórico).",
+        shareBannerBack: "Ir para o Analisador OSG",
+        privacyToggle: "Privacidade e tratamento de dados",
+        privacyTitle: "Privacidade e tratamento de dados",
+        privacyText: "O texto que introduzes é enviado para um serviço intermediário (Cloudflare Worker) que o reencaminha para a API da Anthropic apenas para gerar esta análise — não é usado para treinar modelos de IA. O histórico de análises fica associado ao código de acesso da tua organização, num armazenamento gerido pelo administrador do Analisador OSG. Evita incluir dados pessoais identificáveis desnecessários (nomes de beneficiários, números de identificação) no texto analisado. Para questões sobre retenção ou eliminação de dados, contacta o administrador da tua organização.",
+        deleteHistoryButton: "Eliminar",
+        deleteHistoryConfirm: "Eliminar esta análise do histórico permanentemente?",
+        deleteHistoryError: "Não foi possível eliminar (funcionalidade pode ainda não estar disponível no servidor).",
+        paymentManualLabel: "Ou introduz o ID de sessão do pagamento (Stripe)",
+        paymentManualButton: "Verificar",
         restartButton: "Analisar outro orçamento",
         footerSources: "Fontes: OCDE Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Indicador ODS 5.c.1 (ONU) · enquadramentos nacionais e regionais quando aplicável.",
         fileTooLarge: (mb) => `Este ficheiro tem ${mb} MB — o limite é 30 MB. Tente exportar só a secção relevante.`,
@@ -446,6 +508,38 @@ const STRINGS = {
         roadmapShort: "Court terme (0-6 mois)",
         roadmapMedium: "Moyen terme (6-18 mois)",
         roadmapLong: "Long terme (18+ mois)",
+        orgActionsTitle: "Recommandations et prochaines étapes par organisation",
+        orgActionsCurrentLabel: "Niveau actuel",
+        orgActionsNextStep: "Prochaine étape",
+        methodologyDisclaimer: "Cette analyse a été générée par intelligence artificielle sur la base exclusive du texte fourni par l'utilisateur. Elle doit être revue et validée par un(e) spécialiste en budgétisation sensible au genre avant toute utilisation officielle, décisionnelle ou publication institutionnelle.",
+        errInputTooShort: "Écrivez au moins 40 caractères avant d'analyser (le texte actuel est trop court pour une analyse fiable).",
+        confirmRestart: "Tu vas perdre l'analyse actuelle (sauf si elle est déjà enregistrée). Continuer ?",
+        saveChangesButton: "Enregistrer les modifications dans l'historique",
+        saveChangesSaving: "Enregistrement…",
+        saveChangesDone: "Modifications enregistrées",
+        saveChangesError: "Impossible d'enregistrer. Réessayez.",
+        unsavedChangesNote: "Des corrections manuelles ne sont pas enregistrées.",
+        auditLabel: "Historique de la modification",
+        auditPrevious: (prev) => `Valeur précédente de l'IA : ${prev}`,
+        addLineButton: "Ajouter une ligne manuellement",
+        addLineNamePlaceholder: "Nom du projet/ligne",
+        addLineCommentPlaceholder: "Commentaire (optionnel)",
+        addLineConfirm: "Ajouter",
+        addLineCancel: "Annuler",
+        removeLineButton: "Supprimer la ligne",
+        downloadCsv: "Télécharger le CSV",
+        shareButton: "Copier le lien partageable",
+        shareCopied: "Lien copié",
+        shareBannerText: "Vous consultez une analyse partagée (lecture seule de référence — non liée à votre compte ni à votre historique).",
+        shareBannerBack: "Aller à l'Analyseur OSG",
+        privacyToggle: "Confidentialité et traitement des données",
+        privacyTitle: "Confidentialité et traitement des données",
+        privacyText: "Le texte que vous saisissez est envoyé à un service intermédiaire (Cloudflare Worker) qui le transmet à l'API Anthropic uniquement pour générer cette analyse — il n'est pas utilisé pour entraîner des modèles d'IA. L'historique des analyses est associé au code d'accès de votre organisation, dans un stockage géré par l'administrateur de l'Analyseur OSG. Évitez d'inclure des données personnelles identifiables inutiles (noms de bénéficiaires, numéros d'identification) dans le texte analysé. Pour toute question sur la conservation ou la suppression des données, contactez l'administrateur de votre organisation.",
+        deleteHistoryButton: "Supprimer",
+        deleteHistoryConfirm: "Supprimer définitivement cette analyse de l'historique ?",
+        deleteHistoryError: "Impossible de supprimer (fonctionnalité peut-être pas encore disponible côté serveur).",
+        paymentManualLabel: "Ou saisissez l'ID de session du paiement (Stripe)",
+        paymentManualButton: "Vérifier",
         restartButton: "Analyser un autre budget",
         footerSources: "Sources : OCDE Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Indicateur ODD 5.c.1 (ONU) · cadres nationaux et régionaux le cas échéant.",
         fileTooLarge: (mb) => `Ce fichier fait ${mb} Mo — la limite est de 30 Mo. Essayez d'exporter uniquement la section pertinente.`,
@@ -557,6 +651,38 @@ const STRINGS = {
         roadmapShort: "Short term (0-6 months)",
         roadmapMedium: "Medium term (6-18 months)",
         roadmapLong: "Long term (18+ months)",
+        orgActionsTitle: "Recommendations and next steps by organisation",
+        orgActionsCurrentLabel: "Current level",
+        orgActionsNextStep: "Next step",
+        methodologyDisclaimer: "This analysis was generated by artificial intelligence based solely on the text provided by the user. It should be reviewed and validated by a gender-responsive budgeting specialist before any official, decision-making, or institutional publication use.",
+        errInputTooShort: "Write at least 40 characters before analysing (the current text is too short for a reliable analysis).",
+        confirmRestart: "You will lose the current analysis (unless already saved). Continue?",
+        saveChangesButton: "Save changes to history",
+        saveChangesSaving: "Saving…",
+        saveChangesDone: "Changes saved",
+        saveChangesError: "Could not save. Please try again.",
+        unsavedChangesNote: "You have unsaved manual corrections.",
+        auditLabel: "Change history",
+        auditPrevious: (prev) => `Previous AI value: ${prev}`,
+        addLineButton: "Add line manually",
+        addLineNamePlaceholder: "Project/line name",
+        addLineCommentPlaceholder: "Comment (optional)",
+        addLineConfirm: "Add",
+        addLineCancel: "Cancel",
+        removeLineButton: "Remove line",
+        downloadCsv: "Download CSV",
+        shareButton: "Copy shareable link",
+        shareCopied: "Link copied",
+        shareBannerText: "You are viewing a shared analysis (read-only reference — not linked to your account or history).",
+        shareBannerBack: "Go to the OSG Analyser",
+        privacyToggle: "Privacy and data handling",
+        privacyTitle: "Privacy and data handling",
+        privacyText: "The text you enter is sent to an intermediary service (Cloudflare Worker) that forwards it to the Anthropic API solely to generate this analysis — it is not used to train AI models. Analysis history is linked to your organisation's access code, in storage managed by the OSG Analyser administrator. Avoid including unnecessary identifiable personal data (beneficiary names, ID numbers) in the analysed text. For questions about data retention or deletion, contact your organisation's administrator.",
+        deleteHistoryButton: "Delete",
+        deleteHistoryConfirm: "Permanently delete this analysis from history?",
+        deleteHistoryError: "Could not delete (feature may not yet be available server-side).",
+        paymentManualLabel: "Or enter the payment session ID (Stripe)",
+        paymentManualButton: "Verify",
         restartButton: "Analyse another budget",
         footerSources: "Sources: OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · SDG Indicator 5.c.1 (UN) · national and regional frameworks where applicable.",
         fileTooLarge: (mb) => `This file is ${mb} MB — the limit is 30 MB. Try exporting just the relevant section.`,
@@ -668,6 +794,38 @@ const STRINGS = {
         roadmapShort: "Corto plazo (0-6 meses)",
         roadmapMedium: "Medio plazo (6-18 meses)",
         roadmapLong: "Largo plazo (18+ meses)",
+        orgActionsTitle: "Recomendaciones y próximos pasos por organización",
+        orgActionsCurrentLabel: "Nivel actual",
+        orgActionsNextStep: "Próximo paso",
+        methodologyDisclaimer: "Este análisis fue generado por inteligencia artificial basándose exclusivamente en el texto proporcionado por el usuario. Debe ser revisado y validado por un/a especialista en presupuestos con perspectiva de género antes de cualquier uso oficial, decisorio o de publicación institucional.",
+        errInputTooShort: "Escriba al menos 40 caracteres antes de analizar (el texto actual es demasiado corto para un análisis fiable).",
+        confirmRestart: "Perderás el análisis actual (a menos que ya esté guardado). ¿Continuar?",
+        saveChangesButton: "Guardar cambios en el historial",
+        saveChangesSaving: "Guardando…",
+        saveChangesDone: "Cambios guardados",
+        saveChangesError: "No se pudo guardar. Inténtalo de nuevo.",
+        unsavedChangesNote: "Tienes correcciones manuales sin guardar.",
+        auditLabel: "Historial del cambio",
+        auditPrevious: (prev) => `Valor anterior de la IA: ${prev}`,
+        addLineButton: "Añadir línea manualmente",
+        addLineNamePlaceholder: "Nombre del proyecto/línea",
+        addLineCommentPlaceholder: "Comentario (opcional)",
+        addLineConfirm: "Añadir",
+        addLineCancel: "Cancelar",
+        removeLineButton: "Eliminar línea",
+        downloadCsv: "Descargar CSV",
+        shareButton: "Copiar enlace para compartir",
+        shareCopied: "Enlace copiado",
+        shareBannerText: "Estás viendo un análisis compartido (solo lectura de referencia — no vinculado a tu cuenta ni a tu historial).",
+        shareBannerBack: "Ir al Analizador OSG",
+        privacyToggle: "Privacidad y tratamiento de datos",
+        privacyTitle: "Privacidad y tratamiento de datos",
+        privacyText: "El texto que introduces se envía a un servicio intermediario (Cloudflare Worker) que lo reenvía a la API de Anthropic únicamente para generar este análisis — no se utiliza para entrenar modelos de IA. El historial de análisis está vinculado al código de acceso de tu organización, en un almacenamiento gestionado por el administrador del Analizador OSG. Evita incluir datos personales identificables innecesarios (nombres de beneficiarios, números de identificación) en el texto analizado. Para preguntas sobre retención o eliminación de datos, contacta con el administrador de tu organización.",
+        deleteHistoryButton: "Eliminar",
+        deleteHistoryConfirm: "¿Eliminar permanentemente este análisis del historial?",
+        deleteHistoryError: "No se pudo eliminar (la función puede no estar disponible aún en el servidor).",
+        paymentManualLabel: "O introduce el ID de sesión del pago (Stripe)",
+        paymentManualButton: "Verificar",
         restartButton: "Analizar otro presupuesto",
         footerSources: "Fuentes: OCDE Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Indicador ODS 5.c.1 (ONU) · marcos nacionales y regionales cuando corresponda.",
         fileTooLarge: (mb) => `Este archivo tiene ${mb} MB — el límite es 30 MB. Intente exportar solo la sección relevante.`,
@@ -779,6 +937,38 @@ const STRINGS = {
         roadmapShort: "المدى القصير (0-6 أشهر)",
         roadmapMedium: "المدى المتوسط (6-18 شهراً)",
         roadmapLong: "المدى الطويل (أكثر من 18 شهراً)",
+        orgActionsTitle: "التوصيات والخطوات التالية لكل مؤسسة",
+        orgActionsCurrentLabel: "المستوى الحالي",
+        orgActionsNextStep: "الخطوة التالية",
+        methodologyDisclaimer: "تم إنشاء هذا التحليل بواسطة الذكاء الاصطناعي استناداً فقط إلى النص الذي قدمه المستخدم. يجب مراجعته والتحقق منه من قبل متخصص في الميزانية المستجيبة للنوع الاجتماعي قبل أي استخدام رسمي أو قرار أو نشر مؤسسي.",
+        errInputTooShort: "اكتب 40 حرفاً على الأقل قبل التحليل (النص الحالي قصير جداً لتحليل موثوق).",
+        confirmRestart: "ستفقد التحليل الحالي (ما لم يكن محفوظاً بالفعل). هل تريد المتابعة؟",
+        saveChangesButton: "حفظ التغييرات في السجل",
+        saveChangesSaving: "جارٍ الحفظ…",
+        saveChangesDone: "تم حفظ التغييرات",
+        saveChangesError: "تعذّر الحفظ. حاول مرة أخرى.",
+        unsavedChangesNote: "لديك تصحيحات يدوية غير محفوظة.",
+        auditLabel: "سجل التعديل",
+        auditPrevious: (prev) => `القيمة السابقة من الذكاء الاصطناعي: ${prev}`,
+        addLineButton: "إضافة بند يدوياً",
+        addLineNamePlaceholder: "اسم المشروع/البند",
+        addLineCommentPlaceholder: "تعليق (اختياري)",
+        addLineConfirm: "إضافة",
+        addLineCancel: "إلغاء",
+        removeLineButton: "إزالة البند",
+        downloadCsv: "تنزيل CSV",
+        shareButton: "نسخ رابط قابل للمشاركة",
+        shareCopied: "تم نسخ الرابط",
+        shareBannerText: "أنت تشاهد تحليلاً تمت مشاركته (مرجع للقراءة فقط — غير مرتبط بحسابك أو سجلك).",
+        shareBannerBack: "الذهاب إلى محلل OSG",
+        privacyToggle: "الخصوصية ومعالجة البيانات",
+        privacyTitle: "الخصوصية ومعالجة البيانات",
+        privacyText: "يتم إرسال النص الذي تدخله إلى خدمة وسيطة (Cloudflare Worker) تعيد توجيهه إلى واجهة برمجة تطبيقات Anthropic فقط لإنشاء هذا التحليل — ولا يُستخدم لتدريب نماذج الذكاء الاصطناعي. يرتبط سجل التحليلات برمز وصول مؤسستك، في تخزين يديره مسؤول محلل OSG. تجنب تضمين بيانات شخصية يمكن التعرف عليها دون داعٍ (أسماء المستفيدين، أرقام الهوية) في النص المحلَّل. لأي أسئلة حول الاحتفاظ بالبيانات أو حذفها، تواصل مع مسؤول مؤسستك.",
+        deleteHistoryButton: "حذف",
+        deleteHistoryConfirm: "هل تريد حذف هذا التحليل نهائياً من السجل؟",
+        deleteHistoryError: "تعذّر الحذف (قد لا تكون الميزة متاحة بعد على الخادم).",
+        paymentManualLabel: "أو أدخل معرّف جلسة الدفع (Stripe)",
+        paymentManualButton: "تحقق",
         restartButton: "تحليل ميزانية أخرى",
         footerSources: "المصادر: OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · مؤشر هدف التنمية المستدامة 5.c.1 (الأمم المتحدة) · أطر وطنية وإقليمية عند الاقتضاء.",
         fileTooLarge: (mb) => `حجم هذا الملف ${mb} ميغابايت — والحد الأقصى هو 30 ميغابايت. حاول تصدير القسم المعني فقط.`,
@@ -890,6 +1080,38 @@ const STRINGS = {
         roadmapShort: "短期（0-6个月）",
         roadmapMedium: "中期（6-18个月）",
         roadmapLong: "长期（18个月以上）",
+        orgActionsTitle: "按机构划分的建议和下一步行动",
+        orgActionsCurrentLabel: "当前水平",
+        orgActionsNextStep: "下一步",
+        methodologyDisclaimer: "本分析由人工智能仅根据用户提供的文本生成。在用于任何正式、决策或机构出版用途之前，应由性别响应式预算专家进行审查和验证。",
+        errInputTooShort: "分析前请至少输入40个字符（当前文本太短，无法进行可靠分析）。",
+        confirmRestart: "你将丢失当前分析（除非已保存）。要继续吗？",
+        saveChangesButton: "将更改保存到历史记录",
+        saveChangesSaving: "正在保存…",
+        saveChangesDone: "更改已保存",
+        saveChangesError: "无法保存，请重试。",
+        unsavedChangesNote: "你有尚未保存的手动修正。",
+        auditLabel: "修改记录",
+        auditPrevious: (prev) => `AI的原值：${prev}`,
+        addLineButton: "手动添加条目",
+        addLineNamePlaceholder: "项目/条目名称",
+        addLineCommentPlaceholder: "备注（可选）",
+        addLineConfirm: "添加",
+        addLineCancel: "取消",
+        removeLineButton: "删除条目",
+        downloadCsv: "下载CSV",
+        shareButton: "复制可分享链接",
+        shareCopied: "链接已复制",
+        shareBannerText: "您正在查看一份共享分析（只读参考——与您的账户或历史记录无关）。",
+        shareBannerBack: "前往OSG分析器",
+        privacyToggle: "隐私与数据处理",
+        privacyTitle: "隐私与数据处理",
+        privacyText: "您输入的文本会发送到一个中间服务（Cloudflare Worker），该服务仅将其转发给Anthropic API以生成此分析——不会用于训练AI模型。分析历史与您机构的访问代码相关联，存储由OSG分析器管理员管理。请避免在分析文本中包含不必要的可识别个人数据（受益人姓名、身份证号码）。有关数据保留或删除的问题，请联系您机构的管理员。",
+        deleteHistoryButton: "删除",
+        deleteHistoryConfirm: "确定要永久删除历史记录中的此分析吗？",
+        deleteHistoryError: "无法删除（该功能可能尚未在服务器端提供）。",
+        paymentManualLabel: "或输入付款会话ID（Stripe）",
+        paymentManualButton: "验证",
         restartButton: "分析另一份预算",
         footerSources: "来源：OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · 联合国可持续发展目标指标5.c.1 · 适用时的国家和区域框架。",
         fileTooLarge: (mb) => `该文件为 ${mb} MB — 上限为30 MB。请尝试仅导出相关部分。`,
@@ -1001,6 +1223,38 @@ const STRINGS = {
         roadmapShort: "Краткосрочно (0-6 месяцев)",
         roadmapMedium: "Среднесрочно (6-18 месяцев)",
         roadmapLong: "Долгосрочно (18+ месяцев)",
+        orgActionsTitle: "Рекомендации и дальнейшие шаги по каждой организации",
+        orgActionsCurrentLabel: "Текущий уровень",
+        orgActionsNextStep: "Следующий шаг",
+        methodologyDisclaimer: "Этот анализ был сгенерирован искусственным интеллектом исключительно на основе текста, предоставленного пользователем. Перед любым официальным, управленческим или институциональным использованием он должен быть проверен и подтверждён специалистом по гендерному бюджетированию.",
+        errInputTooShort: "Введите не менее 40 символов перед анализом (текущий текст слишком короткий для достоверного анализа).",
+        confirmRestart: "Вы потеряете текущий анализ (если он ещё не сохранён). Продолжить?",
+        saveChangesButton: "Сохранить изменения в истории",
+        saveChangesSaving: "Сохранение…",
+        saveChangesDone: "Изменения сохранены",
+        saveChangesError: "Не удалось сохранить. Попробуйте снова.",
+        unsavedChangesNote: "У вас есть несохранённые ручные исправления.",
+        auditLabel: "История изменения",
+        auditPrevious: (prev) => `Предыдущее значение ИИ: ${prev}`,
+        addLineButton: "Добавить статью вручную",
+        addLineNamePlaceholder: "Название проекта/статьи",
+        addLineCommentPlaceholder: "Комментарий (необязательно)",
+        addLineConfirm: "Добавить",
+        addLineCancel: "Отмена",
+        removeLineButton: "Удалить статью",
+        downloadCsv: "Скачать CSV",
+        shareButton: "Скопировать ссылку для общего доступа",
+        shareCopied: "Ссылка скопирована",
+        shareBannerText: "Вы просматриваете общий анализ (только для справки — не связан с вашей учётной записью или историей).",
+        shareBannerBack: "Перейти в Анализатор OSG",
+        privacyToggle: "Конфиденциальность и обработка данных",
+        privacyTitle: "Конфиденциальность и обработка данных",
+        privacyText: "Введённый вами текст отправляется в промежуточный сервис (Cloudflare Worker), который пересылает его в API Anthropic исключительно для создания этого анализа — он не используется для обучения ИИ-моделей. История анализов привязана к коду доступа вашей организации и хранится в системе, управляемой администратором Анализатора OSG. Избегайте включения ненужных идентифицируемых персональных данных (имена получателей, идентификационные номера) в анализируемый текст. По вопросам хранения или удаления данных обратитесь к администратору вашей организации.",
+        deleteHistoryButton: "Удалить",
+        deleteHistoryConfirm: "Окончательно удалить этот анализ из истории?",
+        deleteHistoryError: "Не удалось удалить (функция может быть ещё не доступна на сервере).",
+        paymentManualLabel: "Или введите ID сессии платежа (Stripe)",
+        paymentManualButton: "Проверить",
         restartButton: "Анализировать другой бюджет",
         footerSources: "Источники: OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Индикатор ЦУР 5.c.1 (ООН) · национальные и региональные основы, если применимо.",
         fileTooLarge: (mb) => `Этот файл весит ${mb} МБ — лимит составляет 30 МБ. Попробуйте экспортировать только нужный раздел.`,
@@ -1112,6 +1366,38 @@ const STRINGS = {
         roadmapShort: "Muda mfupi (miezi 0-6)",
         roadmapMedium: "Muda wa kati (miezi 6-18)",
         roadmapLong: "Muda mrefu (zaidi ya miezi 18)",
+        orgActionsTitle: "Mapendekezo na hatua zinazofuata kwa kila shirika",
+        orgActionsCurrentLabel: "Kiwango cha sasa",
+        orgActionsNextStep: "Hatua inayofuata",
+        methodologyDisclaimer: "Uchambuzi huu ulitengenezwa na akili bandia kwa kutegemea tu maandishi yaliyotolewa na mtumiaji. Unapaswa kukaguliwa na kuthibitishwa na mtaalamu wa bajeti inayozingatia jinsia kabla ya matumizi yoyote rasmi, ya maamuzi, au uchapishaji wa kitaasisi.",
+        errInputTooShort: "Andika angalau herufi 40 kabla ya kuchambua (maandishi ya sasa ni mafupi mno kwa uchambuzi wa kuaminika).",
+        confirmRestart: "Utapoteza uchambuzi wa sasa (isipokuwa umeshahifadhiwa). Endelea?",
+        saveChangesButton: "Hifadhi mabadiliko kwenye historia",
+        saveChangesSaving: "Inahifadhi…",
+        saveChangesDone: "Mabadiliko yamehifadhiwa",
+        saveChangesError: "Imeshindwa kuhifadhi. Jaribu tena.",
+        unsavedChangesNote: "Una masahihisho ya mkono ambayo hayajahifadhiwa.",
+        auditLabel: "Historia ya mabadiliko",
+        auditPrevious: (prev) => `Thamani ya awali ya AI: ${prev}`,
+        addLineButton: "Ongeza kipengele kwa mkono",
+        addLineNamePlaceholder: "Jina la mradi/kipengele",
+        addLineCommentPlaceholder: "Maoni (si lazima)",
+        addLineConfirm: "Ongeza",
+        addLineCancel: "Ghairi",
+        removeLineButton: "Ondoa kipengele",
+        downloadCsv: "Pakua CSV",
+        shareButton: "Nakili kiungo cha kushiriki",
+        shareCopied: "Kiungo kimenakiliwa",
+        shareBannerText: "Unaangalia uchambuzi ulioshirikiwa (marejeleo ya kusoma tu — hauhusiani na akaunti au historia yako).",
+        shareBannerBack: "Nenda kwenye Kichambuzi cha OSG",
+        privacyToggle: "Faragha na utunzaji wa data",
+        privacyTitle: "Faragha na utunzaji wa data",
+        privacyText: "Maandishi unayoweka yanatumwa kwa huduma ya kati (Cloudflare Worker) inayoyapeleka kwa API ya Anthropic pekee ili kutengeneza uchambuzi huu — hayatumiwi kufundisha miundo ya AI. Historia ya uchambuzi inahusishwa na msimbo wa ufikiaji wa shirika lako, katika hifadhi inayosimamiwa na msimamizi wa Kichambuzi cha OSG. Epuka kujumuisha data binafsi zisizo za lazima zinazoweza kutambulika (majina ya wanufaika, nambari za utambulisho) katika maandishi yanayochambuliwa. Kwa maswali kuhusu uhifadhi au ufutaji wa data, wasiliana na msimamizi wa shirika lako.",
+        deleteHistoryButton: "Futa",
+        deleteHistoryConfirm: "Futa kabisa uchambuzi huu kutoka kwenye historia?",
+        deleteHistoryError: "Imeshindwa kufuta (kipengele huenda hakipatikani bado upande wa seva).",
+        paymentManualLabel: "Au weka kitambulisho cha kipindi cha malipo (Stripe)",
+        paymentManualButton: "Thibitisha",
         restartButton: "Chambua bajeti nyingine",
         footerSources: "Vyanzo: OECD Best Practices for Gender Budgeting (2023) · PEFA GRPFM (2020) · Kiashiria cha SDG 5.c.1 (UN) · mifumo ya kitaifa na kikanda inapohitajika.",
         fileTooLarge: (mb) => `Faili hii ina MB ${mb} — kikomo ni MB 30. Jaribu kuhamisha sehemu husika pekee.`,
@@ -1250,6 +1536,24 @@ function useGoogleFonts() {
     }, []);
 }
 
+// Codificação segura em UTF-8 para embutir o resultado da análise no
+// próprio URL (link partilhável, sem depender de sessão/backend) e
+// descodificação inversa ao abrir esse link.
+function codificarPartilha(obj) {
+    const json = JSON.stringify(obj);
+    const bytes = new TextEncoder().encode(json);
+    let binary = "";
+    bytes.forEach((b) => { binary += String.fromCharCode(b); });
+    return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function descodificarPartilha(str) {
+    const base64 = str.replace(/-/g, "+").replace(/_/g, "/");
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return JSON.parse(new TextDecoder().decode(bytes));
+}
+
 function parseAnalysisJson(text) {
     const clean = text.replace(/```json|```/g, "").trim();
     try { return JSON.parse(clean); }
@@ -1283,6 +1587,7 @@ function validateFullReport(parsed) {
     if (typeof parsed.internationalBenchmark !== "string") parsed.internationalBenchmark = "";
     if (!parsed.roadmap || typeof parsed.roadmap !== "object") parsed.roadmap = { shortTerm: [], mediumTerm: [], longTerm: [] };
     ["shortTerm", "mediumTerm", "longTerm"].forEach((k) => { if (!Array.isArray(parsed.roadmap[k])) parsed.roadmap[k] = []; });
+    if (!Array.isArray(parsed.organizationActions)) parsed.organizationActions = [];
 }
 
 // Contagem determinística dos marcadores G0/G1/G2 por linha orçamental —
@@ -1370,7 +1675,17 @@ function OSGAnalyzer() {
     const [ficheiroNome, setFicheiroNome] = useState("");
     const [extraindo, setExtraindo] = useState(false);
     const [erroFicheiro, setErroFicheiro] = useState("");
+    const [changesSaved, setChangesSaved] = useState(false);
+    const [savingChanges, setSavingChanges] = useState(false);
+    const [linkPartilhadoCopiado, setLinkPartilhadoCopiado] = useState(false);
+    const [novaLinhaNome, setNovaLinhaNome] = useState("");
+    const [novaLinhaMarcador, setNovaLinhaMarcador] = useState("G0");
+    const [novaLinhaComentario, setNovaLinhaComentario] = useState("");
+    const [showAddLine, setShowAddLine] = useState(false);
+    const [sharedView, setSharedView] = useState(false);
+    const [manualSessionInput, setManualSessionInput] = useState("");
     const [showFrameworks, setShowFrameworks] = useState(false);
+    const [showPrivacy, setShowPrivacy] = useState(false);
 
     // ---- Relatório completo ----
     const [fullReport, setFullReport] = useState(null);
@@ -1398,6 +1713,23 @@ function OSGAnalyzer() {
     const [showCompare, setShowCompare] = useState(false);
     const [compareData, setCompareData] = useState([]);
     const [compareLoading, setCompareLoading] = useState(false);
+
+    // Deteta um link partilhado (#share=...) ao carregar a página — funciona
+    // sem código de acesso, pois o resultado já vem embutido no próprio URL.
+    useEffect(() => {
+        const hash = window.location.hash;
+        if (hash && hash.startsWith("#share=")) {
+            try {
+                const payload = descodificarPartilha(hash.slice(7));
+                if (payload && payload.result) {
+                    if (payload.lang && LANGUAGES[payload.lang]) setLang(payload.lang);
+                    setResult(payload.result);
+                    setStatus("done");
+                    setSharedView(true);
+                }
+            } catch { /* link inválido ou corrompido — ignora e segue para o portal normal */ }
+        }
+    }, []);
 
     useEffect(() => {
         let cancelado = false;
@@ -1446,6 +1778,18 @@ function OSGAnalyzer() {
         setGateStatus("checking");
         window.history.replaceState({}, "", window.location.pathname);
     }
+    // Recurso manual para quando o webhook do Stripe demora mais do que as
+    // tentativas automáticas — o utilizador pode colar o ID de sessão que
+    // recebeu na página de confirmação de pagamento da Stripe.
+    async function verificarSessaoManual() {
+        const sessionId = manualSessionInput.trim();
+        if (!sessionId) return;
+        try {
+            const data = await chamarAPI({ action: "get_purchased_code", sessionId });
+            setPaymentCode(data.code);
+            setPaymentError(false);
+        } catch { setPaymentError(true); }
+    }
 
     async function entrarComCodigo() {
         const codigo = gateInput.trim();
@@ -1476,8 +1820,19 @@ function OSGAnalyzer() {
     }
     function verHistoricoItem(item) {
         setResult(item.result); setExemploAtivo(null); setStatus("done");
-        setFullReport(null); setFullReportStatus("idle"); setShowFullReport(false);
-        setShowHistory(false); setShowAdmin(false);
+        // Se este item já tiver um relatório completo previamente guardado
+        // (via "Guardar alterações"), recupera-o também, evitando gerar de novo.
+        if (item.fullReport) { setFullReport(item.fullReport); setFullReportStatus("done"); }
+        else { setFullReport(null); setFullReportStatus("idle"); }
+        setShowFullReport(false);
+        setShowHistory(false); setShowAdmin(false); setChangesSaved(false);
+    }
+    async function eliminarHistoricoItem(item) {
+        if (!window.confirm(s.deleteHistoryConfirm)) return;
+        try {
+            await apagarHistoricoEntrada(accessCode, item);
+            setHistory((prev) => prev.filter((h) => h.savedAt !== item.savedAt));
+        } catch { setErrorMsg(s.deleteHistoryError); }
     }
     async function abrirAdmin() {
         setShowHistory(false); setShowAdmin(true); setAdminLoading(true);
@@ -1785,6 +2140,8 @@ Produza um relatório com as seguintes secções:
 
 5b. "roadmap": um roteiro de próximos passos concretos, agrupado em 3 horizontes temporais, cada um com 2-4 ações objetivas e realistas (não repita literalmente as "recommendations" — desdobre-as em passos práticos e sequenciados): {"shortTerm": ["..."] (0-6 meses, ações administrativas rápidas e de baixo custo), "mediumTerm": ["..."] (6-18 meses, mudanças de processo, formação, ferramentas), "longTerm": ["..."] (18+ meses, mudanças estruturais/legais, institucionalização plena)}.
 
+5c. "organizationActions": recomendações e próximo passo ESPECÍFICOS para cada ministério/organização/entidade orçamental efetivamente identificável no texto (a partir dos nomes dos ministérios, organismos ou dos "lineItems" já classificados) — não invente organizações que não constem do texto. Para cada organização (máximo 8, priorizando as com maior peso orçamental ou pior desempenho de género), devolva: {"organization": "<nome exato da organização/ministério tal como aparece no texto>", "currentMarker": "<G0|G1|G2|G3|nível predominante nas linhas dessa organização, ou \\"N/D\\" se não houver marcador associável>", "recommendation": "<1 recomendação específica e acionável para esta organização, máx 25 palavras>", "nextStep": "<1 próximo passo concreto e imediato para esta organização, máx 20 palavras>"}. Se o texto não permitir identificar organizações distintas com informação suficiente, devolva array vazio.
+
 6. "annexEvidence": array de até 8 itens, cada um com "item" (nome curto do que está a ser evidenciado, ex.: nome do projeto ou dimensão) e "quote" (paráfrase curta, máx 25 palavras, de um trecho relevante do texto original fornecido — nunca uma citação literal longa, e nunca inventada).
 
 7. "internationalBenchmark": parágrafo de 70-100 palavras que posiciona a distribuição G0/G1/G2 já calculada (use os números exatos fornecidos acima, não invente outros) face a padrões de referência publicamente conhecidos e estáveis — sem inventar estatísticas do país em causa: a União Europeia exige que pelo menos 85% das ações tenham marcador G1 ou superior; o PNUD tem como meta 15% em GEN3 (equivalente a G2) até 2030 e 0% em GEN0; o Banco Mundial exige o seu "gender tag" em pelo menos 55% das operações aprovadas. Compare a percentagem de G1+G2 da análise com estas referências (ex.: "muito abaixo do referencial de 85% da UE") e conclua com uma frase sobre a distância a percorrer. Não afirme que o país está formalmente sujeito a estas metas — são pontos de comparação internacional, não obrigações legais do país analisado.
@@ -1792,7 +2149,7 @@ Produza um relatório com as seguintes secções:
 AUTOVERIFICAÇÃO (mental, não incluir na resposta): confirme que "sectorAnalysis" só tem conteúdo se o texto original realmente tiver estrutura setorial/ministerial suficiente, que nenhuma "narrative" contradiz a pontuação já atribuída na análise, e que nenhum facto foi inventado além do texto original e da análise fornecida.
 
 Responda APENAS com um JSON válido, sem markdown, neste formato exato:
-{"executiveSummary": "...", "methodology": "...", "dimensionAnalysis": [{"key": "<key>", "narrative": "..."}], "sectorAnalysis": "...", "recommendations": ["...", "..."], "annexEvidence": [{"item": "...", "quote": "..."}], "internationalBenchmark": "...", "roadmap": {"shortTerm": ["...", "..."], "mediumTerm": ["...", "..."], "longTerm": ["...", "..."]}}
+{"executiveSummary": "...", "methodology": "...", "dimensionAnalysis": [{"key": "<key>", "narrative": "..."}], "sectorAnalysis": "...", "recommendations": ["...", "..."], "annexEvidence": [{"item": "...", "quote": "..."}], "internationalBenchmark": "...", "roadmap": {"shortTerm": ["...", "..."], "mediumTerm": ["...", "..."], "longTerm": ["...", "..."]}, "organizationActions": [{"organization": "...", "currentMarker": "...", "recommendation": "...", "nextStep": "..."}]}
 
 Use as keys exatas de dimensão: ${MODULE_KEYS.join(", ")}.
 
@@ -1801,8 +2158,10 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta deve ser escrita inteiramente em ${LA
 
     async function analisar() {
         if (!input.trim()) return;
+        if (input.trim().length < 40) { setStatus("error"); setErrorMsg(s.errInputTooShort); return; }
         setStatus("loading"); setErrorMsg(""); setExemploAtivo(null);
         setFullReport(null); setFullReportStatus("idle"); setShowFullReport(false);
+        setChangesSaved(false);
         try {
             const system = buildSystemPrompt();
             let conteudoParaAnalise = input;
@@ -1866,6 +2225,7 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta deve ser escrita inteiramente em ${LA
             setFullReport(parsed);
             setFullReportStatus("done");
             setShowFullReport(true);
+            setChangesSaved(false);
         } catch (e) {
             setFullReportStatus("error");
         }
@@ -1958,12 +2318,25 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta deve ser escrita inteiramente em ${LA
             });
         }
 
+        if (report.organizationActions && report.organizationActions.length > 0) {
+            secaoTitulo(s.orgActionsTitle);
+            report.organizationActions.forEach((oa) => {
+                texto(`${oa.organization} — ${s.orgActionsCurrentLabel}: ${oa.currentMarker}`, { bold: true, size: 10, color: [31, 93, 91] });
+                texto(oa.recommendation, { size: 9.5 });
+                texto(`${s.orgActionsNextStep}: ${oa.nextStep}`, { size: 9, color: [122, 143, 140] });
+                novaLinha(4);
+            });
+        }
+
         if (report.annexEvidence && report.annexEvidence.length > 0) {
             secaoTitulo(s.fullReportAnnex);
             report.annexEvidence.forEach((ev) => {
                 texto(`${ev.item}: “${ev.quote}”`, { size: 9, color: [122, 143, 140] });
             });
         }
+
+        novaLinha(10);
+        texto(s.methodologyDisclaimer, { size: 8, color: [154, 166, 163] });
 
         doc.save(`relatorio-osg-${lang}.pdf`);
     }
@@ -1985,6 +2358,11 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta deve ser escrita inteiramente em ${LA
         ].join("") : "";
         const anexo_html = (report.annexEvidence || []).map((ev) =>
             `<tr><td style="padding:4pt;border:1px solid #DED7C6;font-weight:bold;">${ev.item}</td><td style="padding:4pt;border:1px solid #DED7C6;font-style:italic;">${ev.quote}</td></tr>`
+        ).join("");
+        const orgActions_html = (report.organizationActions || []).map((oa) =>
+            `<h3 style="color:#1F5D5B;font-size:12pt;margin-bottom:2pt;">${oa.organization} — ${s.orgActionsCurrentLabel}: ${oa.currentMarker}</h3>
+             <p style="margin:0 0 4pt 0;">${oa.recommendation}</p>
+             <p style="margin:0 0 12pt 0;color:#7A8F8C;font-size:9pt;">${s.orgActionsNextStep}: ${oa.nextStep}</p>`
         ).join("");
         const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
 <head><meta charset="utf-8"><title>${s.fullReportTitle}</title></head>
@@ -2011,7 +2389,10 @@ ${report.internationalBenchmark && report.internationalBenchmark.trim() ? `<h2 s
 
 ${roadmap_html ? `<h2 style="color:#16302E;">${s.roadmapTitle}</h2>${roadmap_html}` : ""}
 
+${orgActions_html ? `<h2 style="color:#16302E;">${s.orgActionsTitle}</h2>${orgActions_html}` : ""}
+
 ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style="border-collapse:collapse;width:100%;">${anexo_html}</table>` : ""}
+<p style="margin-top:24pt;font-size:8pt;color:#9AA6A3;">${s.methodologyDisclaimer}</p>
 </body></html>`;
         const blob = new Blob(['\ufeff', html], { type: "application/msword" });
         const url = URL.createObjectURL(blob);
@@ -2026,17 +2407,82 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
 
     // Permite corrigir manualmente o marcador G0/G1/G2/G3 atribuído pela IA
     // a uma linha orçamental — o utilizador tem sempre a palavra final.
+    // Guarda o valor anterior e a data/hora para efeitos de auditoria.
     function alterarMarcador(idx, novoMarcador) {
         setResult((prev) => {
             if (!prev || !prev.lineItems) return prev;
-            const lineItems = prev.lineItems.map((li, i) => i === idx ? { ...li, marker: novoMarcador, manualOverride: true } : li);
+            const lineItems = prev.lineItems.map((li, i) => {
+                if (i !== idx || li.marker === novoMarcador) return li;
+                return {
+                    ...li,
+                    marker: novoMarcador,
+                    manualOverride: true,
+                    previousMarker: li.manualOverride ? li.previousMarker : li.marker,
+                    overrideTimestamp: new Date().toISOString(),
+                };
+            });
             return { ...prev, lineItems };
         });
+        setChangesSaved(false);
+    }
+    // Adiciona uma linha orçamental introduzida manualmente pelo utilizador
+    // (não vinda da análise da IA) — útil quando a IA não detetou um projeto
+    // que o utilizador sabe que existe no orçamento.
+    function adicionarLinha(nome, marcador, comentario) {
+        if (!nome || !nome.trim()) return;
+        setResult((prev) => {
+            if (!prev) return prev;
+            const novaLinha = { name: nome.trim(), marker: marcador, comment: comentario && comentario.trim() ? comentario.trim() : "", manualEntry: true };
+            return { ...prev, lineItems: [...(prev.lineItems || []), novaLinha] };
+        });
+        setChangesSaved(false);
+    }
+    function removerLinha(idx) {
+        setResult((prev) => {
+            if (!prev || !prev.lineItems) return prev;
+            return { ...prev, lineItems: prev.lineItems.filter((_, i) => i !== idx) };
+        });
+        setChangesSaved(false);
+    }
+    async function guardarAlteracoes() {
+        if (!result) return;
+        setSavingChanges(true);
+        const ok = await guardarHistorico(accessCode, { lang, inputExcerpt: input.slice(0, 400), result, fullReport, savedAt: new Date().toISOString() });
+        setSavingChanges(false);
+        setChangesSaved(ok);
+        if (ok) setTimeout(() => setChangesSaved(false), 3000);
+    }
+    function baixarCSV(result) {
+        const header = ["marker", "name", "comment", "manualOverride"];
+        const linhas = (result.lineItems || []).map((li) => [li.marker, li.name, li.comment || "", li.manualOverride ? "sim" : "não"]);
+        const escapar = (v) => `"${String(v).replace(/"/g, '""')}"`;
+        const csv = [header, ...linhas].map((row) => row.map(escapar).join(",")).join("\n");
+        const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `marcadores-osg-${lang}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+    async function partilharAnalise() {
+        if (!result) return;
+        try {
+            const payload = codificarPartilha({ lang, result });
+            const url = `${window.location.origin}${window.location.pathname}#share=${payload}`;
+            await navigator.clipboard.writeText(url);
+            setLinkPartilhadoCopiado(true);
+            setTimeout(() => setLinkPartilhadoCopiado(false), 2500);
+        } catch {}
     }
     function reiniciar() {
+        if (result && !window.confirm(s.confirmRestart)) return;
         setInput(""); setResult(null); setExemploAtivo(null); setStatus("idle");
         setCopiado(false); setFicheiroNome(""); setErroFicheiro("");
         setFullReport(null); setFullReportStatus("idle"); setShowFullReport(false);
+        setChangesSaved(false);
     }
     function verExemplo(pais) {
         const ex = EXEMPLOS_PT[pais];
@@ -2045,7 +2491,7 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
         setFullReport(null); setFullReportStatus("idle"); setShowFullReport(false);
     }
 
-    if (gateStatus !== "ok") {
+    if (gateStatus !== "ok" && !sharedView) {
         if (gateStatus === "payment") {
             return (React.createElement("div", { className: "min-h-screen w-full flex items-center justify-center px-6", dir: isRTL ? "rtl" : "ltr", style: { background: "#F6F3ED", fontFamily: bodyFont, color: "#16302E" } },
                 React.createElement("div", { className: "w-full max-w-sm text-center" },
@@ -2056,7 +2502,20 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
                         !paymentCode && !paymentError && React.createElement(React.Fragment, null,
                             React.createElement(Loader2, { className: "w-6 h-6 animate-spin mx-auto mb-3", style: { color: "#1F5D5B" } }),
                             React.createElement("p", { className: "text-sm", style: { color: "#7A8F8C" } }, s.paymentChecking)),
-                        paymentError && React.createElement("p", { className: "text-sm", style: { color: "#B5541F" } }, s.paymentError),
+                        paymentError && React.createElement(React.Fragment, null,
+                            React.createElement("p", { className: "text-sm mb-4", style: { color: "#B5541F" } }, s.paymentError),
+                            React.createElement("label", { className: "text-xs block mb-1.5", style: { color: "#7A8F8C" } }, s.paymentManualLabel),
+                            React.createElement("input", {
+                                type: "text", value: manualSessionInput, onChange: (e) => setManualSessionInput(e.target.value),
+                                onKeyDown: (e) => { if (e.key === "Enter") verificarSessaoManual(); },
+                                placeholder: "cs_...", className: "w-full border rounded-md px-3 py-2 text-sm outline-none mb-2",
+                                style: { borderColor: "#DED7C6" },
+                            }),
+                            React.createElement("button", {
+                                onClick: verificarSessaoManual, disabled: !manualSessionInput.trim(),
+                                className: "w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium disabled:opacity-40",
+                                style: { background: "#1F5D5B", color: "#F6F3ED" },
+                            }, s.paymentManualButton)),
                         paymentCode && React.createElement(React.Fragment, null,
                             React.createElement(Check, { className: "w-8 h-8 mx-auto mb-3", style: { color: "#1F5D5B" } }),
                             React.createElement("h1", { className: "text-base font-medium mb-2", style: { fontFamily: headingFont } }, s.paymentSuccessTitle),
@@ -2100,6 +2559,12 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
 
     return (React.createElement("div", { className: "min-h-screen w-full", dir: isRTL ? "rtl" : "ltr", style: { background: "#F6F3ED", fontFamily: bodyFont, color: "#16302E" } },
         React.createElement("div", { className: "max-w-3xl mx-auto px-6 py-14" },
+            sharedView && React.createElement("div", { className: "rounded-lg p-3 mb-6 flex items-center justify-between gap-3 flex-wrap", style: { background: "#EDE8DC", color: "#495C59" } },
+                React.createElement("span", { className: "text-xs" }, s.shareBannerText),
+                React.createElement("button", {
+                    onClick: () => { window.location.hash = ""; window.location.reload(); },
+                    className: "text-xs underline flex-shrink-0", style: { color: "#1F5D5B" },
+                }, s.shareBannerBack)),
             React.createElement("div", { className: "flex items-center justify-between gap-3 mb-3 flex-wrap" },
                 React.createElement("div", { className: "flex items-center gap-3" },
                     React.createElement(Scale, { className: "w-6 h-6", style: { color: "#C9A227" }, strokeWidth: 1.75 }),
@@ -2133,7 +2598,7 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
                     React.createElement("span", { className: "text-xs", style: { color: "#9AA6A3" } }, s.charCount(input.length)),
                     React.createElement("button", { onClick: analisar, disabled: !input.trim() || status === "loading", className: "inline-flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-medium transition-opacity disabled:opacity-40", style: { background: "#1F5D5B", color: "#F6F3ED" } }, status === "loading" ? (React.createElement(React.Fragment, null,
                         React.createElement(Loader2, { className: "w-4 h-4 animate-spin" }), " ", progresso || s.analyzingButton)) : (React.createElement(React.Fragment, null,
-                        s.analyzeButton + " ", React.createElement(ArrowEnd, { className: "w-4 h-4" }))))))),
+                        s.analyzeButton + " ", React.createElement(ArrowEnd, { className: "w-4 h-4", style: isRTL ? { transform: "scaleX(-1)" } : undefined }))))))),
             showHistory && (React.createElement("div", { className: "rounded-lg border p-5 mb-4", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
                 React.createElement("div", { className: "flex items-center justify-between mb-3" },
                     React.createElement("h2", { className: "text-sm font-medium" }, s.historyLabel),
@@ -2141,16 +2606,21 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
                 historyLoading && React.createElement(Loader2, { className: "w-4 h-4 animate-spin", style: { color: "#7A8F8C" } }),
                 !historyLoading && history.length === 0 && React.createElement("p", { className: "text-xs", style: { color: "#9AA6A3" } }, s.historyEmpty),
                 !historyLoading && history.length > 0 && React.createElement("div", { className: "space-y-2" }, history.map((item, idx) => (
-                    React.createElement("button", { key: idx, onClick: () => verHistoricoItem(item), className: "w-full text-left rounded-md border p-3 hover:bg-gray-50", style: { borderColor: "#EDE8DC" } },
-                        React.createElement("div", { className: "flex items-center justify-between" },
-                            React.createElement("span", { className: "text-sm font-medium" }, item.result ? item.result.overallLevel : "—"),
-                            React.createElement("span", { className: "text-xs", style: { color: "#9AA6A3" } }, item.savedAt ? new Date(item.savedAt).toLocaleDateString() : "")),
-                        React.createElement("p", { className: "text-xs mt-1 truncate", style: { color: "#7A8F8C" } }, item.inputExcerpt || ""))))),
+                    React.createElement("div", { key: idx, className: "flex items-stretch gap-2" },
+                        React.createElement("button", { onClick: () => verHistoricoItem(item), className: "flex-1 text-left rounded-md border p-3 hover:bg-gray-50 min-w-0", style: { borderColor: "#EDE8DC" } },
+                            React.createElement("div", { className: "flex items-center justify-between" },
+                                React.createElement("span", { className: "text-sm font-medium" }, item.result ? item.result.overallLevel : "—"),
+                                React.createElement("span", { className: "text-xs", style: { color: "#9AA6A3" } }, item.savedAt ? new Date(item.savedAt).toLocaleDateString() : "")),
+                            React.createElement("p", { className: "text-xs mt-1 truncate", style: { color: "#7A8F8C" } }, item.inputExcerpt || "")),
+                        React.createElement("button", {
+                            onClick: () => eliminarHistoricoItem(item), "aria-label": s.deleteHistoryButton, title: s.deleteHistoryButton,
+                            className: "flex-shrink-0 rounded-md border px-3 text-xs", style: { borderColor: "#EDE8DC", color: "#B5541F" },
+                        }, "×"))))),
                 !historyLoading && history.length > 1 && React.createElement("button", {
                     onClick: () => { setShowHistory(false); setShowTrends(true); },
                     className: "inline-flex items-center gap-1.5 text-xs mt-4",
                     style: { color: "#1F5D5B" },
-                }, React.createElement(ArrowEnd, { className: "w-3.5 h-3.5" }), " " + s.trendsButton))),
+                }, React.createElement(ArrowEnd, { className: "w-3.5 h-3.5", style: isRTL ? { transform: "scaleX(-1)" } : undefined }), " " + s.trendsButton))),
             showTrends && (React.createElement("div", { className: "rounded-lg border p-5 mb-4", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
                 React.createElement("div", { className: "flex items-center justify-between mb-4" },
                     React.createElement("h2", { className: "text-sm font-medium" }, s.trendsTitle),
@@ -2272,7 +2742,18 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
                     React.createElement("button", { onClick: () => baixarWord(result), className: "inline-flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
                         React.createElement(Download, { className: "w-3.5 h-3.5" }), " " + s.downloadWord),
                     React.createElement("button", { onClick: () => window.print(), className: "inline-flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
-                        React.createElement(Printer, { className: "w-3.5 h-3.5" }), " " + s.printResult)),
+                        React.createElement(Printer, { className: "w-3.5 h-3.5" }), " " + s.printResult),
+                    !sharedView && React.createElement("button", { onClick: () => baixarCSV(result), className: "inline-flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
+                        React.createElement(Download, { className: "w-3.5 h-3.5" }), " " + s.downloadCsv),
+                    !sharedView && React.createElement("button", { onClick: partilharAnalise, className: "inline-flex items-center gap-1.5 text-xs", style: { color: "#7A8F8C" } },
+                        linkPartilhadoCopiado ? React.createElement(Check, { className: "w-3.5 h-3.5" }) : React.createElement(Copy, { className: "w-3.5 h-3.5" }), " " + (linkPartilhadoCopiado ? s.shareCopied : s.shareButton)),
+                    !sharedView && React.createElement("button", {
+                        onClick: guardarAlteracoes, disabled: savingChanges,
+                        className: "inline-flex items-center gap-1.5 text-xs disabled:opacity-40", style: { color: changesSaved ? "#1F5D5B" : "#7A8F8C" },
+                    },
+                        changesSaved ? React.createElement(Check, { className: "w-3.5 h-3.5" }) : React.createElement(Download, { className: "w-3.5 h-3.5" }),
+                        " " + (savingChanges ? s.saveChangesSaving : changesSaved ? s.saveChangesDone : s.saveChangesButton))),
+                !sharedView && !changesSaved && result.lineItems && result.lineItems.some((li) => li.manualOverride || li.manualEntry) && React.createElement("p", { className: "text-xs -mt-4 mb-4", style: { color: "#C9A227" } }, s.unsavedChangesNote),
                 React.createElement("div", { className: "space-y-3" }, mods.map((mod) => {
                     const m = result.modules.find((r) => r.key === mod.key);
                     if (!m) return null;
@@ -2289,7 +2770,7 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
                         React.createElement("p", { className: "text-sm mt-3", style: { color: "#3E4C49" } }, m.finding),
                         m.evidence && React.createElement("p", { className: "text-xs mt-1.5 italic", style: { color: "#9AA6A3" } }, `${s.evidenceLabel}: ${m.evidence}`),
                         React.createElement("p", { className: "text-sm mt-1.5 flex items-start gap-1.5", style: { color: "#1F5D5B" } },
-                            React.createElement(ArrowEnd, { className: "w-3.5 h-3.5 mt-0.5 flex-shrink-0" }), m.recommendation)));
+                            React.createElement(ArrowEnd, { className: "w-3.5 h-3.5 mt-0.5 flex-shrink-0", style: isRTL ? { transform: "scaleX(-1)" } : undefined }), m.recommendation)));
                 })),
                 result.lineItems && result.lineItems.length > 0 && (React.createElement("div", { className: "mt-6" },
                     React.createElement("div", { className: "flex items-center gap-2 mb-1" },
@@ -2330,18 +2811,53 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
                     })(),
                     React.createElement("div", { className: "rounded-lg border overflow-hidden", style: { borderColor: "#DED7C6", background: "#FFFFFF" } }, result.lineItems.map((li, idx) => {
                         return (React.createElement("div", { key: idx, className: "flex items-start justify-between gap-4 p-3", style: { borderTop: idx > 0 ? "1px solid #EDE8DC" : "none" } },
-                            React.createElement("div", null,
+                            React.createElement("div", { className: "min-w-0" },
                                 React.createElement("div", { className: "text-sm font-medium" }, li.name),
-                                React.createElement("div", { className: "text-xs mt-0.5", style: { color: "#7A8F8C" } }, li.comment),
-                                li.manualOverride && React.createElement("div", { className: "text-xs mt-1 italic", style: { color: "#C9A227" } }, s.manualOverrideLabel)),
+                                li.comment && React.createElement("div", { className: "text-xs mt-0.5", style: { color: "#7A8F8C" } }, li.comment),
+                                li.manualOverride && React.createElement("div", { className: "text-xs mt-1", style: { color: "#C9A227" } },
+                                    s.manualOverrideLabel + (li.previousMarker ? ` — ${s.auditPrevious(li.previousMarker)}` : "")),
+                                li.manualEntry && React.createElement("div", { className: "text-xs mt-1 italic", style: { color: "#9AA6A3" } }, s.addLineButton)),
+                            React.createElement("div", { className: "flex items-center gap-1.5 flex-shrink-0" },
+                                React.createElement("select", {
+                                    value: li.marker,
+                                    onChange: (e) => alterarMarcador(idx, e.target.value),
+                                    "aria-label": s.lineItemsLabel,
+                                    className: "text-xs px-2 py-1 rounded font-medium border-0 outline-none cursor-pointer appearance-none text-center",
+                                    style: { fontFamily: "'IBM Plex Mono', monospace", color: "#FFFFFF", background: (markerInfo[li.marker] || {}).color || "#9AA6A3" },
+                                }, Object.keys(markerInfo).map((code) => React.createElement("option", { key: code, value: code, style: { color: "#16302E", background: "#FFFFFF" } }, code))),
+                                React.createElement("button", {
+                                    onClick: () => removerLinha(idx), "aria-label": s.removeLineButton, title: s.removeLineButton,
+                                    className: "text-xs leading-none px-1.5 py-1 rounded",
+                                    style: { color: "#B5541F" },
+                                }, "×"))));
+                    })),
+                    showAddLine ? (
+                        React.createElement("div", { className: "mt-3 rounded-lg border p-3", style: { borderColor: "#DED7C6", background: "#FBFAF6" } },
+                            React.createElement("input", {
+                                type: "text", value: novaLinhaNome, onChange: (e) => setNovaLinhaNome(e.target.value),
+                                placeholder: s.addLineNamePlaceholder,
+                                className: "w-full border rounded-md px-3 py-2 text-sm outline-none mb-2", style: { borderColor: "#DED7C6" },
+                            }),
+                            React.createElement("input", {
+                                type: "text", value: novaLinhaComentario, onChange: (e) => setNovaLinhaComentario(e.target.value),
+                                placeholder: s.addLineCommentPlaceholder,
+                                className: "w-full border rounded-md px-3 py-2 text-sm outline-none mb-2", style: { borderColor: "#DED7C6" },
+                            }),
                             React.createElement("select", {
-                                value: li.marker,
-                                onChange: (e) => alterarMarcador(idx, e.target.value),
-                                "aria-label": s.lineItemsLabel,
-                                className: "text-xs flex-shrink-0 px-2 py-1 rounded font-medium border-0 outline-none cursor-pointer appearance-none text-center",
-                                style: { fontFamily: "'IBM Plex Mono', monospace", color: "#FFFFFF", background: (markerInfo[li.marker] || {}).color || "#9AA6A3" },
-                            }, Object.keys(markerInfo).map((code) => React.createElement("option", { key: code, value: code, style: { color: "#16302E", background: "#FFFFFF" } }, code)))));
-                    })))),
+                                value: novaLinhaMarcador, onChange: (e) => setNovaLinhaMarcador(e.target.value),
+                                className: "border rounded-md px-2 py-1.5 text-sm outline-none mb-3", style: { borderColor: "#DED7C6" },
+                            }, Object.keys(markerInfo).map((code) => React.createElement("option", { key: code, value: code }, code))),
+                            React.createElement("div", { className: "flex items-center gap-3" },
+                                React.createElement("button", {
+                                    onClick: () => { adicionarLinha(novaLinhaNome, novaLinhaMarcador, novaLinhaComentario); setNovaLinhaNome(""); setNovaLinhaComentario(""); setNovaLinhaMarcador("G0"); setShowAddLine(false); },
+                                    disabled: !novaLinhaNome.trim(),
+                                    className: "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium disabled:opacity-40",
+                                    style: { background: "#1F5D5B", color: "#F6F3ED" },
+                                }, s.addLineConfirm),
+                                React.createElement("button", { onClick: () => setShowAddLine(false), className: "text-xs", style: { color: "#7A8F8C" } }, s.addLineCancel)))
+                    ) : (
+                        React.createElement("button", { onClick: () => setShowAddLine(true), className: "mt-3 text-xs underline", style: { color: "#1F5D5B" } }, s.addLineButton)
+                    ))),
 
                 React.createElement("div", { className: "mt-8 rounded-lg border p-5 print:hidden", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
                     React.createElement("div", { className: "flex items-center gap-2 mb-1" },
@@ -2353,12 +2869,12 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
                         onClick: gerarRelatorioCompleto, disabled: fullReportStatus === "loading",
                         className: "inline-flex items-center gap-2 px-4 py-2 rounded-md text-xs font-medium disabled:opacity-40",
                         style: { background: "#1F5D5B", color: "#F6F3ED" },
-                    }, fullReportStatus === "loading" ? React.createElement(React.Fragment, null, React.createElement(Loader2, { className: "w-3.5 h-3.5 animate-spin" }), " " + s.fullReportGenerating) : React.createElement(React.Fragment, null, s.fullReportButton + " ", React.createElement(ArrowEnd, { className: "w-3.5 h-3.5" }))),
+                    }, fullReportStatus === "loading" ? React.createElement(React.Fragment, null, React.createElement(Loader2, { className: "w-3.5 h-3.5 animate-spin" }), " " + s.fullReportGenerating) : React.createElement(React.Fragment, null, s.fullReportButton + " ", React.createElement(ArrowEnd, { className: "w-3.5 h-3.5", style: isRTL ? { transform: "scaleX(-1)" } : undefined }))),
                     fullReportStatus === "done" && React.createElement("button", {
                         onClick: () => setShowFullReport(true),
                         className: "inline-flex items-center gap-2 px-4 py-2 rounded-md text-xs font-medium",
                         style: { background: "#1F5D5B", color: "#F6F3ED" },
-                    }, s.fullReportTitle + " ", React.createElement(ArrowEnd, { className: "w-3.5 h-3.5" }))),
+                    }, s.fullReportTitle + " ", React.createElement(ArrowEnd, { className: "w-3.5 h-3.5", style: isRTL ? { transform: "scaleX(-1)" } : undefined }))),
 
                 React.createElement("button", { onClick: reiniciar, className: "inline-flex items-center gap-2 mt-6 text-sm", style: { color: "#7A8F8C" } },
                     React.createElement(RotateCcw, { className: "w-3.5 h-3.5" }), " " + s.restartButton))),
@@ -2429,12 +2945,27 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
                                     React.createElement("li", { key: j, className: "text-sm", style: { color: "#3E4C49" } }, it)))))
                         )))),
 
+                fullReport.organizationActions && fullReport.organizationActions.length > 0 && (
+                    React.createElement("div", { className: "mb-4" },
+                        React.createElement("h3", { className: "text-xs uppercase tracking-wide mb-3", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#7A8F8C" } }, s.orgActionsTitle),
+                        React.createElement("div", { className: "space-y-3" }, fullReport.organizationActions.map((oa, i) => (
+                            React.createElement("div", { key: i, className: "rounded-lg border p-4", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
+                                React.createElement("div", { className: "flex items-start justify-between gap-4 mb-2" },
+                                    React.createElement("h4", { className: "text-sm font-medium" }, oa.organization),
+                                    React.createElement("span", { className: "text-xs flex-shrink-0 px-2 py-1 rounded font-medium", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#FFFFFF", background: (markerInfo[oa.currentMarker] || {}).color || "#9AA6A3" } }, oa.currentMarker)),
+                                React.createElement("p", { className: "text-sm", style: { color: "#3E4C49" } }, oa.recommendation),
+                                React.createElement("p", { className: "text-xs mt-1.5 flex items-start gap-1.5", style: { color: "#1F5D5B" } },
+                                    React.createElement(ArrowEnd, { className: "w-3.5 h-3.5 mt-0.5 flex-shrink-0", style: isRTL ? { transform: "scaleX(-1)" } : undefined }), `${s.orgActionsNextStep}: ${oa.nextStep}`))
+                        ))))),
+
                 fullReport.annexEvidence && fullReport.annexEvidence.length > 0 && (React.createElement("div", { className: "rounded-lg border overflow-hidden mb-6", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
                     React.createElement("h3", { className: "text-xs uppercase tracking-wide p-4 pb-2", style: { fontFamily: "'IBM Plex Mono', monospace", color: "#7A8F8C" } }, s.fullReportAnnex),
                     fullReport.annexEvidence.map((ev, idx) => (
                         React.createElement("div", { key: idx, className: "px-4 py-3", style: { borderTop: idx > 0 ? "1px solid #EDE8DC" : "none" } },
                             React.createElement("div", { className: "text-sm font-medium" }, ev.item),
-                            React.createElement("div", { className: "text-xs mt-0.5 italic", style: { color: "#9AA6A3" } }, `“${ev.quote}”`))))))
+                            React.createElement("div", { className: "text-xs mt-0.5 italic", style: { color: "#9AA6A3" } }, `“${ev.quote}”`)))))),
+
+                React.createElement("p", { className: "text-xs italic mt-6", style: { color: "#9AA6A3" } }, s.methodologyDisclaimer)
             )),
             React.createElement("div", { className: "mt-14" },
                 React.createElement("button", {
@@ -2452,7 +2983,15 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
                                 React.createElement("div", { className: "text-xs mt-1", style: { color: "#1F5D5B" } }, fw.instrument),
                                 React.createElement("div", { className: "text-xs mt-1", style: { color: "#3E4C49" } }, fw.scale),
                                 React.createElement("div", { className: "text-xs mt-1 italic", style: { color: "#9AA6A3" } }, fw.note)))));
-                })()),
+                })(),
+                React.createElement("button", {
+                    onClick: () => setShowPrivacy((v) => !v),
+                    className: "inline-flex items-center gap-1.5 text-xs underline mt-3 print:hidden",
+                    style: { color: "#7A8F8C" },
+                }, s.privacyToggle),
+                showPrivacy && React.createElement("div", { className: "mt-3 rounded-lg border p-4", style: { borderColor: "#DED7C6", background: "#FFFFFF" } },
+                    React.createElement("h3", { className: "text-sm font-medium mb-2", style: { fontFamily: headingFont } }, s.privacyTitle),
+                    React.createElement("p", { className: "text-xs", style: { color: "#7A8F8C" } }, s.privacyText))),
             React.createElement("div", { className: "mt-6 flex items-center gap-2 text-xs", style: { color: "#9AA6A3" } },
                 React.createElement(FileText, { className: "w-3.5 h-3.5" }), s.footerSources))));
 }
