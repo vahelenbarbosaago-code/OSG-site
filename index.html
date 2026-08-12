@@ -147,6 +147,23 @@ async function chamarAPI(payload, tentativa) {
     }
     return data;
 }
+// Executa uma lista de tarefas assíncronas com um limite de concorrência —
+// em vez de disparar tudo de uma vez (Promise.all), o que para documentos
+// grandes (até 12 partes) facilmente esgota o limite de pedidos por minuto
+// da API da Anthropic e provoca falhas em cascata.
+async function mapComConcorrenciaLimitada(items, limite, fn) {
+    const resultados = new Array(items.length);
+    let indice = 0;
+    async function trabalhador() {
+        while (indice < items.length) {
+            const i = indice++;
+            resultados[i] = await fn(items[i], i);
+        }
+    }
+    const trabalhadores = Array.from({ length: Math.min(limite, items.length) }, trabalhador);
+    await Promise.all(trabalhadores);
+    return resultados;
+}
 async function chamarWorker(system, userContent, maxTokens, accessCode) {
     const data = await chamarAPI({ system, messages: [{ role: "user", content: userContent }], max_tokens: maxTokens, accessCode });
     const text = (data.content || []).map((b) => b.text || "").join("");
@@ -500,6 +517,7 @@ const STRINGS = {
         gateRequestDemo: "Pedir uma demonstração",
         gateRequestSubject: "Pedido de demonstração — Analisador OSG",
         naoGuardarLabel: "Não guardar esta análise no histórico (útil para orçamentos particularmente sensíveis)",
+        pdfLibError: "Não foi possível carregar a biblioteca de PDF (verifica a tua ligação à internet ou restrições de rede). Experimenta 'Descarregar Word' em alternativa.",
         accessCodePlaceholder: "Código de acesso",
         accessCodeButton: "Entrar",
         accessCodeChecking: "A verificar…",
@@ -667,6 +685,7 @@ const STRINGS = {
         gateRequestDemo: "Demander une démonstration",
         gateRequestSubject: "Demande de démonstration — Analyseur OSG",
         naoGuardarLabel: "Ne pas enregistrer cette analyse dans l'historique (utile pour les budgets particulièrement sensibles)",
+        pdfLibError: "Impossible de charger la bibliothèque PDF (vérifiez votre connexion internet ou les restrictions réseau). Essayez plutôt 'Télécharger Word'.",
         accessCodePlaceholder: "Code d'accès",
         accessCodeButton: "Se connecter",
         accessCodeChecking: "Vérification…",
@@ -834,6 +853,7 @@ const STRINGS = {
         gateRequestDemo: "Request a demo",
         gateRequestSubject: "Demo request — OSG Analyser",
         naoGuardarLabel: "Do not save this analysis to history (useful for particularly sensitive budgets)",
+        pdfLibError: "Could not load the PDF library (check your internet connection or network restrictions). Try 'Download Word' instead.",
         accessCodePlaceholder: "Access code",
         accessCodeButton: "Log in",
         accessCodeChecking: "Checking…",
@@ -1001,6 +1021,7 @@ const STRINGS = {
         gateRequestDemo: "Solicitar una demostración",
         gateRequestSubject: "Solicitud de demostración — Analizador OSG",
         naoGuardarLabel: "No guardar este análisis en el historial (útil para presupuestos especialmente sensibles)",
+        pdfLibError: "No se pudo cargar la librería de PDF (comprueba tu conexión a internet o restricciones de red). Prueba 'Descargar Word' en su lugar.",
         accessCodePlaceholder: "Código de acceso",
         accessCodeButton: "Entrar",
         accessCodeChecking: "Verificando…",
@@ -1168,6 +1189,7 @@ const STRINGS = {
         gateRequestDemo: "طلب عرض توضيحي",
         gateRequestSubject: "طلب عرض توضيحي — محلل OSG",
         naoGuardarLabel: "عدم حفظ هذا التحليل في السجل (مفيد للميزانيات الحساسة بشكل خاص)",
+        pdfLibError: "تعذر تحميل مكتبة PDF (تحقق من اتصالك بالإنترنت أو قيود الشبكة). جرّب 'تنزيل Word' بدلاً من ذلك.",
         accessCodePlaceholder: "رمز الوصول",
         accessCodeButton: "تسجيل الدخول",
         accessCodeChecking: "جارٍ التحقق…",
@@ -1335,6 +1357,7 @@ const STRINGS = {
         gateRequestDemo: "申请演示",
         gateRequestSubject: "演示申请——OSG分析器",
         naoGuardarLabel: "不将此分析保存到历史记录中（适用于特别敏感的预算）",
+        pdfLibError: "无法加载PDF库（请检查您的网络连接或网络限制）。请尝试改用“下载Word”。",
         accessCodePlaceholder: "访问码",
         accessCodeButton: "登录",
         accessCodeChecking: "正在验证…",
@@ -1502,6 +1525,7 @@ const STRINGS = {
         gateRequestDemo: "Запросить демонстрацию",
         gateRequestSubject: "Запрос демонстрации — Анализатор OSG",
         naoGuardarLabel: "Не сохранять этот анализ в истории (полезно для особо чувствительных бюджетов)",
+        pdfLibError: "Не удалось загрузить библиотеку PDF (проверьте подключение к интернету или сетевые ограничения). Попробуйте вместо этого 'Скачать Word'.",
         accessCodePlaceholder: "Код доступа",
         accessCodeButton: "Войти",
         accessCodeChecking: "Проверка…",
@@ -1669,6 +1693,7 @@ const STRINGS = {
         gateRequestDemo: "Omba onyesho",
         gateRequestSubject: "Ombi la onyesho — Kichambuzi cha OSG",
         naoGuardarLabel: "Usihifadhi uchambuzi huu kwenye historia (muhimu kwa bajeti nyeti sana)",
+        pdfLibError: "Haikuweza kupakia maktaba ya PDF (angalia muunganisho wako wa intaneti au ruhusa za mtandao). Jaribu 'Descarregar Word' badala yake.",
         accessCodePlaceholder: "Msimbo wa ufikiaji",
         accessCodeButton: "Ingia",
         accessCodeChecking: "Inathibitisha…",
@@ -2263,7 +2288,7 @@ function OSGAnalyzer() {
     }
 
     function baixarPdf(result) {
-        if (typeof jspdf === "undefined") return;
+        if (typeof jspdf === "undefined") { window.alert(s.pdfLibError); return; }
         const { jsPDF } = jspdf;
         const doc = new jsPDF({ unit: "pt", format: "a4" });
         const margem = 48;
@@ -2502,11 +2527,11 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta deve ser escrita inteiramente em ${LA
             if (input.length > ANALISE_CHUNK_SIZE) {
                 const partes = dividirEmPartes(input, ANALISE_CHUNK_SIZE);
                 setProgresso(s.progressChunking(partes.length));
-                const extratos = await Promise.all(partes.map(async (parte, i) => {
+                const extratos = await mapComConcorrenciaLimitada(partes, 3, async (parte, i) => {
                     const prompt = EXTRACTION_SYSTEM.replace("{N}", `${i + 1} de ${partes.length}`);
                     try { return parseAnalysisJson(await chamarWorker(prompt, parte, 1200, accessCode)); }
                     catch { return { notas: "", linhas: [] }; }
-                }));
+                });
                 setProgresso(s.progressSynthesizing);
                 conteudoParaAnalise = extratos.map((ex, i) => `--- Excerto ${i + 1}/${extratos.length} ---\nNotas: ${ex.notas || "(sem informação relevante)"}\nLinhas: ${JSON.stringify(ex.linhas || [])}`).join("\n\n");
             }
@@ -2573,7 +2598,7 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta deve ser escrita inteiramente em ${LA
     }
 
     function baixarRelatorioPdf(report, analysisResult) {
-        if (typeof jspdf === "undefined") return;
+        if (typeof jspdf === "undefined") { window.alert(s.pdfLibError); return; }
         const { jsPDF } = jspdf;
         const doc = new jsPDF({ unit: "pt", format: "a4" });
         const margem = 48;
