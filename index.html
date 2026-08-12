@@ -505,6 +505,7 @@ const STRINGS = {
         gateAboutBlurb: "O Analisador OSG aplica as normas internacionais de orçamentação sensível ao género (OCDE-CAD, UE, PEFA, PNUD) para analisar orçamentos públicos e atribuir o Marcador de Género G0-G3.",
         gateRequestDemo: "Pedir uma demonstração",
         gateRequestSubject: "Pedido de demonstração — Analisador OSG",
+        naoGuardarLabel: "Não guardar esta análise no histórico (útil para orçamentos particularmente sensíveis)",
         accessCodePlaceholder: "Código de acesso",
         accessCodeButton: "Entrar",
         accessCodeChecking: "A verificar…",
@@ -670,6 +671,7 @@ const STRINGS = {
         gateAboutBlurb: "L'Analyseur OSG applique les normes internationales de budgétisation sensible au genre (OCDE-CAD, UE, PEFA, PNUD) pour analyser les budgets publics et attribuer le Marqueur de Genre G0-G3.",
         gateRequestDemo: "Demander une démonstration",
         gateRequestSubject: "Demande de démonstration — Analyseur OSG",
+        naoGuardarLabel: "Ne pas enregistrer cette analyse dans l'historique (utile pour les budgets particulièrement sensibles)",
         accessCodePlaceholder: "Code d'accès",
         accessCodeButton: "Se connecter",
         accessCodeChecking: "Vérification…",
@@ -835,6 +837,7 @@ const STRINGS = {
         gateAboutBlurb: "The OSG Analyser applies international gender-responsive budgeting standards (OECD-DAC, EU, PEFA, UNDP) to analyse public budgets and assign the G0-G3 Gender Marker.",
         gateRequestDemo: "Request a demo",
         gateRequestSubject: "Demo request — OSG Analyser",
+        naoGuardarLabel: "Do not save this analysis to history (useful for particularly sensitive budgets)",
         accessCodePlaceholder: "Access code",
         accessCodeButton: "Log in",
         accessCodeChecking: "Checking…",
@@ -1000,6 +1003,7 @@ const STRINGS = {
         gateAboutBlurb: "El Analizador OSG aplica las normas internacionales de presupuestación con perspectiva de género (OCDE-CAD, UE, PEFA, PNUD) para analizar presupuestos públicos y asignar el Marcador de Género G0-G3.",
         gateRequestDemo: "Solicitar una demostración",
         gateRequestSubject: "Solicitud de demostración — Analizador OSG",
+        naoGuardarLabel: "No guardar este análisis en el historial (útil para presupuestos especialmente sensibles)",
         accessCodePlaceholder: "Código de acceso",
         accessCodeButton: "Entrar",
         accessCodeChecking: "Verificando…",
@@ -1165,6 +1169,7 @@ const STRINGS = {
         gateAboutBlurb: "يطبّق محلل OSG المعايير الدولية للميزانية المستجيبة للنوع الاجتماعي (OCDE-CAD، الاتحاد الأوروبي، PEFA، برنامج الأمم المتحدة الإنمائي) لتحليل الميزانيات العامة وتحديد المؤشر الجندري G0-G3.",
         gateRequestDemo: "طلب عرض توضيحي",
         gateRequestSubject: "طلب عرض توضيحي — محلل OSG",
+        naoGuardarLabel: "عدم حفظ هذا التحليل في السجل (مفيد للميزانيات الحساسة بشكل خاص)",
         accessCodePlaceholder: "رمز الوصول",
         accessCodeButton: "تسجيل الدخول",
         accessCodeChecking: "جارٍ التحقق…",
@@ -1330,6 +1335,7 @@ const STRINGS = {
         gateAboutBlurb: "OSG分析器应用国际性别响应式预算标准（OECD-DAC、欧盟、PEFA、联合国开发计划署）来分析公共预算并分配G0-G3性别标记。",
         gateRequestDemo: "申请演示",
         gateRequestSubject: "演示申请——OSG分析器",
+        naoGuardarLabel: "不将此分析保存到历史记录中（适用于特别敏感的预算）",
         accessCodePlaceholder: "访问码",
         accessCodeButton: "登录",
         accessCodeChecking: "正在验证…",
@@ -1495,6 +1501,7 @@ const STRINGS = {
         gateAboutBlurb: "Анализатор OSG применяет международные стандарты гендерного бюджетирования (ОЭСР-КСР, ЕС, PEFA, ПРООН) для анализа государственных бюджетов и присвоения гендерного маркера G0-G3.",
         gateRequestDemo: "Запросить демонстрацию",
         gateRequestSubject: "Запрос демонстрации — Анализатор OSG",
+        naoGuardarLabel: "Не сохранять этот анализ в истории (полезно для особо чувствительных бюджетов)",
         accessCodePlaceholder: "Код доступа",
         accessCodeButton: "Войти",
         accessCodeChecking: "Проверка…",
@@ -1660,6 +1667,7 @@ const STRINGS = {
         gateAboutBlurb: "Kichambuzi cha OSG kinatumia viwango vya kimataifa vya bajeti inayozingatia jinsia (OECD-DAC, EU, PEFA, UNDP) kuchambua bajeti za umma na kutoa Alama ya Kijinsia G0-G3.",
         gateRequestDemo: "Omba onyesho",
         gateRequestSubject: "Ombi la onyesho — Kichambuzi cha OSG",
+        naoGuardarLabel: "Usihifadhi uchambuzi huu kwenye historia (muhimu kwa bajeti nyeti sana)",
         accessCodePlaceholder: "Msimbo wa ufikiaji",
         accessCodeButton: "Ingia",
         accessCodeChecking: "Inathibitisha…",
@@ -1941,6 +1949,7 @@ function OSGAnalyzer() {
     const [ficheiroNome, setFicheiroNome] = useState("");
     const [extraindo, setExtraindo] = useState(false);
     const [erroFicheiro, setErroFicheiro] = useState("");
+    const [naoGuardar, setNaoGuardar] = useState(false);
     const [changesSaved, setChangesSaved] = useState(false);
     const [savingChanges, setSavingChanges] = useState(false);
     const [linkPartilhadoCopiado, setLinkPartilhadoCopiado] = useState(false);
@@ -2519,7 +2528,7 @@ IMPORTANTE SOBRE O IDIOMA: toda a resposta deve ser escrita inteiramente em ${LA
             } catch { /* mantém a análise original sem indicador de confiança */ }
 
             setResult(parsed); setStatus("done");
-            guardarHistorico(accessCode, { lang, inputExcerpt: input.slice(0, 400), result: parsed });
+            if (!naoGuardar) guardarHistorico(accessCode, { lang, inputExcerpt: input.slice(0, 400), result: parsed });
         } catch (e) {
             if (e && e.offline) {
                 setErrorMsg(s.errOffline);
@@ -2932,6 +2941,9 @@ ${anexo_html ? `<h2 style="color:#16302E;">${s.fullReportAnnex}</h2><table style
                     React.createElement("input", { id: "osg-file", type: "file", accept: ".pdf,.xlsx,.xls,.csv,.txt", onChange: lidarComFicheiro, disabled: extraindo, className: "hidden" }),
                     ficheiroNome && !erroFicheiro && React.createElement("span", { className: "text-xs truncate max-w-[160px]", style: { color: "#9AA6A3" } }, ficheiroNome)),
                 erroFicheiro && React.createElement("p", { className: "text-xs mt-2", style: { color: "#B5541F" } }, erroFicheiro),
+                React.createElement("label", { className: "flex items-center gap-2 text-xs mt-3 cursor-pointer", style: { color: "#7A8F8C" } },
+                    React.createElement("input", { type: "checkbox", checked: naoGuardar, onChange: (e) => setNaoGuardar(e.target.checked) }),
+                    s.naoGuardarLabel),
                 React.createElement("div", { className: "flex items-center justify-between mt-4 flex-wrap gap-2" },
                     React.createElement("span", { className: "text-xs", style: { color: "#9AA6A3" } }, s.charCount(input.length)),
                     React.createElement("button", { onClick: analisar, disabled: !input.trim() || status === "loading", className: "inline-flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-medium transition-opacity disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2", style: { background: "#1F5D5B", color: "#F6F3ED", outlineColor: "#C9A227" } }, status === "loading" ? (React.createElement(React.Fragment, null,
